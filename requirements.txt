@@ -30,3 +30,5 @@ scipy
 ruff
 pyaudio
 matplotlib
+isodate
+nanoid

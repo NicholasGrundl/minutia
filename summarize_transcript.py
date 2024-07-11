@@ -20,7 +20,7 @@ logger = setup_anthropic_logger()
 
 # Load environment variables
 ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
-MAX_TOKENS_OUTPUT = 1000  # Adjust based on your max_tokens_to_sample setting
+MAX_TOKENS_OUTPUT = 4096 # Max model output. Around 3.1K words (6-7 single spaced pages)
 
 # Model information
 anthropic_models = {
@@ -58,7 +58,36 @@ def prepare_transcript_for_summary(transcript_data):
 
 def create_summary_prompt(transcript_text):
     """Create a prompt for the language model to generate a summary."""
-    prompt = f"Please provide a concise summary of the following meeting transcript. Focus on the key points discussed, any decisions made, and action items if any. Here's the transcript:\n\n{transcript_text}\n\nPlease summarize this meeting transcript."
+    prompt = f"""Please provide a summary of the following meeting transcript. The target audience is a general reader who may not have been present at the meeting but wants to know the technical details discussed.
+    
+    <summaryformat>
+    Use markdown formatting for headers, bulleted lists, numbered lists and emphasis via bold and italics.
+
+    Try to include around a page or two of notes total balancing brevity with information content.
+    </summaryformat>
+
+    <summarydirections>
+    First create an executive summary section at the beginning of the summary providing a high level oiverview of who, what, where and when.
+
+    Second reflect critically on the major topics discussed in the meeting and make a numbered list of each of these major topics.
+
+    Third, create a heading section for each major topic and expand on the details focusing on technical content, existing or proposed projects or efforts, decisions, and timelines.
+
+    Fourth, review the existing summary text and add any additional information or relevant notes. 
+
+    Finally, end with a action items and conclusion section.
+    </summarydirections>
+
+
+    Here's the transcript:
+
+    <transcript>
+    {transcript_text}
+    
+    </transcript>
+    
+    Please summarize this meeting transcript based on the instructions given in <summaryformat> and <summarydirections>.
+    """
     return prompt
 
 def estimate_tokens(text):
@@ -79,8 +108,11 @@ def estimate_price(
     price = input_price + output_price
     return price
 
-def estimate_tokens_and_price(transcript_text, model='claude-3-5-sonnet'):
+def estimate_tokens_and_price(transcript_text, model='claude-3-5-sonnet', max_output_tokens=None):
     """Estimate tokens and price for summarizing the transcript."""
+    if max_output_tokens is None:
+        max_output_tokens = MAX_TOKENS_OUTPUT
+    
     if model not in anthropic_models:
         raise KeyError(f"model must be one of [{list(anthropic_models.keys())}]")
     
@@ -90,7 +122,7 @@ def estimate_tokens_and_price(transcript_text, model='claude-3-5-sonnet'):
     
     prompt = create_summary_prompt(transcript_text)
     input_tokens = estimate_tokens(prompt)
-    output_tokens = MAX_TOKENS_OUTPUT
+    output_tokens = max_output_tokens
     total_tokens = input_tokens + output_tokens
     estimated_price = estimate_price(
         input_tokens, 
@@ -106,8 +138,11 @@ def estimate_tokens_and_price(transcript_text, model='claude-3-5-sonnet'):
     
     return total_tokens, estimated_price
 
-def generate_summary(transcript_text, model_name='claude-3-5-sonnet'):
+def generate_summary(transcript_text, model_name='claude-3-5-sonnet', max_output_tokens=None, **kwargs):
     """Generate a summary using the Anthropic API."""
+    if max_output_tokens is None:
+        max_output_tokens = MAX_TOKENS_OUTPUT
+        
     if model_name not in anthropic_models:
         raise KeyError(f"model must be one of [{list(anthropic_models.keys())}]")
     model = anthropic_models.get(model_name)['name']
@@ -118,11 +153,12 @@ def generate_summary(transcript_text, model_name='claude-3-5-sonnet'):
     try:
         response = client.messages.create(
             model=model,
-            max_tokens=MAX_TOKENS_OUTPUT,
+            max_tokens=max_output_tokens,
             temperature=0.7,
             messages=[
                 {"role": "user", "content": prompt}
-            ]
+            ],
+            **kwargs
         )
         return response.content[0].text
     except Exception as e:
