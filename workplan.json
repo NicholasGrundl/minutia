@@ -1,0 +1,75 @@
+{
+    "plan_title": "OBS Video Recording to Summarized Notes Conversion Project",
+    "goal": "Develop a Python-based system to process OBS .mkv video recordings with multiple audio tracks, converting them into summarized meeting notes. The system should separate audio tracks, transcribe them using Whisper, align the transcripts, and generate a concise summary. This project aims to automate the creation of meeting notes from video recordings, improving efficiency and accessibility of information from recorded sessions.",
+    "context": "This project utilizes various libraries and AI models, including ffmpeg for audio processing, Whisper for transcription, and language models for summarization. The workflow is implemented in a Jupyter notebook environment, allowing for interactive development and testing.",
+    "workplan": [
+      {
+        "step": 1,
+        "title": "Set up the development environment",
+        "tasks": [
+          "Create and activate the Conda environment using the Makefile",
+          "Install required packages",
+          "Configure Jupyter Lab"
+        ]
+      },
+      {
+        "step": 2,
+        "title": "Create a Jupyter notebook for video processing",
+        "tasks": [
+          "Import necessary libraries",
+          "Define helper functions for file handling"
+        ]
+      },
+      {
+        "step": 3,
+        "title": "Implement audio track separation",
+        "tasks": [
+          "Use ffmpeg-python to extract audio tracks from .mkv file",
+          "Save microphone and desktop audio as separate files"
+        ]
+      },
+      {
+        "step": 4,
+        "title": "Transcribe audio tracks",
+        "tasks": [
+          "Use Whisper to transcribe microphone audio",
+          "Use Whisper to transcribe desktop audio",
+          "Save transcriptions with timestamps"
+        ]
+      },
+      {
+        "step": 5,
+        "title": "Align and combine transcripts",
+        "tasks": [
+          "Implement a function to merge transcripts based on timestamps",
+          "Create a combined, coherent transcript"
+        ]
+      },
+      {
+        "step": 6,
+        "title": "Summarize the transcript",
+        "tasks": [
+          "Use a language model (e.g., OpenAI or Anthropic) to summarize the transcript",
+          "Generate a concise meeting report"
+        ]
+      },
+      {
+        "step": 7,
+        "title": "Test the workflow",
+        "tasks": [
+          "Obtain a sample OBS .mkv recording",
+          "Run the entire process on the sample video",
+          "Verify output at each stage"
+        ]
+      },
+      {
+        "step": 8,
+        "title": "Optimize and refine",
+        "tasks": [
+          "Identify any performance bottlenecks",
+          "Refine the summarization prompt for better results",
+          "Add error handling and logging"
+        ]
+      }
+    ]
+  }
