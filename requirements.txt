@@ -23,3 +23,10 @@ ipywidgets
 panel
 
 click
+sounddevice
+numpy 
+scipy
+
+ruff
+pyaudio
+matplotlib

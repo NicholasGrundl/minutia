@@ -36,10 +36,16 @@ create_env_file:
 .PHONY: install
 install: 
 	pip install -r ./requirements.txt
+	pip freeze > requirements-lock.txt
+	@echo "Pinned requirements exported to requirements-lock.txt"
 
 .PHONY: uninstall
 uninstall:
 	@bash -c "pip uninstall -y -r <(pip freeze)"
+	@if [ -f requirements-lock.txt ]; then \
+		rm requirements-lock.txt; \
+		echo "Removed requirements-lock.txt"; \
+	fi
 
 #### Jupyter ####
 .PHONY: jupyter
