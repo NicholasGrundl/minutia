@@ -56,7 +56,7 @@ def process_audio_files(mic_audio_path, desktop_audio_path, output_dir, whisper_
             logger.info(f"Processing {audio_type} audio")
             transcription = transcribe_audio(audio_path, model_name=whisper_model_name)
             
-            output_path = os.path.join(output_dir, f"{audio_type}_transcription.txt")
+            output_path = os.path.join(output_dir, f"{audio_type}-whisper-{whisper_model_name}_transcription.txt")
             save_transcription(transcription, output_path)
 
         logger.info("Audio processing completed")
