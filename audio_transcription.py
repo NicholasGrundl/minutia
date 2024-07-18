@@ -47,7 +47,7 @@ def save_transcription(transcription, output_path):
 def process_audio_files(mic_audio_path, desktop_audio_path, output_dir, whisper_model_name='base'):
     try:
         os.makedirs(output_dir, exist_ok=True)
-
+        filenames = {}
         for audio_type, audio_path in [("microphone", mic_audio_path), ("desktop", desktop_audio_path)]:
             if not os.path.exists(audio_path):
                 logger.error(f"{audio_type.capitalize()} audio file not found: {audio_path}")
@@ -58,8 +58,9 @@ def process_audio_files(mic_audio_path, desktop_audio_path, output_dir, whisper_
             
             output_path = os.path.join(output_dir, f"{audio_type}-whisper-{whisper_model_name}_transcription.txt")
             save_transcription(transcription, output_path)
-
+            filenames[audio_type] = output_path
         logger.info("Audio processing completed")
+        return filenames
     except Exception as e:
         logger.error(f"Error processing audio files: {str(e)}")
         raise
