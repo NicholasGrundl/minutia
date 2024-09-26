@@ -138,7 +138,7 @@ def estimate_tokens_and_price(transcript_text, model='claude-3-5-sonnet', max_ou
     
     return total_tokens, estimated_price
 
-def generate_summary(transcript_text, model_name='claude-3-5-sonnet', max_output_tokens=None, **kwargs):
+def generate_summary(transcript_text, model_name='claude-3-5-sonnet', max_output_tokens=None, system_prompt=None,**kwargs):
     """Generate a summary using the Anthropic API."""
     if max_output_tokens is None:
         max_output_tokens = MAX_TOKENS_OUTPUT
@@ -148,16 +148,25 @@ def generate_summary(transcript_text, model_name='claude-3-5-sonnet', max_output
     model = anthropic_models.get(model_name)['name']
 
     client = Anthropic(api_key=ANTHROPIC_API_KEY)
-    prompt = create_summary_prompt(transcript_text)
-    
+    if system_prompt is None:
+        #old approach
+        prompt = create_summary_prompt(transcript_text)
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    else:
+        user_prompt = f"Here's the transcript:\n\n{transcript_text}"
+        messages = [
+            {"role": "user", "content": user_prompt},
+        ]
+        
     try:
         response = client.messages.create(
             model=model,
             max_tokens=max_output_tokens,
-            temperature=0.7,
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
+            temperature=0,
+            system=system_prompt,
+            messages=messages,
             **kwargs
         )
         return response.content[0].text
