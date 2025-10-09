@@ -20,10 +20,16 @@ logger = setup_anthropic_logger()
 
 # Load environment variables
 ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
-MAX_TOKENS_OUTPUT = 4096 # Max model output. Around 3.1K words (6-7 single spaced pages)
+MAX_TOKENS_OUTPUT = 8192 # Max model output. Around 3.1K words (6-7 single spaced pages)
 
 # Model information
 anthropic_models = {
+    'claude-4-5-sonnet': {
+        'name': 'claude-sonnet-4-5-20250929',
+        'price_per_1k_input_tokens': 0.003,
+        'price_per_1k_output_tokens': 0.015,
+    },
+    
     'claude-3-5-sonnet': {
         'name': 'claude-3-5-sonnet-20240620',
         'price_per_1k_input_tokens': 0.003,
@@ -137,6 +143,58 @@ def estimate_tokens_and_price(transcript_text, model='claude-3-5-sonnet', max_ou
     logger.info(f"price: ${estimated_price:.4f}")
     
     return total_tokens, estimated_price
+
+def generate_long_summary(transcript_text, model_name='claude-3-5-sonnet', max_output_tokens=None, system_prompt=None,**kwargs):
+    """Generate a summary using the Anthropic API. Allow multiple continues for length"""
+    if max_output_tokens is None:
+        max_output_tokens = MAX_TOKENS_OUTPUT
+        
+    if model_name not in anthropic_models:
+        raise KeyError(f"model must be one of [{list(anthropic_models.keys())}]")
+    model = anthropic_models.get(model_name)['name']
+
+    client = Anthropic(api_key=ANTHROPIC_API_KEY)
+    
+    if system_prompt is None:
+        #old approach
+        prompt = create_summary_prompt(transcript_text)
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    else:
+        user_prompt = f"Here's the transcript:\n\n{transcript_text}"
+        messages = [
+            {"role": "user", "content": user_prompt},
+        ]
+
+
+    full_summary = ""
+    while True:
+        try:
+            response = client.messages.create(
+                model=model,
+                max_tokens=max_output_tokens,
+                temperature=0.1,
+                system=system_prompt,
+                messages=messages,
+                **kwargs
+            )
+            
+            summary_part = response.content[0].text
+            full_summary += summary_part
+            
+            if summary_part.endswith('[CONTINUE]'):
+                full_summary = full_summary[:-10]  # Remove the [CONTINUE] tag
+                messages.append({"role": "assistant", "content": summary_part})
+                messages.append({"role": "user", "content": "Please continue the summary."})
+            else:
+                break
+        except Exception as e:
+            logger.error(f"Error generating summary: {str(e)}")
+            raise
+    return full_summary
+
+
 
 def generate_summary(transcript_text, model_name='claude-3-5-sonnet', max_output_tokens=None, system_prompt=None,**kwargs):
     """Generate a summary using the Anthropic API."""
