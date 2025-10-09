@@ -1,27 +1,24 @@
-# Define variables
-CONDA_ENV_NAME := notetaker
-PYTHON_VERSION := 3.10
+# UV-based project management for Minutia
 
-# Manage Conda Envrionment
-.PHONY: create
-create: requirements.txt conda_packages.txt create_env_conda create_env_file 
+.PHONY: install
+install:
+	@echo "Installing project and dependencies with uv..."
+	uv sync
 
-.PHONY: create_env_conda
-create_env_conda:
-	@echo "Creating conda environment..."
-	conda create -n $(CONDA_ENV_NAME) python=$(PYTHON_VERSION) pip -y
-	@echo "Installing conda packages..."
-	conda install -n $(CONDA_ENV_NAME) --file conda_packages.txt -y
+.PHONY: install-dev
+install-dev:
+	@echo "Installing project with development dependencies..."
+	uv sync --extra dev
 
-.PHONY: remove_env_conda
-remove_env_conda:
-	@echo "Removing conda environment..."
-	conda remove --name $(CONDA_ENV_NAME) --all -y
+.PHONY: install-all
+install-all:
+	@echo "Installing project with all optional dependencies..."
+	uv sync --extra dev --extra jupyter --extra media
 
 
 
-.PHONY: create_env_file
-create_env_file:
+.PHONY: create-env-file
+create-env-file:
 	@echo "Creating .env file..."
 	@if [ ! -f .env ]; then \
 		echo "# API Keys" > .env; \
@@ -32,23 +29,35 @@ create_env_file:
 		echo ".env file already exists. Please ensure it contains your API keys."; \
 	fi
 
-# Python Dependency management
-.PHONY: install
-install: 
-	pip install -r ./requirements.txt
-	pip freeze > requirements-lock.txt
-	@echo "Pinned requirements exported to requirements-lock.txt"
+# Development commands
+.PHONY: lint
+lint:
+	@echo "Running linter..."
+	uv run ruff check .
 
-.PHONY: uninstall
-uninstall:
-	@bash -c "pip uninstall -y -r <(pip freeze)"
-	@if [ -f requirements-lock.txt ]; then \
-		rm requirements-lock.txt; \
-		echo "Removed requirements-lock.txt"; \
-	fi
+.PHONY: format
+format:
+	@echo "Formatting code..."
+	uv run ruff format .
 
-#### Jupyter ####
+.PHONY: lint-fix
+lint-fix:
+	@echo "Running linter with auto-fix..."
+	uv run ruff check --fix .
+
+.PHONY: test
+test:
+	@echo "Running tests..."
+	uv run pytest
+
+.PHONY: clean
+clean:
+	@echo "Cleaning up build artifacts..."
+	rm -rf dist/ build/ *.egg-info/ .pytest_cache/ htmlcov/ .coverage
+
+# Jupyter Lab
 .PHONY: jupyter
 jupyter: 
-	@jupyter lab --autoreload
+	@echo "Starting Jupyter Lab..."
+	uv run jupyter lab --autoreload
 
