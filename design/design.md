@@ -26,6 +26,7 @@ The package will be built upon a modern Python stack, leveraging the following k
     4.  [Smart Filepath Handling](#smart-filepath-handling)
     5.  [Command-Line Interface (CLI)](#command-line-interface-cli)
     6.  [Data Modeling](#data-modeling)
+    7.  [Error Handling and Exception Hierarchy](#error-handling-and-exception-hierarchy)
 2.  [Remaining Gaps](#remaining-gaps)
 
 ## Package Architecture
@@ -42,11 +43,134 @@ Configuration is centralized using `pydantic-settings` to provide a flexible and
 
 ### Provider Architecture
 
-To ensure the package is not tightly coupled to specific AI services, we will implement a pluggable provider architecture. This allows for different transcription and summarization backends to be used interchangeably.
+To ensure the package is not tightly coupled to specific AI services, we will implement a pluggable provider architecture using a decorator-based registry system. This allows for different transcription and summarization backends to be discovered and loaded dynamically, making it simple to add new providers without modifying core application logic.
 
-*   **Base Classes**: Abstract base classes (`TranscriptionProvider`, `SummarizationProvider`) in `providers/base.py` will define the common interface that all providers must implement. This ensures consistent behavior and method signatures (e.g., `transcribe()`, `summarize()`).
-*   **Concrete Implementations**: Specific providers, such as `WhisperProvider` and `ClaudeProvider`, will be implemented in their own modules (e.g., `providers/transcription/whisper.py`). Each will handle the unique logic of interacting with its respective API.
-*   **Registry System**: A registry in `providers/.../registry.py` will allow providers to be discovered and loaded dynamically. This will make it simple to add new providers in the future without modifying the core pipeline logic. The CLI will use this registry to list available providers and their supported models.
+#### Provider Registry
+
+The core of this system is a generic `ProviderRegistry` class that manages the registration and retrieval of provider classes. This will live in `src/minutia/providers/registry.py`.
+
+```python
+# src/minutia/providers/registry.py
+from typing import Type, Dict, Callable, List
+
+from .base import Provider
+
+class ProviderRegistry:
+    """A registry for discovering and managing provider classes."""
+
+    def __init__(self):
+        self._providers: Dict[str, Type[Provider]] = {}
+
+    def register(self, name: str) -> Callable[[Type[Provider]], Type[Provider]]:
+        """Returns a decorator that registers a provider class with a given name."""
+        def decorator(cls: Type[Provider]) -> Type[Provider]:
+            if name in self._providers:
+                # Or log a warning, depending on desired strictness
+                raise ValueError(f"Provider '{name}' is already registered.")
+            self._providers[name] = cls
+            return cls
+        return decorator
+
+    def get(self, name: str) -> Type[Provider]:
+        """Retrieves a provider class by its registered name."""
+        if name not in self._providers:
+            # This will be a custom exception, e.g., ProviderNotFoundError
+            raise ValueError(f"Provider '{name}' not found. Available: {list(self._providers.keys())}")
+        return self._providers[name]
+
+    def list_available(self) -> List[str]:
+        """Returns a list of names of all registered providers."""
+        return list(self._providers.keys())
+```
+
+Singleton instances of this registry will be created for each provider type.
+
+```python
+# src/minutia/providers/__init__.py
+from .registry import ProviderRegistry
+
+# Create singleton instances for each provider type
+transcription_registry = ProviderRegistry()
+summarization_registry = ProviderRegistry()
+
+# Import provider modules to trigger registration
+from . import transcription
+from . import summarization
+```
+
+#### Provider Base Classes
+
+All providers must inherit from an abstract base class that defines a common interface. This ensures consistent behavior and method signatures across all concrete implementations.
+
+```python
+# src/minutia/providers/base.py
+from abc import ABC, abstractmethod
+from typing import List
+
+class Provider(ABC):
+    """Base class for all providers."""
+    @property
+    @abstractmethod
+    def supported_models(self) -> List[str]:
+        """A list of model names supported by this provider."""
+        pass
+
+class TranscriptionProvider(Provider):
+    """Interface for transcription providers."""
+    @abstractmethod
+    def transcribe(self, audio_path: str, model: str) -> str: # Simplified for design doc
+        pass
+
+class SummarizationProvider(Provider):
+    """Interface for summarization providers."""
+    @abstractmethod
+    def summarize(self, transcript: str, model: str) -> str:
+        pass
+```
+
+#### Concrete Implementation and Registration
+
+A concrete provider, such as `WhisperProvider`, is implemented in its own module. It uses the registry's decorator to register itself with a unique name (e.g., `"whisper"`).
+
+```python
+# src/minutia/providers/transcription/whisper.py
+from .. import transcription_registry
+from ..base import TranscriptionProvider
+
+@transcription_registry.register("whisper")
+class WhisperProvider(TranscriptionProvider):
+    """Transcription provider using OpenAI's Whisper."""
+    @property
+    def supported_models(self) -> List[str]:
+        return ["whisper-1", "whisper-large-v3"] # Example models
+
+    def transcribe(self, audio_path: str, model: str) -> str:
+        # Logic to call the Whisper API...
+        print(f"Transcribing {audio_path} using {model}")
+        return "This is a transcribed text."
+```
+
+#### Dynamic Discovery
+
+To ensure the registration code runs, the provider modules are simply imported within the `__init__.py` file of their corresponding package. This clean and explicit mechanism populates the registries when the application starts.
+
+```python
+# src/minutia/providers/transcription/__init__.py
+
+# Import all modules in this directory to ensure their providers are registered.
+from . import whisper
+# from . import new_future_provider # Easy to extend
+```
+
+#### Integration Points
+
+*   **Pipelines**: The pipeline orchestrators will use the registry to fetch the correct provider class based on the user's configuration (e.g., `settings.transcription.provider`). It will then instantiate it, passing any required provider-specific configuration.
+    ```python
+    provider_name = settings.transcription.provider
+    provider_class = transcription_registry.get(provider_name)
+    transcriber = provider_class(config=settings.transcription.provider_config)
+    ```
+*   **CLI**: The `list-providers` command will call `registry.list_available()` to get the names of all registered providers and display them to the user, along with their supported models.
 
 ### Pipeline Orchestration
 
@@ -175,12 +299,90 @@ Example JSON Output (`..._result.json`):
 *   **CLI**: The CLI in `cli/main.py` will receive the `ProcessingResult` object from the pipeline and use the helper functions in `data/formats.py` to write the final output files to the disk based on the paths in `metadata.output_paths`.
 *   **Path Management**: The `PathManager` in `utils/paths.py` will be used by the pipelines to generate the file paths that are stored in `metadata.output_paths`.
 
+### Error Handling and Exception Hierarchy
+
+To ensure robust and predictable error handling, the application will use a custom exception hierarchy. All application-specific errors will inherit from a single base exception, `MinutiaError`. This allows the CLI to catch all known errors gracefully while enabling granular error handling within the application's core components.
+
+The exceptions will be defined in `src/minutia/core/exceptions.py`.
+
+#### Exception Hierarchy Definition
+
+```python
+# src/minutia/core/exceptions.py
+
+class MinutiaError(Exception):
+    """Base exception for all application-specific errors."""
+    pass
+
+# Configuration Errors
+class ConfigurationError(MinutiaError):
+    """Errors related to application configuration and settings."""
+    pass
+
+# File Processing Errors
+class FileProcessingError(MinutiaError):
+    """Errors related to file I/O and media processing."""
+    pass
+
+class InputFileNotFoundError(FileProcessingError, FileNotFoundError):
+    """Raised when the input audio/video file does not exist."""
+    pass
+
+class AudioExtractionError(FileProcessingError):
+    """Raised when audio extraction from a video file fails."""
+    pass
+
+class OutputWriteError(FileProcessingError):
+    """Raised when writing an output file fails."""
+    pass
+
+# Provider Errors
+class ProviderError(MinutiaError):
+    """Errors related to transcription or summarization providers."""
+    pass
+
+class ProviderNotFoundError(ProviderError):
+    """Raised when a requested provider is not found in the registry."""
+    pass
+
+class ProviderAPIError(ProviderError):
+    """Raised for failures in API communication with a provider."""
+    pass
+
+class ProviderModelNotFoundError(ProviderError):
+    """Raised when a requested model is not supported by the provider."""
+    pass
+
+# Pipeline Errors
+class PipelineError(MinutiaError):
+    """Errors that occur during pipeline orchestration."""
+    pass
+
+class TranscriptMergeError(PipelineError):
+    """Raised when merging multiple transcripts fails."""
+    pass
+```
+
+#### Integration and Usage
+
+*   **CLI (`cli/main.py`)**: The main CLI entry point will wrap its execution in a `try...except MinutiaError` block. This allows it to catch any anticipated error from the application, display a user-friendly message (e.g., using a `rich` panel), and exit gracefully with a non-zero status code. Full tracebacks will only be shown in debug mode.
+
+*   **Pipelines (`core/pipelines.py`)**: Pipelines will raise specific exceptions when operations fail. For example, the `VideoPipeline` will raise an `AudioExtractionError` if the `ffmpeg` process fails. It is the responsibility of the calling layer (the CLI) to handle these exceptions.
+
+*   **Providers (`providers/`)**: The provider registry will raise `ProviderNotFoundError`. Concrete provider implementations will wrap API client exceptions (e.g., `anthropic.APIError`) into a `ProviderAPIError`, ensuring that the rest of the application does not depend on third-party library exceptions.
+    ```python
+    # Example in a provider
+    try:
+        response = self.client.messages.create(...)
+    except APIError as e:
+        raise ProviderAPIError(f"Claude API request failed: {e}") from e
+    ```
+
+*   **Configuration (`config/settings.py`)**: The settings loader will wrap `pydantic.ValidationError` in a `ConfigurationError` to provide a consistent error type for all setup-related issues.
+
 ## Remaining Gaps
 
 This section identifies areas that were not fully detailed in the initial planning phase and require further discussion and decision-making.
-
-*   **__meta: [Custom Exception Hierarchy]__**
-    We have a placeholder for `core/exceptions.py`, but the specific exception types and their hierarchy have not been designed. We need to define custom exceptions for common failure modes, such as `ProviderError`, `ConfigurationError`, or `FileProcessingError`, to enable more granular error handling and reporting in the pipelines and CLI.
 
 *   **__meta: [Detailed Data Models]__**
     The plan mentions `data/models.py` for `ProcessingResult` and other structures, but the exact fields and relationships are not specified. We need to define the schemas for the final JSON output, the merged transcript format, and any metadata we want to persist, such as processing time, model versions, and cost estimates.

@@ -135,20 +135,22 @@ Design the complete exception hierarchy for robust error handling throughout the
 
 ## Critical Priority (P0)
 
-### Data Models Schema
+### Done: Data Models Schema
 ```
 [TODO_SECTION_NAME]: __meta: [Data Models Schema] - data/models.py
 [SPECIFIC_FOCUS_INSTRUCTIONS]: Design complete data model schema for ProcessingResult, TranscriptSegment, and ProcessingMetadata with exact field definitions and serialization formats.
 ```
 
-### Provider Registry
+### Done: Provider Registry
 ```
 [TODO_SECTION_NAME]: __meta: [Provider Registry Implementation] - providers/.../registry.py
 [SPECIFIC_FOCUS_INSTRUCTIONS]: Design the complete provider discovery and registration system with dynamic loading and validation.
 ```
 
-### Exception Hierarchy
+### Done: Exception Hierarchy
 ```
+# State Info:
+
 [TODO_SECTION_NAME]: __meta: [Exception Hierarchy] - core/exceptions.py
 [SPECIFIC_FOCUS_INSTRUCTIONS]: Design complete exception hierarchy for robust error handling throughout pipelines and CLI.
 ```
@@ -157,18 +159,24 @@ Design the complete exception hierarchy for robust error handling throughout the
 
 ### Provider Configuration Type Safety
 ```
+# State Info:
+
 [TODO_SECTION_NAME]: __meta: [Provider Configuration Type Safety]
 [SPECIFIC_FOCUS_INSTRUCTIONS]: Replace generic Dict[str, Any] provider configs with type-safe discriminated unions using Pydantic.
 ```
 
 ### Memory Management Strategy
 ```
+# State Info:
+
 [TODO_SECTION_NAME]: __meta: [Memory Management Strategy]
 [SPECIFIC_FOCUS_INSTRUCTIONS]: Design memory management strategy for large files including streaming interfaces and chunking algorithms.
 ```
 
 ### Pipeline Error Handling
 ```
+# State Info:
+
 [TODO_SECTION_NAME]: __meta: [Pipeline Error Handling & Recovery]
 [SPECIFIC_FOCUS_INSTRUCTIONS]: Design comprehensive error handling and recovery mechanisms for pipeline failure modes.
 ```
@@ -177,24 +185,32 @@ Design the complete exception hierarchy for robust error handling throughout the
 
 ### Cost Estimation & Monitoring
 ```
+# State Info:
+
 [TODO_SECTION_NAME]: __meta: [Cost Estimation & Monitoring]
 [SPECIFIC_FOCUS_INSTRUCTIONS]: Design systematic cost tracking across all providers with pre-processing estimates and budget controls.
 ```
 
 ### Logging Configuration
 ```
+# State Info:
+
 [TODO_SECTION_NAME]: __meta: [Logging Configuration]
 [SPECIFIC_FOCUS_INSTRUCTIONS]: Design complete logging setup with structured format, destinations, and provider-specific context.
 ```
 
 ### Environment Variable Mapping
 ```
+# State Info:
+
 [TODO_SECTION_NAME]: __meta: [Environment Variable Mapping]
 [SPECIFIC_FOCUS_INSTRUCTIONS]: Complete environment variable specification with nested setting access and precedence rules.
 ```
 
 ### Testing Strategy
 ```
+# State Info:
+
 [TODO_SECTION_NAME]: __meta: [Testing Strategy & Scope]
 [SPECIFIC_FOCUS_INSTRUCTIONS]: Design comprehensive testing plan with unit/integration boundaries and mocking strategies.
 ```
