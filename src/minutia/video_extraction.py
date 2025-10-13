@@ -16,11 +16,7 @@ import shutil
 import sys
 import re
 
-# Optional imports (comment out if not needed)
-import pydub
-import moviepy.editor as mp
-import scipy
-import librosa
+# Optional imports removed - they were not being used in the code
 
 
 # Set up logger

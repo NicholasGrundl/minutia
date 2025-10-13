@@ -1,10 +1,10 @@
 import os
 import logging
 import click
-from video_extraction import process_mkv_file
-from audio_transcription import process_audio_files
-from transcript_merger import process_transcripts
-from summarize_transcript import (
+from .video_extraction import process_mkv_file
+from .audio_transcription import process_audio_files
+from .transcript_merger import process_transcripts
+from .summarize_transcript import (
     load_transcript, prepare_transcript_for_summary, 
     generate_summary, save_summary, estimate_tokens_and_price
 )
