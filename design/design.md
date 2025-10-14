@@ -1044,47 +1044,62 @@ Every task should ship with:
 
 ## Migration-First Task Breakdown for Junior Developers
 
-### Phase 1: Foundation & Verification (Critical Path)
+### Phase 1: Foundation & Verification (Critical Path - MVP)
 1. **Pipeline Verification & Baseline Script**
    - Verify CreateTranscriptProd.ipynb runs end-to-end with test recording
    - Convert notebook cells to standalone Python script preserving all working logic
-   - Add basic integration test that runs full pipeline and validates outputs
+   - Add basic integration test (smoke test) that runs full pipeline and validates outputs
    - Document current advanced features (personal notes, cost estimation, auto-filenames)
 
-### Phase 2: Pipeline Architecture (Core Focus)
-2. **Pipeline Orchestration Implementation**
-   - Implement PipelineOrchestrator class with callback-based progress reporting
-   - Create PipelineConfig dataclass for input parameters
-   - Add structured exception handling and error recovery
-   - Build step enumeration and state tracking
-   - Add unit tests for orchestrator logic
-
-### Phase 3: Infrastructure Migration (Parallel to Phase 2)
-3. **RunPaths & Path Management**
+### Phase 2: Core Infrastructure (MVP - Parallel work possible)
+2. **RunPaths & Path Management**
    - Implement RunPaths dataclass with factory methods (`from_video_input`, `from_audio_inputs`)
    - Migrate existing modules to use RunPaths instead of ad-hoc path construction
-   - Ensure directories created lazily with proper validation
+   - Ensure directories created with proper validation
    - Add unit tests for path resolution and directory creation
+
+3. **Basic Pipeline Orchestration**
+   - Implement simplified PipelineOrchestrator class with callback-based progress reporting
+   - Create PipelineConfig dataclass for input parameters
+   - Add basic exception handling and error messages
+   - Build step enumeration without state persistence (defer resume-from-failure)
+   - Add unit tests for orchestrator logic
 
 4. **Logging Infrastructure**
    - Replace multiple basic loggers with unified loguru setup
    - Add contextual fields (`step`, `input_file`, `run_root`) for log correlation
-   - Configure JSON sink for run directory and colored stderr sink
+   - Configure simple file sink for run directory and colored stderr sink
    - Integrate with pipeline orchestrator for structured logging
 
-5. **Settings & Configuration**
-   - Create centralized settings module with dataclass/pydantic validation
-   - Migrate scattered environment variable loading to single configuration loader
-   - Add `.env` file support and API key validation
-   - Provide sensible defaults matching current working behavior
-
-### Phase 4: CLI Enhancement (Depends on Phases 2-3)
-6. **Rich CLI Integration**
+### Phase 3: Simple CLI Wrapper (MVP - Depends on Phase 2)
+5. **Basic CLI Interface**
    - Wrap pipeline orchestrator with Click CLI interface
-   - Add rich progress bars connected to pipeline progress callbacks
-   - Implement styled output panels showing artifact locations
-   - Map pipeline exceptions to friendly CLI error messages
+   - Add simple progress output using print/logging (not rich UI yet)
+   - Display final artifact locations on completion
+   - Map pipeline exceptions to clear error messages
    - Preserve all current CLI arguments and functionality
+
+### Post-MVP Enhancements (Phase 4+)
+6. **Rich Progress UI** (After MVP proven)
+   - Replace simple progress output with rich progress bars
+   - Add styled panels for status and artifact locations
+   - Implement sophisticated CLI UX patterns
+
+7. **Resume-From-Failure** (After MVP proven)
+   - Add PipelineState persistence to run directory
+   - Implement state serialization helpers
+   - Add idempotency checks to each pipeline step
+   - Implement `resume_from_failure()` method
+
+8. **Advanced Configuration** (After MVP proven)
+   - Implement full configuration precedence (CLI > env > file > defaults)
+   - Add config file discovery and loading
+   - Enhance validation with pydantic-settings
+
+9. **Comprehensive Testing** (After MVP proven)
+   - Expand smoke test to full unit test suite
+   - Add integration tests with real Whisper tiny model
+   - Add slow tests with golden sample validation
 
 ### Enhanced Testing Strategy with Mocking & Resource Management
 
