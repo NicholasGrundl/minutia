@@ -571,7 +571,9 @@ def execute(self, config: PipelineConfig) -> PipelineResult:
 ```
 
 **Enhanced Design Decisions:**
-- **Simple state persistence** - JSON file enables resume without complexity
+- **State file in run directory** - Stored in `run_root/.minutia_state.json` to prevent concurrent run conflicts
+- **Explicit serialization helpers** - `PipelineState.from_pipeline()` and `to_config()` methods handle Path → JSON conversion clearly
+- **Idempotency built-in** - Each step checks for existing valid artifacts before rerunning
 - **Graceful degradation** - Partial runs provide value (transcripts even if summary fails)
 - **Direct callback chain** - Straightforward progress reporting to rich CLI display
 - **Minimal error handling** - Clear failure points with actionable error messages
