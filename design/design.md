@@ -522,30 +522,29 @@ def execute(self, config: PipelineConfig) -> PipelineResult:
     completed_steps = []
     artifacts = {}
     start_time = time.time()
-    
+
     for step_name in self.steps:
         self._report_progress(step_name, StepStatus.RUNNING, f"Starting {step_name}")
-        
+
         # Save state before each step for resume capability
-        state = PipelineState(
+        state = PipelineState.from_pipeline(
             run_id=config.run_id,
-            started_at=datetime.now(),
             current_step=step_name,
             completed_steps=completed_steps,
             run_paths=config.run_paths,
             config=config
         )
-        self.save_state(state)
-        
+        self.save_state(state, config.run_paths)
+
         try:
             step_outputs = self._execute_step(step_name, config)
             completed_steps.append(step_name)
             artifacts.update(step_outputs)
             self._report_progress(step_name, StepStatus.COMPLETED, f"Finished {step_name}")
-            
+
         except Exception as e:
             self._report_progress(step_name, StepStatus.FAILED, str(e))
-            
+
             # Return partial results - user gets value from completed steps
             return PipelineResult(
                 success=False,
@@ -556,11 +555,12 @@ def execute(self, config: PipelineConfig) -> PipelineResult:
                 artifacts=artifacts,
                 duration_seconds=time.time() - start_time
             )
-    
+
     # All steps completed successfully - cleanup state file
-    if Path(self.state_file).exists():
-        Path(self.state_file).unlink()
-    
+    state_file = self._get_state_file_path(config.run_paths)
+    if state_file.exists():
+        state_file.unlink()
+
     return PipelineResult(
         success=True,
         run_paths=config.run_paths,
