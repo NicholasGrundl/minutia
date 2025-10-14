@@ -36,6 +36,11 @@ Minutia is a meeting recording, transcription, and summarization tool. It extrac
 
 ### Development Tools
 
+- **uv** - Extremely fast Python package and project manager (written in Rust)
+  - 📚 Main Docs: https://docs.astral.sh/uv/
+  - 📚 Project Guide: https://docs.astral.sh/uv/guides/projects/
+  - 📚 Configuration: https://docs.astral.sh/uv/concepts/projects/config/
+
 - **ruff** - Fast linter/formatter (replaces black + flake8)
 
 - **pytest** - Testing framework
