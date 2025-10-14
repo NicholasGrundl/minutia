@@ -1,11 +1,11 @@
 # UV-based project management for Minutia
 #
-# This Makefile provides convenient shortcuts to UV scripts defined in pyproject.toml
-# You can use either:
-#   - make <target>  (convenient, traditional)
-#   - uv run <script> (direct UV invocation)
+# This Makefile is the primary task runner for development commands.
+# Note: UV does not support tool.uv.scripts, so we use Make for task running.
 #
-# All scripts are defined in [tool.uv.scripts] section of pyproject.toml
+# You can use either:
+#   - make <target>           (recommended, convenient)
+#   - uv run <command> <args> (direct command execution)
 
 # Installation commands (UV native, not scripts)
 .PHONY: install
