@@ -1108,6 +1108,99 @@ Every task should ship with:
 - Basic unit tests for RunPaths and orchestrator logic
 - Defer extensive mocking, fixtures, and test categories until after core pipeline proven
 
+#### Minimal MVP Smoke Test
+
+**Goal:** Ensure baseline script doesn't break existing functionality during refactoring.
+
+**Test fixture:**
+```
+tests/fixtures/
+├── sample_short.mkv         # 30-second test recording with 2 audio tracks
+└── expected_outputs/        # Known-good outputs from current notebook
+    ├── microphone_transcript.txt
+    ├── desktop_transcript.txt
+    └── merged_transcript.txt
+```
+
+**Smoke test implementation:**
+```python
+# tests/test_smoke.py
+import pytest
+from pathlib import Path
+from minutia.baseline_script import run_pipeline  # MVP: simple script entry point
+
+def test_end_to_end_pipeline_smoke(tmp_path):
+    """
+    Smoke test: Verify pipeline produces expected outputs without errors.
+
+    This test runs the REAL pipeline with a small test file:
+    - Real FFmpeg extraction
+    - Real Whisper transcription (base model, ~10s on CPU)
+    - Real merging logic
+    - Skip summary (no API cost)
+
+    Pass criteria:
+    - Pipeline completes without exceptions
+    - All expected files are created
+    - Output files are non-empty and valid format
+    """
+    test_video = Path("tests/fixtures/sample_short.mkv")
+    assert test_video.exists(), "Test fixture missing - run setup_fixtures.sh"
+
+    # Run pipeline (skip summary to avoid API cost)
+    result = run_pipeline(
+        input_path=test_video,
+        output_dir=tmp_path,
+        whisper_model="base",
+        skip_summary=True
+    )
+
+    # Verify completion
+    assert result.success, f"Pipeline failed: {result.error}"
+
+    # Verify outputs exist
+    assert (tmp_path / "audio" / "microphone.wav").exists()
+    assert (tmp_path / "audio" / "desktop.wav").exists()
+    assert (tmp_path / "transcripts" / "microphone_transcript.json").exists()
+    assert (tmp_path / "transcripts" / "desktop_transcript.json").exists()
+    assert (tmp_path / "merged_transcript.json").exists()
+
+    # Verify outputs are non-empty
+    merged = (tmp_path / "merged_transcript.json").read_text()
+    assert len(merged) > 100, "Merged transcript suspiciously small"
+
+    # Basic structure validation (don't compare exact content - transcription varies)
+    import json
+    merged_data = json.loads(merged)
+    assert "metadata" in merged_data
+    assert "transcript" in merged_data
+    assert len(merged_data["transcript"]) > 0, "Empty transcript segments"
+```
+
+**Running the smoke test:**
+```bash
+# MVP workflow - simple and fast
+pytest tests/test_smoke.py -v       # < 30s on CPU
+pytest tests/unit/ -v                # < 5s for unit tests
+
+# Full test suite (post-MVP)
+pytest tests/ -v                     # Runs all tests including slow ones
+```
+
+**Fixture creation:**
+```bash
+# tests/setup_fixtures.sh
+# Create 30-second test recording from existing sample
+ffmpeg -i existing_long_recording.mkv -t 30 -c copy tests/fixtures/sample_short.mkv
+```
+
+**Key MVP Testing Principles:**
+1. **One comprehensive smoke test** beats many incomplete unit tests
+2. **Real execution** with small fixture catches integration issues
+3. **Fast enough** (< 30s) for frequent runs during refactoring
+4. **No API costs** - skip summary generation in tests
+5. **Focus on regression prevention** - ensure refactoring doesn't break working pipeline
+
 **Architecture: Hybrid Approach with Test Categories (Post-MVP)**
 
 #### API Mocking Strategy
