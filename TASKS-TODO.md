@@ -5,26 +5,26 @@
 ## Phase 1: Foundation & Verification (Critical Path - MVP)
 
 ### 🔍 Pipeline Verification & Baseline Script
-- [ ] Verify CreateTranscriptProd.ipynb runs end-to-end with test recording
-- [ ] Convert notebook cells to standalone Python script preserving all working logic
-- [ ] Create basic integration test (smoke test) that runs full pipeline and validates outputs
-- [ ] Document current advanced features (personal notes, cost estimation, auto-filenames)
+- [x] Verify CreateTranscriptProd.ipynb runs end-to-end with test recording
+- [x] Convert notebook cells to standalone Python script preserving all working logic
+- [x] Create basic integration test (smoke test) that runs full pipeline and validates outputs
+- [x] Document current advanced features (personal notes, cost estimation, auto-filenames)
 
 ### 🧹 Critical Code Cleanup
-- [ ] **video_extraction.py**: Remove unused imports (whisper, pandas, numpy, transformers, torch, openai, anthropic, pydantic, instructor, dotenv)
-- [ ] **video_extraction.py**: Fix unused loop variable `stream` on line 72
-- [ ] **video_extraction.py**: Remove blank lines with whitespace and add newline at end
-- [ ] Run `uv run ruff check --fix .` to auto-fix formatting issues
-- [ ] Move notebooks to `notebooks/` directory
+- [x] **video_extraction.py**: Remove unused imports (whisper, pandas, numpy, transformers, torch, openai, anthropic, pydantic, instructor, dotenv)
+- [x] **video_extraction.py**: Fix unused loop variable `stream` on line 72
+- [x] **video_extraction.py**: Remove blank lines with whitespace and add newline at end
+- [x] Run `uv run ruff check --fix .` to auto-fix formatting issues
+- [x] Move notebooks to `notebooks/` directory
 
 ## Phase 2: Core Data Structures (MVP - Foundation)
 
 ### 📁 RunPaths & Path Management 
-- [ ] Implement RunPaths dataclass with factory methods (`from_video_input`, `from_audio_inputs`)
-- [ ] Add directory collision handling and validation
-- [ ] Create PipelineConfig and PipelineResult data structures
-- [ ] Migrate existing modules to use RunPaths instead of ad-hoc path construction
-- [ ] Add unit tests for path resolution and data structures
+- [x] Implement RunPaths dataclass with factory methods (`from_video_input`, `from_audio_inputs`)
+- [x] Add directory collision handling and validation
+- [x] Create PipelineConfig and PipelineResult data structures
+- [x] Migrate existing modules to use RunPaths instead of ad-hoc path construction
+- [x] Add unit tests for path resolution and data structures
 
 ## Phase 3: Pipeline Architecture (MVP - Core)
 
