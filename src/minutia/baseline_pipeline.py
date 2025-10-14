@@ -18,9 +18,10 @@ import argparse
 import datetime
 import json
 import logging
+from collections.abc import Iterable, Mapping, MutableMapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable, List, Mapping, MutableMapping, Optional
+from typing import Any
 
 import isodate
 from dotenv import load_dotenv
@@ -60,7 +61,7 @@ def get_isodate() -> str:
     return isodate.date_isoformat(current)
 
 
-def ensure_output_directory(base_dir: Optional[Path], subfolder: Optional[str]) -> Path:
+def ensure_output_directory(base_dir: Path | None, subfolder: str | None) -> Path:
     """
     Resolve and create the output directory.
 
@@ -143,7 +144,7 @@ def create_markdown_report(
 
 def format_personal_notes(notes: Iterable[Mapping[str, Any]]) -> str:
     """Render personal notes into markdown bullet lists for the system prompt."""
-    lines: List[str] = []
+    lines: list[str] = []
     for note in notes:
         text = note.get("note")
         if not text:
@@ -271,7 +272,7 @@ def extract_transcript_text(transcript_data: Mapping[str, Any]) -> str:
 # ---------------------------------------------------------------------------
 
 
-def read_personal_notes(path: Optional[Path]) -> List[MutableMapping[str, Any]]:
+def read_personal_notes(path: Path | None) -> list[MutableMapping[str, Any]]:
     if path is None:
         return []
     data = json.loads(path.read_text(encoding="utf-8"))
@@ -280,7 +281,7 @@ def read_personal_notes(path: Optional[Path]) -> List[MutableMapping[str, Any]]:
     return list(data)
 
 
-def read_personal_info(info: Optional[str], path: Optional[Path]) -> str:
+def read_personal_info(info: str | None, path: Path | None) -> str:
     if info and path:
         raise ValueError("Specify personal info via --personal-info or --personal-info-file, not both.")
     if path:
@@ -288,7 +289,7 @@ def read_personal_info(info: Optional[str], path: Optional[Path]) -> str:
     return info or ""
 
 
-def read_markdown_notes(path: Optional[Path]) -> str:
+def read_markdown_notes(path: Path | None) -> str:
     if not path:
         return ""
     return path.read_text(encoding="utf-8")
@@ -306,8 +307,8 @@ class PipelineArtifacts:
     microphone_transcript: Path
     desktop_transcript: Path
     merged_transcript: Path
-    summary_file: Optional[Path] = None
-    markdown_file: Optional[Path] = None
+    summary_file: Path | None = None
+    markdown_file: Path | None = None
 
 
 def extract_audio(input_video: Path, output_dir: Path) -> Mapping[str, str]:
@@ -354,7 +355,7 @@ def summarise_transcript(
     *,
     model: str,
     use_long_summary: bool,
-    system_prompt: Optional[str],
+    system_prompt: str | None,
 ) -> str:
     """Generate a meeting summary using either the short or long flow."""
     if use_long_summary:
@@ -434,8 +435,8 @@ def run_pipeline(args: argparse.Namespace) -> PipelineArtifacts:
 
     estimate_summary_cost(transcript_text_for_summary, args.summary_model)
 
-    summary_path: Optional[Path] = None
-    markdown_path: Optional[Path] = None
+    summary_path: Path | None = None
+    markdown_path: Path | None = None
 
     if args.skip_summary:
         logger.info("Skipping summary generation (--skip-summary provided).")
@@ -574,7 +575,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv: Optional[List[str]] = None) -> PipelineArtifacts:
+def main(argv: list[str] | None = None) -> PipelineArtifacts:
     parser = build_parser()
     args = parser.parse_args(argv)
     return run_pipeline(args)

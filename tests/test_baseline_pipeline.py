@@ -1,8 +1,12 @@
 import json
 from pathlib import Path
 
-from minutia import baseline_pipeline
-from minutia import audio_transcription, summarize_transcript, video_extraction
+from minutia import (
+    audio_transcription,
+    baseline_pipeline,
+    summarize_transcript,
+    video_extraction,
+)
 
 
 def test_baseline_pipeline_smoke(tmp_path, monkeypatch):
