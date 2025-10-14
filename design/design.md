@@ -6,13 +6,49 @@ This document defines the minimum viable product for the refactored Minutia CLI.
 
 ## MVP Scope & Goals
 
-- **Consistent file handling**: accept either a full MKV or pre-extracted audio pair, create a dated run directory, and emit predictable filenames for all artifacts.
-- **Media processing pipeline**: extract two audio tracks from MKV, run Whisper transcription, merge outputs into a structured transcript, and optionally call Anthropic for summaries.
-- **CLI with progress visibility**: provide a single `minutia process` entry point (plus targeted subcommands if needed) with `rich` progress indicators and friendly status panels.
-- **Prepared for future phases**: surface clear extension points without introducing registries or multi-provider abstractions yet.
-- **Unified logging**: replace ad-hoc loggers with `loguru` and keep stdout free for user-facing CLI output.
+### Core MVP (Refactor Focus)
 
-Anything outside of this scope (LLM-based filename generation, personal note injection, notebook widgets, provider registries) is explicitly deferred.
+**Essential deliverables for Phase 1-3:**
+- **Baseline script**: Convert working notebook to standalone Python script preserving all functionality
+- **RunPaths abstraction**: Centralized path management replacing ad-hoc path construction
+- **Pipeline orchestrator skeleton**: Basic step execution with progress callbacks (no resume yet)
+- **Unified logging**: Replace multiple basic loggers with single loguru instance
+- **Smoke test**: One integration test validating end-to-end pipeline
+
+**Explicitly IN scope for MVP:**
+- Consistent file handling (dated run directories, predictable filenames)
+- Media processing pipeline (video → audio → transcript → merge → summary)
+- Basic CLI wrapper with simple progress output
+- Prepared extension points (TODO markers, narrow interfaces)
+
+**Explicitly OUT of scope for MVP (defer to Phase 2):**
+- Rich progress bars and styled panels (use simple print/logging initially)
+- Resume-from-failure capability (add after orchestrator proven)
+- Advanced configuration system (use simple env vars + CLI flags)
+- Comprehensive test suite (start with minimal smoke test)
+- LLM-based filename generation
+- Personal note injection
+- Provider registries
+
+### Rationale for Narrower MVP
+
+**Why defer rich CLI & resume?**
+- Rich progress bars require stable orchestrator events - build foundation first
+- Resume-from-failure adds complexity - validate core pipeline works before adding recovery
+- Deferring these reduces risk and delivers faster iteration cycle
+
+**MVP Delivery Sequence:**
+1. **Phase 1**: Verify notebook, create baseline script, add smoke test (2-3 days)
+2. **Phase 2**: Implement RunPaths + basic orchestrator + unified logging (3-4 days)
+3. **Phase 3**: Wrap in simple CLI with basic progress output (1-2 days)
+
+**Total MVP: ~1 week of focused work**
+
+After MVP proves architecture, Phase 2 adds:
+- Rich progress UI
+- Resume capability
+- Enhanced configuration
+- Comprehensive testing
 
 ### Ground Zero: Pipeline Verification
 
