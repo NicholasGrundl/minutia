@@ -1,10 +1,11 @@
 # Import necessary libraries
-import ffmpeg
-import os
 import logging
+import os
+import re
 import shutil
 import sys
-import re
+
+import ffmpeg
 
 # Optional imports removed - they were not being used in the code
 
@@ -53,31 +54,31 @@ def extract_all_audio_tracks(input_file, output_directory):
     """
     # Get video information
     _, audio_streams = get_video_info(input_file)
-    
+
     # Create output directory if it doesn't exist
     os.makedirs(output_directory, exist_ok=True)
-    
+
     # Extract each audio track
     extracted_files = []
     for i, _ in enumerate(audio_streams):
         output_file = os.path.join(output_directory, f"audio_track_{i+1}.wav")
         extract_audio_track(input_file, output_file, i)
         extracted_files.append(output_file)
-    
+
     return extracted_files
 
 def identify_audio_tracks(audio_files, mic_track_number=3, desktop_track_number=2):
     """
     Identify which audio file corresponds to the microphone and desktop audio
     based on the provided track numbers. OBS uses 1 index tracks.
-    
+
     :param audio_files: List of audio file paths
     :param mic_track_number: The track number corresponding to the microphone audio
     :param desktop_track_number: The track number corresponding to the desktop audio
     :return: Dictionary with 'microphone' and 'desktop' keys and corresponding file paths
     """
     logger.info("Identifying audio tracks based on provided track numbers")
-    
+
     mic_file = None
     desktop_file = None
 
@@ -86,10 +87,10 @@ def identify_audio_tracks(audio_files, mic_track_number=3, desktop_track_number=
     for file in audio_files:
         filename = os.path.splitext(os.path.basename(file))[0]  # Get filename without extension
         match = track_pattern.search(filename)
-        
+
         if match:
             track_number = int(match.group(1))
-            
+
             if track_number == mic_track_number:
                 mic_file = file
                 logger.info(f"Identified microphone audio: {mic_file}")
@@ -128,19 +129,19 @@ def process_mkv_file(input_mkv, output_dir):
     Process an .mkv file to extract and identify audio tracks.
     """
     logger.info(f"Processing file: {input_mkv}")
-    
+
     # Extract all audio tracks
     extracted_files = extract_all_audio_tracks(input_mkv, output_dir)
     logger.info(f"Extracted {len(extracted_files)} audio tracks")
-    
+
     # Identify microphone and desktop audio
     identified_tracks = identify_audio_tracks(audio_files=extracted_files)
-    
+
     # Create copies with descriptive names
     renamed_tracks = copy_and_rename_audio_files(identified_tracks, output_dir)
-    
+
     logger.info("Audio track separation completed:")
     logger.info(f"Microphone audio saved as: {renamed_tracks['microphone']}")
     logger.info(f"Desktop audio saved as: {renamed_tracks['desktop']}")
-    
+
     return renamed_tracks
