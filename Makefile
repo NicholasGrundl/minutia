@@ -7,6 +7,9 @@
 #   - make <target>           (recommended, convenient)
 #   - uv run <command> <args> (direct command execution)
 
+PYTHON_VENV := .venv/bin/python
+PYTEST_ARGS ?=
+
 # Installation commands (UV native, not scripts)
 .PHONY: install
 install:
@@ -61,8 +64,13 @@ check-all:
 # Testing commands
 .PHONY: test
 test:
-	@echo "Running tests..."
+	@echo "Running tests via uv..."
 	uv run pytest
+
+.PHONY: test-codex
+test-codex:
+	@echo "Running tests via local .venv..."
+	.venv/bin/python -m pytest tests/
 
 .PHONY: test-unit
 test-unit:
@@ -83,6 +91,11 @@ test-all:
 test-cov:
 	@echo "Running tests with coverage..."
 	uv run pytest --cov=src/minutia --cov-report=html --cov-report=term
+
+.PHONY: test-cleanup
+test-cleanup:
+	@echo "Removing test artifacts..."
+	rm -rf .coverage .coverage.* coverage.xml htmlcov/ .pytest_cache/
 
 # Development commands
 .PHONY: clean
@@ -114,10 +127,12 @@ help:
 	@echo ""
 	@echo "Testing:"
 	@echo "  make test             Run all tests"
+	@echo "  make test-codex       Run tests via local .venv (offline-friendly)"
 	@echo "  make test-unit        Run unit tests only"
 	@echo "  make test-integration Run unit + integration tests"
 	@echo "  make test-all         Run all tests including slow"
 	@echo "  make test-cov         Run tests with coverage report"
+	@echo "  make test-cleanup     Remove pytest and coverage artifacts"
 	@echo ""
 	@echo "Development:"
 	@echo "  make clean            Remove build artifacts"

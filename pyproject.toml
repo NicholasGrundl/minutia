@@ -95,7 +95,13 @@ testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-addopts = []
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=src/minutia",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
 
 [build-system]
 requires = ["hatchling"]
