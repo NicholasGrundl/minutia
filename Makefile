@@ -123,6 +123,6 @@ help:
 	@echo "  make clean            Remove build artifacts"
 	@echo "  make jupyter          Start Jupyter Lab"
 	@echo ""
-	@echo "Note: All commands use UV scripts defined in pyproject.toml"
-	@echo "You can also run directly: uv run <script-name>"
+	@echo "Note: This Makefile is the primary task runner."
+	@echo "You can also run commands directly: uv run <command> <args>"
 
