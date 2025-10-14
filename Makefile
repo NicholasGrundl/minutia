@@ -126,3 +126,10 @@ help:
 	@echo "Note: This Makefile is the primary task runner."
 	@echo "You can also run commands directly: uv run <command> <args>"
 
+
+# LLM committing
+
+.PHONY: commit
+commit:
+	@echo "Committing changes with LLM summarization..."
+	.claude/hooks/macro-commit.sh --force

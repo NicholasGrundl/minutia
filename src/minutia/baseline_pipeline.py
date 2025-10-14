@@ -26,12 +26,8 @@ from typing import Any
 import isodate
 from dotenv import load_dotenv
 
-from . import (
-    audio_transcription,
-    summarize_transcript,
-    transcript_merger,
-    video_extraction,
-)
+from . import audio_transcription, summarize_transcript, transcript_merger, video_extraction
+from .paths import RunPaths
 
 logger = logging.getLogger(__name__)
 
@@ -59,27 +55,6 @@ def get_isodate() -> str:
     """Return the current UTC date encoded as an ISO 8601 date string."""
     current = datetime.datetime.now(tz=datetime.timezone.utc)
     return isodate.date_isoformat(current)
-
-
-def ensure_output_directory(base_dir: Path | None, subfolder: str | None) -> Path:
-    """
-    Resolve and create the output directory.
-
-    When a base directory is not specified the notebook convention of
-    `<YYYY-MM-DD>-output` is used. A subfolder replicates the `dir_subfolder`
-    behaviour from the notebook.
-    """
-    if base_dir is None:
-        base_dir = Path.cwd() / f"{get_isodate()}-output"
-    if subfolder:
-        base_dir = base_dir / subfolder
-    base_dir.mkdir(parents=True, exist_ok=True)
-    return base_dir
-
-
-# ---------------------------------------------------------------------------
-# Advanced summarisation helpers
-# ---------------------------------------------------------------------------
 
 
 def get_filename_prompt(content: str) -> str:
@@ -302,48 +277,65 @@ def read_markdown_notes(path: Path | None) -> str:
 
 @dataclass
 class PipelineArtifacts:
-    microphone_audio: Path
-    desktop_audio: Path
-    microphone_transcript: Path
-    desktop_transcript: Path
+    run_paths: RunPaths
+    transcription_files: Mapping[str, Path]
     merged_transcript: Path
     summary_file: Path | None = None
     markdown_file: Path | None = None
 
 
-def extract_audio(input_video: Path, output_dir: Path) -> Mapping[str, str]:
-    """Extract audio tracks from the input video using the existing module."""
-    logger.info("Extracting audio tracks from %s", input_video)
-    return video_extraction.process_mkv_file(str(input_video), str(output_dir))
+def extract_audio(
+    run_paths: RunPaths,
+    mic_track: int,
+    desktop_track: int,
+) -> Mapping[str, Path]:
+    """Extract audio tracks into the run's audio directory."""
+    logger.info("Extracting audio tracks from %s", run_paths.input_path)
+    files = video_extraction.process_mkv_file(
+        input_mkv=str(run_paths.input_path),
+        output_dir=str(run_paths.audio_dir),
+        mic_track_number=mic_track,
+        desktop_track_number=desktop_track,
+    )
+
+    microphone = Path(files["microphone"])
+    desktop = Path(files["desktop"])
+
+    if microphone != run_paths.microphone_audio:
+        microphone.rename(run_paths.microphone_audio)
+    if desktop != run_paths.desktop_audio:
+        desktop.rename(run_paths.desktop_audio)
+
+    return {
+        "microphone": run_paths.microphone_audio,
+        "desktop": run_paths.desktop_audio,
+    }
 
 
-def transcribe_audio(
-    microphone: Path,
-    desktop: Path,
-    output_dir: Path,
-    whisper_model: str,
-) -> Mapping[str, str]:
+def transcribe_audio(run_paths: RunPaths, whisper_model: str) -> Mapping[str, Path]:
     """Transcribe microphone and desktop audio using Whisper."""
     logger.info("Transcribing audio with Whisper model '%s'", whisper_model)
-    return audio_transcription.process_audio_files(
-        str(microphone),
-        str(desktop),
-        output_dir=str(output_dir),
+    transcripts = audio_transcription.process_audio_files(
+        str(run_paths.microphone_audio),
+        str(run_paths.desktop_audio),
+        output_dir=str(run_paths.transcripts_dir),
         whisper_model_name=whisper_model,
     )
+    return {key: Path(value) for key, value in transcripts.items()}
 
 
 def merge_transcripts(
-    microphone_transcript: Path,
-    desktop_transcript: Path,
-    output_file: Path,
+    run_paths: RunPaths,
+    transcripts: Mapping[str, Path],
     parse_overlaps: bool,
+    target_path: Path | None = None,
 ) -> Mapping[str, Any]:
     """Merge Whisper transcripts into a single JSON artifact."""
+    output_file = target_path or run_paths.merged_transcript
     logger.info("Merging transcripts into %s", output_file)
     return transcript_merger.process_transcripts(
-        mic_transcript_file=str(microphone_transcript),
-        desktop_transcript_file=str(desktop_transcript),
+        mic_transcript_file=str(transcripts["microphone"]),
+        desktop_transcript_file=str(transcripts["desktop"]),
         output_file=str(output_file),
         parse_overlaps=parse_overlaps,
     )
@@ -392,28 +384,27 @@ def run_pipeline(args: argparse.Namespace) -> PipelineArtifacts:
     load_dotenv()
     configure_logging()
 
-    output_dir = ensure_output_directory(args.output_dir, args.subfolder)
-    logger.info("Writing run artifacts to %s", output_dir)
+    base_output_dir = args.output_dir or Path("./runs")
+    base_output_dir = base_output_dir.expanduser().resolve()
+    run_suffix = args.subfolder
 
-    audio_files = extract_audio(args.input_video, output_dir)
-    microphone_audio = Path(audio_files["microphone"])
-    desktop_audio = Path(audio_files["desktop"])
-
-    transcripts = transcribe_audio(
-        microphone_audio,
-        desktop_audio,
-        output_dir,
-        whisper_model=args.whisper_model,
+    run_paths = RunPaths.from_video_input(
+        args.input_video,
+        base_output_dir=base_output_dir,
+        run_suffix=run_suffix,
     )
-    microphone_transcript = Path(transcripts["microphone"])
-    desktop_transcript = Path(transcripts["desktop"])
+    run_paths.ensure_directories()
+    logger.info("Writing run artifacts to %s", run_paths.run_root)
 
-    merged_transcript_path = output_dir / args.transcript_filename
+    extract_audio(run_paths, args.mic_track, args.desktop_track)
+    transcripts = transcribe_audio(run_paths, args.whisper_model)
+
+    merged_transcript_path = run_paths.run_root / args.transcript_filename
     transcript_data = merge_transcripts(
-        microphone_transcript,
-        desktop_transcript,
-        merged_transcript_path,
+        run_paths,
+        transcripts,
         parse_overlaps=args.parse_overlaps,
+        target_path=merged_transcript_path,
     )
 
     personal_notes = read_personal_notes(args.personal_notes)
@@ -441,10 +432,11 @@ def run_pipeline(args: argparse.Namespace) -> PipelineArtifacts:
     if args.skip_summary:
         logger.info("Skipping summary generation (--skip-summary provided).")
     else:
-        summary_name = args.summary_filename
+        summary_path = run_paths.run_root / args.summary_filename
         if args.timestamp_summary:
-            summary_name = f"{get_isodatetime()}-{summary_name}"
-        summary_path = output_dir / summary_name
+            summary_path = summary_path.with_name(
+                f"{get_isodatetime()}-{summary_path.name}"
+            )
 
         summary_text = summarise_transcript(
             transcript_text=transcript_text_for_summary,
@@ -457,15 +449,13 @@ def run_pipeline(args: argparse.Namespace) -> PipelineArtifacts:
         if args.generate_markdown:
             markdown_path = create_markdown_report(
                 summary_text,
-                output_dir,
+                run_paths.run_root,
                 model_name=args.summary_model,
             )
 
     return PipelineArtifacts(
-        microphone_audio=microphone_audio,
-        desktop_audio=desktop_audio,
-        microphone_transcript=microphone_transcript,
-        desktop_transcript=desktop_transcript,
+        run_paths=run_paths,
+        transcription_files=transcripts,
         merged_transcript=merged_transcript_path,
         summary_file=summary_path,
         markdown_file=markdown_path,
@@ -490,19 +480,31 @@ def build_parser() -> argparse.ArgumentParser:
         "--output-dir",
         type=Path,
         default=None,
-        help="Directory to write outputs. Defaults to ./<YYYY-MM-DD>-output.",
+        help="Base directory for run outputs (default: ./runs).",
     )
     parser.add_argument(
         "--subfolder",
         type=str,
         default=None,
-        help="Optional subfolder inside the output directory.",
+        help="Optional suffix appended to the generated run directory.",
     )
     parser.add_argument(
         "--whisper-model",
         type=str,
         default="base",
         help="Whisper model name (matches notebook default).",
+    )
+    parser.add_argument(
+        "--mic-track",
+        type=int,
+        default=3,
+        help="OBS track number for microphone audio (default: 3).",
+    )
+    parser.add_argument(
+        "--desktop-track",
+        type=int,
+        default=2,
+        help="OBS track number for desktop audio (default: 2).",
     )
     parser.add_argument(
         "--transcript-filename",

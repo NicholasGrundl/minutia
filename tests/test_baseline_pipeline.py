@@ -25,7 +25,7 @@ def test_baseline_pipeline_smoke(tmp_path, monkeypatch):
 
     created_transcripts = []
 
-    def fake_process_mkv_file(input_file: str, output_dir: str):
+    def fake_process_mkv_file(input_mkv: str, output_dir: str, **kwargs):
         out_dir = Path(output_dir)
         out_dir.mkdir(parents=True, exist_ok=True)
         microphone = out_dir / "microphone_audio.wav"
@@ -95,8 +95,10 @@ def test_baseline_pipeline_smoke(tmp_path, monkeypatch):
 
     artifacts = baseline_pipeline.run_pipeline(args)
 
-    # Validate audio extraction stub was invoked
+    # Validate audio extraction and transcription steps
     assert created_transcripts, "Transcription step did not create transcripts"
+    assert artifacts.run_paths.audio_dir.exists()
+    assert artifacts.transcription_files["microphone"].exists()
 
     # Validate merged transcript file
     assert artifacts.merged_transcript.exists()
