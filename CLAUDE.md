@@ -92,21 +92,21 @@ make create-env-file
 
 ```bash
 # Linting and formatting
-make lint                 # or: uv run lint
-make lint-fix             # or: uv run lint-fix
-make format               # or: uv run format
-make check-all            # or: uv run check-all  (runs lint-fix + format + test)
+make lint                 # or: uv run ruff check .
+make lint-fix             # or: uv run ruff check --fix .
+make format               # or: uv run ruff format .
+make check-all            # Runs lint-fix + format + test (chained)
 ```
 
 ### Testing
 
 ```bash
 # Run tests (when implemented)
-make test                 # or: uv run test            (all tests)
-make test-unit            # or: uv run test-unit       (unit only, fast)
-make test-integration     # or: uv run test-integration (unit + integration)
-make test-all             # or: uv run test-all        (includes slow tests)
-make test-cov             # or: uv run test-cov        (with coverage report)
+make test                 # or: uv run pytest
+make test-unit            # or: uv run pytest -m unit
+make test-integration     # or: uv run pytest -m "unit or integration"
+make test-all             # or: uv run pytest -m "unit or integration or slow"
+make test-cov             # or: uv run pytest --cov=src/minutia --cov-report=html --cov-report=term
 ```
 
 **Important**: Tests directory does not exist yet. When creating tests, place them in `tests/` following pytest conventions with markers: `@pytest.mark.unit`, `@pytest.mark.integration`, `@pytest.mark.slow`.
@@ -115,10 +115,10 @@ make test-cov             # or: uv run test-cov        (with coverage report)
 
 ```bash
 # Start Jupyter Lab (for notebook development)
-make jupyter              # or: uv run jupyter
+make jupyter              # or: uv run jupyter lab --autoreload
 
 # Clean build artifacts
-make clean                # or: uv run clean
+make clean
 
 # Run CLI commands
 uv run minutia --help
