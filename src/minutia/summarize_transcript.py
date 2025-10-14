@@ -66,7 +66,7 @@ def prepare_transcript_for_summary(transcript_data):
 def create_summary_prompt(transcript_text):
     """Create a prompt for the language model to generate a summary."""
     prompt = f"""Please provide a summary of the following meeting transcript. The target audience is a general reader who may not have been present at the meeting but wants to know the technical details discussed.
-    
+
     <summaryformat>
     Use markdown formatting for headers, bulleted lists, numbered lists and emphasis via bold and italics.
 
@@ -80,7 +80,7 @@ def create_summary_prompt(transcript_text):
 
     Third, create a heading section for each major topic and expand on the details focusing on technical content, existing or proposed projects or efforts, decisions, and timelines.
 
-    Fourth, review the existing summary text and add any additional information or relevant notes. 
+    Fourth, review the existing summary text and add any additional information or relevant notes.
 
     Finally, end with a action items and conclusion section.
     </summarydirections>
@@ -90,9 +90,9 @@ def create_summary_prompt(transcript_text):
 
     <transcript>
     {transcript_text}
-    
+
     </transcript>
-    
+
     Please summarize this meeting transcript based on the instructions given in <summaryformat> and <summarydirections>.
     """
     return prompt
