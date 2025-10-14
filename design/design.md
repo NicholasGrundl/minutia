@@ -1103,7 +1103,12 @@ Every task should ship with:
 
 ### Enhanced Testing Strategy with Mocking & Resource Management
 
-**Architecture: Hybrid Approach with Test Categories**
+**Note:** The comprehensive testing strategy below is primarily **post-MVP**. For MVP, focus on:
+- One smoke test that validates end-to-end pipeline with real (small) test file
+- Basic unit tests for RunPaths and orchestrator logic
+- Defer extensive mocking, fixtures, and test categories until after core pipeline proven
+
+**Architecture: Hybrid Approach with Test Categories (Post-MVP)**
 
 #### API Mocking Strategy
 
