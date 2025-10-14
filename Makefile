@@ -35,52 +35,65 @@ create-env-file:
 		echo ".env file already exists. Please ensure it contains your API keys."; \
 	fi
 
-# Code quality commands (wraps UV scripts)
+# Code quality commands
 .PHONY: lint
 lint:
-	uv run lint
+	@echo "Running linter..."
+	uv run ruff check .
 
 .PHONY: format
 format:
-	uv run format
+	@echo "Formatting code..."
+	uv run ruff format .
 
 .PHONY: lint-fix
 lint-fix:
-	uv run lint-fix
+	@echo "Running linter with auto-fix..."
+	uv run ruff check --fix .
 
 .PHONY: check-all
 check-all:
-	uv run check-all
+	@echo "Running lint-fix, format, and test..."
+	@$(MAKE) lint-fix
+	@$(MAKE) format
+	@$(MAKE) test
 
-# Testing commands (wraps UV scripts)
+# Testing commands
 .PHONY: test
 test:
-	uv run test
+	@echo "Running tests..."
+	uv run pytest
 
 .PHONY: test-unit
 test-unit:
-	uv run test-unit
+	@echo "Running unit tests..."
+	uv run pytest -m unit
 
 .PHONY: test-integration
 test-integration:
-	uv run test-integration
+	@echo "Running unit and integration tests..."
+	uv run pytest -m "unit or integration"
 
 .PHONY: test-all
 test-all:
-	uv run test-all
+	@echo "Running all tests including slow..."
+	uv run pytest -m "unit or integration or slow"
 
 .PHONY: test-cov
 test-cov:
-	uv run test-cov
+	@echo "Running tests with coverage..."
+	uv run pytest --cov=src/minutia --cov-report=html --cov-report=term
 
-# Development commands (wraps UV scripts)
+# Development commands
 .PHONY: clean
 clean:
-	uv run clean
+	@echo "Cleaning up build artifacts..."
+	rm -rf dist/ build/ *.egg-info/ .pytest_cache/ htmlcov/ .coverage
 
 .PHONY: jupyter
 jupyter:
-	uv run jupyter
+	@echo "Starting Jupyter Lab..."
+	uv run jupyter lab --autoreload
 
 # Help command
 .PHONY: help
