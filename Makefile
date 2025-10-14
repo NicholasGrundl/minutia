@@ -1,5 +1,13 @@
 # UV-based project management for Minutia
+#
+# This Makefile provides convenient shortcuts to UV scripts defined in pyproject.toml
+# You can use either:
+#   - make <target>  (convenient, traditional)
+#   - uv run <script> (direct UV invocation)
+#
+# All scripts are defined in [tool.uv.scripts] section of pyproject.toml
 
+# Installation commands (UV native, not scripts)
 .PHONY: install
 install:
 	@echo "Installing project and dependencies with uv..."
@@ -15,8 +23,6 @@ install-all:
 	@echo "Installing project with all optional dependencies..."
 	uv sync --extra dev --extra jupyter --extra media
 
-
-
 .PHONY: create-env-file
 create-env-file:
 	@echo "Creating .env file..."
@@ -29,35 +35,81 @@ create-env-file:
 		echo ".env file already exists. Please ensure it contains your API keys."; \
 	fi
 
-# Development commands
+# Code quality commands (wraps UV scripts)
 .PHONY: lint
 lint:
-	@echo "Running linter..."
-	uv run ruff check .
+	uv run lint
 
 .PHONY: format
 format:
-	@echo "Formatting code..."
-	uv run ruff format .
+	uv run format
 
 .PHONY: lint-fix
 lint-fix:
-	@echo "Running linter with auto-fix..."
-	uv run ruff check --fix .
+	uv run lint-fix
 
+.PHONY: check-all
+check-all:
+	uv run check-all
+
+# Testing commands (wraps UV scripts)
 .PHONY: test
 test:
-	@echo "Running tests..."
-	uv run pytest
+	uv run test
 
+.PHONY: test-unit
+test-unit:
+	uv run test-unit
+
+.PHONY: test-integration
+test-integration:
+	uv run test-integration
+
+.PHONY: test-all
+test-all:
+	uv run test-all
+
+.PHONY: test-cov
+test-cov:
+	uv run test-cov
+
+# Development commands (wraps UV scripts)
 .PHONY: clean
 clean:
-	@echo "Cleaning up build artifacts..."
-	rm -rf dist/ build/ *.egg-info/ .pytest_cache/ htmlcov/ .coverage
+	uv run clean
 
-# Jupyter Lab
 .PHONY: jupyter
-jupyter: 
-	@echo "Starting Jupyter Lab..."
-	uv run jupyter lab --autoreload
+jupyter:
+	uv run jupyter
+
+# Help command
+.PHONY: help
+help:
+	@echo "Minutia Development Commands"
+	@echo ""
+	@echo "Installation:"
+	@echo "  make install          Install core dependencies"
+	@echo "  make install-dev      Install with dev dependencies (ruff, pytest)"
+	@echo "  make install-all      Install everything (dev, jupyter, media)"
+	@echo "  make create-env-file  Create .env file template"
+	@echo ""
+	@echo "Code Quality:"
+	@echo "  make lint             Check code with ruff"
+	@echo "  make lint-fix         Auto-fix linting issues"
+	@echo "  make format           Format code with ruff"
+	@echo "  make check-all        Run lint-fix + format + test"
+	@echo ""
+	@echo "Testing:"
+	@echo "  make test             Run all tests"
+	@echo "  make test-unit        Run unit tests only"
+	@echo "  make test-integration Run unit + integration tests"
+	@echo "  make test-all         Run all tests including slow"
+	@echo "  make test-cov         Run tests with coverage report"
+	@echo ""
+	@echo "Development:"
+	@echo "  make clean            Remove build artifacts"
+	@echo "  make jupyter          Start Jupyter Lab"
+	@echo ""
+	@echo "Note: All commands use UV scripts defined in pyproject.toml"
+	@echo "You can also run directly: uv run <script-name>"
 
