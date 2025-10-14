@@ -59,7 +59,7 @@ def extract_all_audio_tracks(input_file, output_directory):
     
     # Extract each audio track
     extracted_files = []
-    for i, stream in enumerate(audio_streams):
+    for i, _ in enumerate(audio_streams):
         output_file = os.path.join(output_directory, f"audio_track_{i+1}.wav")
         extract_audio_track(input_file, output_file, i)
         extracted_files.append(output_file)
