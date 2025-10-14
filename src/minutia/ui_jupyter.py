@@ -11,7 +11,7 @@ from IPython.display import display
 
 
 class AudioCaptureWidget:
-    def __init__(self, device_type='microphone'):
+    def __init__(self, device_type="microphone"):
         self.device_type = device_type
         self.is_recording = False
         self.buffer = io.BytesIO()
@@ -19,7 +19,9 @@ class AudioCaptureWidget:
         self.create_widgets()
 
     def create_widgets(self):
-        self.start_button = widgets.Button(description=f"Start {self.device_type} Recording")
+        self.start_button = widgets.Button(
+            description=f"Start {self.device_type} Recording"
+        )
         self.stop_button = widgets.Button(description="Stop Recording", disabled=True)
         self.save_button = widgets.Button(description="Save Recording", disabled=True)
         self.status_label = widgets.Label(value="Ready")
@@ -28,12 +30,9 @@ class AudioCaptureWidget:
         self.stop_button.on_click(self.stop_recording)
         self.save_button.on_click(self.save_recording)
 
-        self.widget = widgets.VBox([
-            self.start_button,
-            self.stop_button,
-            self.save_button,
-            self.status_label
-        ])
+        self.widget = widgets.VBox(
+            [self.start_button, self.stop_button, self.save_button, self.status_label]
+        )
 
     def start_recording(self, _):
         self.is_recording = True
@@ -47,7 +46,9 @@ class AudioCaptureWidget:
         threading.Thread(target=self._record).start()
 
     def _record(self):
-        with sd.InputStream(callback=self._audio_callback, channels=2, samplerate=44100):
+        with sd.InputStream(
+            callback=self._audio_callback, channels=2, samplerate=44100
+        ):
             while self.is_recording:
                 sd.sleep(100)
 
@@ -71,4 +72,3 @@ class AudioCaptureWidget:
 
     def display(self):
         display(self.widget)
-

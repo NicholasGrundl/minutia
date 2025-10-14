@@ -15,32 +15,46 @@ from .transcript_merger import process_transcripts
 from .video_extraction import process_mkv_file
 
 # Set up logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
+
 
 @click.group()
 def cli():
     """OBS Video Processing CLI"""
     pass
 
+
 @cli.command()
-@click.argument('input_video', type=click.Path(exists=True))
-@click.argument('output_dir', type=click.Path())
-@click.option('--mic-track', default=3, help='Track number for microphone audio (default: 3)')
-@click.option('--desktop-track', default=2, help='Track number for desktop audio (default: 2)')
+@click.argument("input_video", type=click.Path(exists=True))
+@click.argument("output_dir", type=click.Path())
+@click.option(
+    "--mic-track", default=3, help="Track number for microphone audio (default: 3)"
+)
+@click.option(
+    "--desktop-track", default=2, help="Track number for desktop audio (default: 2)"
+)
 def extract_audio(input_video, output_dir, mic_track, desktop_track):
     """Extract audio tracks from MKV file."""
     try:
-        audio_files = process_mkv_file(input_video, output_dir, mic_track_number=mic_track, desktop_track_number=desktop_track)
+        audio_files = process_mkv_file(
+            input_video,
+            output_dir,
+            mic_track_number=mic_track,
+            desktop_track_number=desktop_track,
+        )
         click.echo(f"Audio files extracted: {audio_files}")
     except Exception as e:
         logger.error(f"Audio extraction failed: {str(e)}")
         raise click.ClickException(str(e))
 
+
 @cli.command()
-@click.argument('mic_audio', type=click.Path(exists=True))
-@click.argument('desktop_audio', type=click.Path(exists=True))
-@click.argument('output_dir', type=click.Path())
+@click.argument("mic_audio", type=click.Path(exists=True))
+@click.argument("desktop_audio", type=click.Path(exists=True))
+@click.argument("output_dir", type=click.Path())
 def transcribe(mic_audio, desktop_audio, output_dir):
     """Transcribe audio files."""
     try:
@@ -50,10 +64,11 @@ def transcribe(mic_audio, desktop_audio, output_dir):
         logger.error(f"Transcription failed: {str(e)}")
         raise click.ClickException(str(e))
 
+
 @cli.command()
-@click.argument('mic_transcript', type=click.Path(exists=True))
-@click.argument('desktop_transcript', type=click.Path(exists=True))
-@click.argument('output_file', type=click.Path())
+@click.argument("mic_transcript", type=click.Path(exists=True))
+@click.argument("desktop_transcript", type=click.Path(exists=True))
+@click.argument("output_file", type=click.Path())
 def merge_transcripts(mic_transcript, desktop_transcript, output_file):
     """Merge microphone and desktop transcripts."""
     try:
@@ -63,18 +78,30 @@ def merge_transcripts(mic_transcript, desktop_transcript, output_file):
         logger.error(f"Transcript merging failed: {str(e)}")
         raise click.ClickException(str(e))
 
+
 @cli.command()
-@click.argument('merged_transcript', type=click.Path(exists=True))
-@click.argument('output_file', type=click.Path())
-@click.option('--model', type=click.Choice(['claude-3-5-sonnet', 'claude-3-haiku']), default='claude-3-5-sonnet', help='Model to use for summarization')
-@click.option('--dry-run', is_flag=True, help='Estimate tokens and price without generating summary')
+@click.argument("merged_transcript", type=click.Path(exists=True))
+@click.argument("output_file", type=click.Path())
+@click.option(
+    "--model",
+    type=click.Choice(["claude-3-5-sonnet", "claude-3-haiku"]),
+    default="claude-3-5-sonnet",
+    help="Model to use for summarization",
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Estimate tokens and price without generating summary",
+)
 def summarize(merged_transcript, output_file, model, dry_run):
     """Generate summary from merged transcript."""
     try:
         transcript_data = load_transcript(merged_transcript)
         transcript_text = prepare_transcript_for_summary(transcript_data)
 
-        total_tokens, estimated_price = estimate_tokens_and_price(transcript_text, model)
+        total_tokens, estimated_price = estimate_tokens_and_price(
+            transcript_text, model
+        )
         click.echo(f"Estimated tokens: {total_tokens}")
         click.echo(f"Estimated price: ${estimated_price:.4f}")
 
@@ -89,34 +116,57 @@ def summarize(merged_transcript, output_file, model, dry_run):
         logger.error(f"Summary generation failed: {str(e)}")
         raise click.ClickException(str(e))
 
+
 @cli.command()
-@click.argument('input_video', type=click.Path(exists=True))
-@click.argument('output_dir', type=click.Path())
-@click.option('--mic-track', default=3, help='Track number for microphone audio (default: 3)')
-@click.option('--desktop-track', default=2, help='Track number for desktop audio (default: 2)')
-@click.option('--model', type=click.Choice(['claude-3-5-sonnet', 'claude-3-haiku']), default='claude-3-5-sonnet', help='Model to use for summarization')
+@click.argument("input_video", type=click.Path(exists=True))
+@click.argument("output_dir", type=click.Path())
+@click.option(
+    "--mic-track", default=3, help="Track number for microphone audio (default: 3)"
+)
+@click.option(
+    "--desktop-track", default=2, help="Track number for desktop audio (default: 2)"
+)
+@click.option(
+    "--model",
+    type=click.Choice(["claude-3-5-sonnet", "claude-3-haiku"]),
+    default="claude-3-5-sonnet",
+    help="Model to use for summarization",
+)
 def process_all(input_video, output_dir, mic_track, desktop_track, model):
     """Run the entire video processing workflow."""
     try:
         # Step 1: Process MKV file
         click.echo("Step 1: Processing MKV file")
-        audio_files = process_mkv_file(input_video, output_dir, mic_track_number=mic_track, desktop_track_number=desktop_track)
+        audio_files = process_mkv_file(
+            input_video,
+            output_dir,
+            mic_track_number=mic_track,
+            desktop_track_number=desktop_track,
+        )
 
         # Step 2: Transcribe audio files
         click.echo("Step 2: Transcribing audio files")
-        transcriptions = process_audio_files(audio_files['microphone'], audio_files['desktop'], output_dir)
+        transcriptions = process_audio_files(
+            audio_files["microphone"], audio_files["desktop"], output_dir
+        )
 
         # Step 3: Merge transcripts
         click.echo("Step 3: Merging transcripts")
         merged_transcript_file = os.path.join(output_dir, "merged_transcript.json")
-        process_transcripts(transcriptions['microphone'], transcriptions['desktop'], merged_transcript_file)
+        process_transcripts(
+            transcriptions["microphone"],
+            transcriptions["desktop"],
+            merged_transcript_file,
+        )
 
         # Step 4: Generate summary
         click.echo("Step 4: Generating summary")
         transcript_data = load_transcript(merged_transcript_file)
         transcript_text = prepare_transcript_for_summary(transcript_data)
 
-        total_tokens, estimated_price = estimate_tokens_and_price(transcript_text, model)
+        total_tokens, estimated_price = estimate_tokens_and_price(
+            transcript_text, model
+        )
         click.echo(f"Estimated tokens for summary: {total_tokens}")
         click.echo(f"Estimated price for summary: ${estimated_price:.4f}")
 
@@ -130,6 +180,7 @@ def process_all(input_video, output_dir, mic_track, desktop_track, model):
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}")
         raise click.ClickException(str(e))
+
 
 if __name__ == "__main__":
     cli()

@@ -10,12 +10,16 @@ def setup_logger(name="whisper", level=logging.INFO):
     logger.propagate = False
     logger.setLevel(level)
     handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+    handler.setFormatter(
+        logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    )
     logger.addHandler(handler)
     return logger
 
+
 # Usage
 logger = setup_logger()
+
 
 def transcribe_audio(audio_path, model_name="base"):
     try:
@@ -31,6 +35,7 @@ def transcribe_audio(audio_path, model_name="base"):
         logger.error(f"Error during transcription: {str(e)}")
         raise
 
+
 def save_transcription(transcription, output_path):
     try:
         logger.info(f"Saving transcription to: {output_path}")
@@ -45,19 +50,30 @@ def save_transcription(transcription, output_path):
         logger.error(f"Error saving transcription: {str(e)}")
         raise
 
-def process_audio_files(mic_audio_path, desktop_audio_path, output_dir, whisper_model_name='base'):
+
+def process_audio_files(
+    mic_audio_path, desktop_audio_path, output_dir, whisper_model_name="base"
+):
     try:
         os.makedirs(output_dir, exist_ok=True)
         filenames = {}
-        for audio_type, audio_path in [("microphone", mic_audio_path), ("desktop", desktop_audio_path)]:
+        for audio_type, audio_path in [
+            ("microphone", mic_audio_path),
+            ("desktop", desktop_audio_path),
+        ]:
             if not os.path.exists(audio_path):
-                logger.error(f"{audio_type.capitalize()} audio file not found: {audio_path}")
+                logger.error(
+                    f"{audio_type.capitalize()} audio file not found: {audio_path}"
+                )
                 continue
 
             logger.info(f"Processing {audio_type} audio")
             transcription = transcribe_audio(audio_path, model_name=whisper_model_name)
 
-            output_path = os.path.join(output_dir, f"{audio_type}-whisper-{whisper_model_name}_transcription.txt")
+            output_path = os.path.join(
+                output_dir,
+                f"{audio_type}-whisper-{whisper_model_name}_transcription.txt",
+            )
             save_transcription(transcription, output_path)
             filenames[audio_type] = output_path
         logger.info("Audio processing completed")

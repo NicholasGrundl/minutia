@@ -5,6 +5,7 @@ import param
 
 pn.extension()
 
+
 class AudioSelectionWidget(param.Parameterized):
     file_input = param.Parameter()
     audio_player = param.Parameter()
@@ -12,11 +13,15 @@ class AudioSelectionWidget(param.Parameterized):
 
     def __init__(self, **params):
         super().__init__(**params)
-        self.file_input = pn.widgets.FileInput(accept='.wav')
-        self.audio_player = pn.widgets.Audio(name='Audio Player', sizing_mode='stretch_width')
-        self.play_button = pn.widgets.Button(name='Play', button_type='primary', disabled=True)
+        self.file_input = pn.widgets.FileInput(accept=".wav")
+        self.audio_player = pn.widgets.Audio(
+            name="Audio Player", sizing_mode="stretch_width"
+        )
+        self.play_button = pn.widgets.Button(
+            name="Play", button_type="primary", disabled=True
+        )
 
-        self.file_input.param.watch(self.update_audio, 'value')
+        self.file_input.param.watch(self.update_audio, "value")
         self.play_button.on_click(self.play_audio)
 
     def update_audio(self, event):
@@ -44,19 +49,15 @@ class AudioSelectionWidget(param.Parameterized):
             print("Playing audio...")  # Debug print
             self.audio_player.playing = True
 
-    @param.depends('audio_info')
+    @param.depends("audio_info")
     def get_audio_info(self):
         return self.audio_info
 
-    @pn.depends('file_input.value', 'audio_info')
+    @pn.depends("file_input.value", "audio_info")
     def panel(self):
         return pn.Column(
             self.file_input,
             pn.pane.Markdown(self.get_audio_info),
             self.play_button,
-            self.audio_player
+            self.audio_player,
         )
-
-
-
-
