@@ -1,15 +1,5 @@
 # Import necessary libraries
 import ffmpeg
-import whisper
-import pandas as pd
-import numpy as np
-from transformers import pipeline
-import torch
-import openai
-import anthropic
-from pydantic import BaseModel
-import instructor
-from dotenv import load_dotenv
 import os
 import logging
 import shutil
