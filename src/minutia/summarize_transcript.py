@@ -1,29 +1,10 @@
 import json
-import logging
-import os
-import sys
 
 import tiktoken
 from anthropic import Anthropic
+from .config import resolve_anthropic_api_key
+from .logging import logger
 
-
-def setup_anthropic_logger(name="anthropic", level=logging.INFO):
-    logger = logging.getLogger(name)
-    logger.propagate = False
-    logger.setLevel(level)
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(
-        logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    )
-    logger.addHandler(handler)
-    return logger
-
-
-# Usage
-logger = setup_anthropic_logger()
-
-# Load environment variables
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 MAX_TOKENS_OUTPUT = (
     8192  # Max model output. Around 3.1K words (6-7 single spaced pages)
 )
@@ -55,7 +36,7 @@ def load_transcript(file_path):
             data = json.load(f)
         return data
     except Exception as e:
-        logger.error(f"Error loading transcript: {str(e)}")
+        logger.exception("Error loading transcript: {}", e)
         raise
 
 
@@ -147,11 +128,11 @@ def estimate_tokens_and_price(
         price_per_1k_input_tokens,
         price_per_1k_output_tokens,
     )
-    logger.info(f"Estimating metrics for {model}")
-    logger.info(f"input tokens: {input_tokens}")
-    logger.info(f"output tokens: {output_tokens}")
-    logger.info(f"total tokens: {total_tokens}")
-    logger.info(f"price: ${estimated_price:.4f}")
+    logger.info("Estimating metrics for {}", model)
+    logger.info("input tokens: {}", input_tokens)
+    logger.info("output tokens: {}", output_tokens)
+    logger.info("total tokens: {}", total_tokens)
+    logger.info("price: ${:.4f}", estimated_price)
 
     return total_tokens, estimated_price
 
@@ -161,6 +142,7 @@ def generate_long_summary(
     model_name="claude-3-5-sonnet",
     max_output_tokens=None,
     system_prompt=None,
+    api_key=None,
     **kwargs,
 ):
     """Generate a summary using the Anthropic API. Allow multiple continues for length"""
@@ -171,7 +153,10 @@ def generate_long_summary(
         raise KeyError(f"model must be one of [{list(anthropic_models.keys())}]")
     model = anthropic_models.get(model_name)["name"]
 
-    client = Anthropic(api_key=ANTHROPIC_API_KEY)
+    api_key = api_key or resolve_anthropic_api_key()
+    if not api_key:
+        raise RuntimeError("Anthropic API key not configured")
+    client = Anthropic(api_key=api_key)
 
     if system_prompt is None:
         # old approach
@@ -207,7 +192,7 @@ def generate_long_summary(
             else:
                 break
         except Exception as e:
-            logger.error(f"Error generating summary: {str(e)}")
+            logger.exception("Error generating summary: {}", e)
             raise
     return full_summary
 
@@ -217,6 +202,7 @@ def generate_summary(
     model_name="claude-3-5-sonnet",
     max_output_tokens=None,
     system_prompt=None,
+    api_key=None,
     **kwargs,
 ):
     """Generate a summary using the Anthropic API."""
@@ -227,7 +213,10 @@ def generate_summary(
         raise KeyError(f"model must be one of [{list(anthropic_models.keys())}]")
     model = anthropic_models.get(model_name)["name"]
 
-    client = Anthropic(api_key=ANTHROPIC_API_KEY)
+    api_key = api_key or resolve_anthropic_api_key()
+    if not api_key:
+        raise RuntimeError("Anthropic API key not configured")
+    client = Anthropic(api_key=api_key)
     if system_prompt is None:
         # old approach
         prompt = create_summary_prompt(transcript_text)
@@ -249,7 +238,7 @@ def generate_summary(
         )
         return response.content[0].text
     except Exception as e:
-        logger.error(f"Error generating summary: {str(e)}")
+        logger.exception("Error generating summary: {}", e)
         raise
 
 
@@ -258,7 +247,7 @@ def save_summary(summary, output_file):
     try:
         with open(output_file, "w") as f:
             f.write(summary)
-        logger.info(f"Summary saved to {output_file}")
+        logger.info("Summary saved to {}", output_file)
     except Exception as e:
-        logger.error(f"Error saving summary: {str(e)}")
+        logger.exception("Error saving summary: {}", e)
         raise

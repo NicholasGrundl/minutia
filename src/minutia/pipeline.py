@@ -16,7 +16,16 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence
 
+from .logging import configure_logging, logging_context, logger
 from .paths import RunPaths
+
+# Anthropic model choices sourced from Claude model overview:
+# https://docs.claude.com/en/docs/about-claude/models/overview
+SUMMARY_MODEL_CHOICES: Sequence[str] = (
+    "claude-4-5-sonnet",
+    "claude-3-5-sonnet",
+    "claude-3-haiku",
+)
 
 
 class StepStatus(Enum):
@@ -149,6 +158,10 @@ class PipelineConfig:
         The audio track number for the desktop audio in the source video.
     base_output_dir : Path, default=Path('./runs')
         The parent directory where all run-specific output folders are created.
+    anthropic_api_key : str, optional
+        API key used when performing summarisation with Anthropic models.
+    log_level : str, default='INFO'
+        Minimum log level applied to pipeline logging output.
     """
 
     input_path: Path
@@ -160,6 +173,18 @@ class PipelineConfig:
     mic_track: int = 3
     desktop_track: int = 2
     base_output_dir: Path = Path("./runs")
+    anthropic_api_key: Optional[str] = None
+    log_level: str = "INFO"
+
+    def __post_init__(self) -> None:
+        if self.summary_model not in SUMMARY_MODEL_CHOICES:
+            choices = ", ".join(SUMMARY_MODEL_CHOICES)
+            raise ValueError(
+                f"Unsupported summary_model '{self.summary_model}'. "
+                f"Choose one of: {choices}. Refer to Claude model overview for details: "
+                "https://docs.claude.com/en/docs/about-claude/models/overview",
+            )
+        object.__setattr__(self, "log_level", self.log_level.upper())
 
 
 StepRunner = Callable[[PipelineConfig, Mapping[str, Any]], Dict[str, Any]]
@@ -306,6 +331,7 @@ class PipelineOrchestrator:
             summary_text = summarize_transcript.generate_summary(
                 transcript_text,
                 model_name=config.summary_model,
+                api_key=config.anthropic_api_key,
             )
             summarize_transcript.save_summary(summary_text, str(config.run_paths.summary_file))
             return {
@@ -354,6 +380,7 @@ class PipelineOrchestrator:
         Exceptions raised by individual steps are caught so the caller receives
         a :class:`PipelineResult` containing partial progress information.
         """
+        configure_logging(level=config.log_level, logs_file=config.run_paths.logs_file)
         config.run_paths.ensure_directories()
 
         artifacts: Dict[str, Any] = {}
@@ -362,36 +389,49 @@ class PipelineOrchestrator:
         self.state = PipelineExecutionState()
         self.state.success = None
 
-        for step in self.steps:
-            if not step.is_enabled(config):
-                self._report_progress(step.name, StepStatus.COMPLETED, "Skipped")
-                continue
+        with logging_context(
+            input_file=config.input_path, run_root=config.run_paths.run_root
+        ):
+            logger.info("Starting pipeline run")
+            for step in self.steps:
+                if not step.is_enabled(config):
+                    with logging_context(step=step.name):
+                        logger.info("Skipping disabled step")
+                        self._report_progress(step.name, StepStatus.COMPLETED, "Skipped")
+                    continue
 
-            self.state.current_step = step.name
-            self._report_progress(step.name, StepStatus.RUNNING, step.description)
+                self.state.current_step = step.name
+                with logging_context(step=step.name):
+                    self._report_progress(step.name, StepStatus.RUNNING, step.description)
+                    logger.info("Running step")
 
-            try:
-                step_outputs = step.runner(config, MappingProxyType(artifacts))
-                if step_outputs:
-                    artifacts.update(step_outputs)
-                completed_steps.append(step.name)
-                self.state.completed_steps = list(completed_steps)
-                self.state.artifacts = dict(artifacts)
-                self._report_progress(step.name, StepStatus.COMPLETED, "Completed")
-            except Exception as exc:  # noqa: BLE001 - propagate structured failure state
-                self.state.failed_step = step.name
-                self.state.error = exc
-                self.state.success = False
-                self._report_progress(step.name, StepStatus.FAILED, str(exc), error=exc)
-                return PipelineResult(
-                    success=False,
-                    run_paths=config.run_paths,
-                    completed_steps=list(completed_steps),
-                    failed_step=step.name,
-                    error=exc,
-                    artifacts=dict(artifacts),
-                    duration_seconds=time.perf_counter() - start_time,
-                )
+                    try:
+                        step_outputs = step.runner(config, MappingProxyType(artifacts))
+                        if step_outputs:
+                            artifacts.update(step_outputs)
+                        completed_steps.append(step.name)
+                        self.state.completed_steps = list(completed_steps)
+                        self.state.artifacts = dict(artifacts)
+                        self._report_progress(step.name, StepStatus.COMPLETED, "Completed")
+                        logger.info("Step completed")
+                    except Exception as exc:  # noqa: BLE001 - propagate structured failure state
+                        self.state.failed_step = step.name
+                        self.state.error = exc
+                        self.state.success = False
+                        self._report_progress(
+                            step.name, StepStatus.FAILED, str(exc), error=exc
+                        )
+                        logger.exception("Step failed with error: {}", exc)
+                        return PipelineResult(
+                            success=False,
+                            run_paths=config.run_paths,
+                            completed_steps=list(completed_steps),
+                            failed_step=step.name,
+                            error=exc,
+                            artifacts=dict(artifacts),
+                            duration_seconds=time.perf_counter() - start_time,
+                        )
+            logger.info("Pipeline run completed successfully")
 
         self.state.current_step = None
         self.state.success = True

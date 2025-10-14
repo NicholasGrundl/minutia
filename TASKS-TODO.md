@@ -29,25 +29,25 @@
 ## Phase 3: Pipeline Architecture (MVP - Core)
 
 ### ⚙️ Basic Pipeline Orchestration
-- [ ] Implement PipelineOrchestrator class with callback-based progress reporting
-- [ ] Add basic step execution with exception handling and error messages
-- [ ] Create step enumeration and execution framework
-- [ ] Add basic state tracking (defer full resume-from-failure to Phase 8)
-- [ ] Add unit tests for orchestrator logic
+- [x] Implement PipelineOrchestrator class with callback-based progress reporting
+- [x] Add basic step execution with exception handling and error messages
+- [x] Create step enumeration and execution framework
+- [x] Add basic state tracking (defer full resume-from-failure to Phase 8)
+- [x] Add unit tests for orchestrator logic
 
 ## Phase 4: Logging & Configuration (MVP - Infrastructure)
 
 ### 📝 Unified Logging System
-- [ ] Replace multiple basic loggers with unified loguru setup
-- [ ] Add contextual fields (`step`, `input_file`, `run_root`) for log correlation
-- [ ] Configure simple file sink for run directory and colored stderr sink
-- [ ] Integrate with pipeline orchestrator for structured logging
+- [x] Replace multiple basic loggers with unified loguru setup
+- [x] Add contextual fields (`step`, `input_file`, `run_root`) for log correlation
+- [x] Configure simple file sink for run directory and colored stderr sink
+- [x] Integrate with pipeline orchestrator for structured logging
 
 ### ⚙️ Basic Configuration System
-- [ ] Implement basic configuration system with environment variable support
-- [ ] Add configuration validation and API key handling
-- [ ] Add `.env` file support for configuration
-- [ ] Secure API key handling with fallback chain
+- [x] Implement basic configuration system with environment variable support
+- [x] Add configuration validation and API key handling
+- [x] Add `.env` file support for configuration
+- [x] Secure API key handling with fallback chain
 
 ## Phase 5: Simple CLI Wrapper (MVP - Interface)
 

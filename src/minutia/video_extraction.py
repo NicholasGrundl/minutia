@@ -2,28 +2,12 @@
 
 from __future__ import annotations
 
-import logging
 import shutil
 from collections.abc import Iterable
 from pathlib import Path
 
 import ffmpeg
-
-
-def _configure_logger() -> logging.Logger:
-    """Create a dedicated logger for ffmpeg operations."""
-    logger = logging.getLogger("minutia.video_extraction")
-    if not logger.handlers:
-        handler = logging.StreamHandler()
-        handler.setFormatter(
-            logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-        )
-        logger.addHandler(handler)
-        logger.setLevel(logging.INFO)
-    return logger
-
-
-logger = _configure_logger()
+from .logging import logger
 
 
 def get_video_info(file_path: Path) -> dict[str, Iterable[dict]]:
@@ -65,7 +49,11 @@ def identify_audio_tracks(
     OBS numbers tracks starting at 1, so the generated filenames use the same
     convention (audio_track_1.wav, audio_track_2.wav, ...).
     """
-    logger.info("Identifying audio tracks (mic=%s, desktop=%s)", mic_track_number, desktop_track_number)
+    logger.info(
+        "Identifying audio tracks (mic={}, desktop={})",
+        mic_track_number,
+        desktop_track_number,
+    )
     track_lookup = {}
     for file in audio_files:
         suffix = file.stem.split("_")[-1]
@@ -76,7 +64,7 @@ def identify_audio_tracks(
     desktop = track_lookup.get(desktop_track_number)
 
     if microphone is None or desktop is None:
-        logger.error("Available tracks: %s", sorted(track_lookup))
+        logger.error("Available tracks: {}", sorted(track_lookup))
         raise ValueError("Could not identify both microphone and desktop audio files.")
 
     return {"microphone": microphone, "desktop": desktop}
@@ -104,9 +92,9 @@ def process_mkv_file(
     input_path = Path(input_mkv)
     output_path = Path(output_dir)
 
-    logger.info("Processing MKV file %s", input_path)
+    logger.info("Processing MKV file {}", input_path)
     extracted_files = list(extract_all_audio_tracks(input_path, output_path))
-    logger.info("Extracted %s audio tracks", len(extracted_files))
+    logger.info("Extracted {} audio tracks", len(extracted_files))
 
     identified_tracks = identify_audio_tracks(
         extracted_files,
@@ -115,7 +103,7 @@ def process_mkv_file(
     )
     renamed_tracks = copy_and_rename_audio_files(identified_tracks, output_path)
 
-    logger.info("Microphone audio: %s", renamed_tracks["microphone"])
-    logger.info("Desktop audio: %s", renamed_tracks["desktop"])
+    logger.info("Microphone audio: {}", renamed_tracks["microphone"])
+    logger.info("Desktop audio: {}", renamed_tracks["desktop"])
 
     return {key: str(path) for key, path in renamed_tracks.items()}

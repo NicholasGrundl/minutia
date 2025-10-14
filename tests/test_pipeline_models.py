@@ -25,6 +25,8 @@ def test_pipeline_config_defaults(tmp_path):
     assert config.mic_track == 3
     assert config.desktop_track == 2
     assert config.base_output_dir == Path("./runs")
+    assert config.anthropic_api_key is None
+    assert config.log_level == "INFO"
 
 
 def test_step_progress_representation():
@@ -78,3 +80,15 @@ def test_pipeline_config_custom_summary_model(tmp_path):
     )
 
     assert config.summary_model == "claude-3-haiku"
+
+
+def test_pipeline_config_log_level_normalisation(tmp_path):
+    run_paths = create_run_paths(tmp_path)
+    config = PipelineConfig(
+        input_path=run_paths.input_path,
+        run_paths=run_paths,
+        run_id="run",
+        log_level="debug",
+    )
+
+    assert config.log_level == "DEBUG"

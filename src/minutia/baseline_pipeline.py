@@ -17,32 +17,17 @@ from __future__ import annotations
 import argparse
 import datetime
 import json
-import logging
 from collections.abc import Iterable, Mapping, MutableMapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import isodate
-from dotenv import load_dotenv
-
 from . import audio_transcription, summarize_transcript, transcript_merger, video_extraction
+from .config import load_config
+from .logging import configure_logging as setup_logging
+from .logging import logging_context, logger
 from .paths import RunPaths
-
-logger = logging.getLogger(__name__)
-
-
-# ---------------------------------------------------------------------------
-# Shared helpers
-# ---------------------------------------------------------------------------
-
-
-def configure_logging(level: int = logging.INFO) -> None:
-    """Configure root logging to mirror the notebook defaults."""
-    logging.basicConfig(
-        level=level,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    )
 
 
 def get_isodatetime() -> str:
@@ -112,7 +97,7 @@ def create_markdown_report(
     """
     filename = get_filename_from_content(content, model_name=model_name)
     filepath = output_path / f"{filename}.md"
-    logger.info("Writing markdown report to %s", filepath)
+    logger.info("Writing markdown report to {}", filepath)
     filepath.write_text(content, encoding="utf-8")
     return filepath
 
@@ -290,7 +275,7 @@ def extract_audio(
     desktop_track: int,
 ) -> Mapping[str, Path]:
     """Extract audio tracks into the run's audio directory."""
-    logger.info("Extracting audio tracks from %s", run_paths.input_path)
+    logger.info("Extracting audio tracks from {}", run_paths.input_path)
     files = video_extraction.process_mkv_file(
         input_mkv=str(run_paths.input_path),
         output_dir=str(run_paths.audio_dir),
@@ -314,7 +299,7 @@ def extract_audio(
 
 def transcribe_audio(run_paths: RunPaths, whisper_model: str) -> Mapping[str, Path]:
     """Transcribe microphone and desktop audio using Whisper."""
-    logger.info("Transcribing audio with Whisper model '%s'", whisper_model)
+    logger.info("Transcribing audio with Whisper model '{}'", whisper_model)
     transcripts = audio_transcription.process_audio_files(
         str(run_paths.microphone_audio),
         str(run_paths.desktop_audio),
@@ -332,7 +317,7 @@ def merge_transcripts(
 ) -> Mapping[str, Any]:
     """Merge Whisper transcripts into a single JSON artifact."""
     output_file = target_path or run_paths.merged_transcript
-    logger.info("Merging transcripts into %s", output_file)
+    logger.info("Merging transcripts into {}", output_file)
     return transcript_merger.process_transcripts(
         mic_transcript_file=str(transcripts["microphone"]),
         desktop_transcript_file=str(transcripts["desktop"]),
@@ -348,6 +333,7 @@ def summarise_transcript(
     model: str,
     use_long_summary: bool,
     system_prompt: str | None,
+    api_key: str | None,
 ) -> str:
     """Generate a meeting summary using either the short or long flow."""
     if use_long_summary:
@@ -355,12 +341,14 @@ def summarise_transcript(
             transcript_text=transcript_text,
             model_name=model,
             system_prompt=system_prompt,
+            api_key=api_key,
         )
     else:
         summary = summarize_transcript.generate_summary(
             transcript_text=transcript_text,
             model_name=model,
             system_prompt=system_prompt,
+            api_key=api_key,
         )
     summarize_transcript.save_summary(summary, str(summary_path))
     return summary
@@ -375,16 +363,14 @@ def estimate_summary_cost(
         transcript_text,
         model=model,
     )
-    logger.info("Estimated tokens: %s", total_tokens)
-    logger.info("Estimated price: $%.4f", estimated_price)
+    logger.info("Estimated tokens: {}", total_tokens)
+    logger.info("Estimated price: ${:.4f}", estimated_price)
 
 
 def run_pipeline(args: argparse.Namespace) -> PipelineArtifacts:
     """Execute the end-to-end workflow using the supplied CLI arguments."""
-    load_dotenv()
-    configure_logging()
-
-    base_output_dir = args.output_dir or Path("./runs")
+    app_config = load_config()
+    base_output_dir = args.output_dir or app_config.base_output_dir
     base_output_dir = base_output_dir.expanduser().resolve()
     run_suffix = args.subfolder
 
@@ -393,73 +379,91 @@ def run_pipeline(args: argparse.Namespace) -> PipelineArtifacts:
         base_output_dir=base_output_dir,
         run_suffix=run_suffix,
     )
+    setup_logging(level=app_config.log_level, logs_file=run_paths.logs_file)
     run_paths.ensure_directories()
-    logger.info("Writing run artifacts to %s", run_paths.run_root)
 
-    extract_audio(run_paths, args.mic_track, args.desktop_track)
-    transcripts = transcribe_audio(run_paths, args.whisper_model)
+    with logging_context(
+        input_file=run_paths.input_path, run_root=run_paths.run_root
+    ):
+        logger.info("Writing run artifacts to {}", run_paths.run_root)
 
-    merged_transcript_path = run_paths.run_root / args.transcript_filename
-    transcript_data = merge_transcripts(
-        run_paths,
-        transcripts,
-        parse_overlaps=args.parse_overlaps,
-        target_path=merged_transcript_path,
-    )
-
-    personal_notes = read_personal_notes(args.personal_notes)
-    personal_info = read_personal_info(args.personal_info, args.personal_info_file)
-    markdown_notes = read_markdown_notes(args.markdown_notes)
-
-    if personal_notes or personal_info or markdown_notes:
-        system_prompt = generate_meeting_summary_prompt(
-            personal_notes,
-            personal_info,
-            markdown_notes,
+        mic_track = args.mic_track if args.mic_track is not None else app_config.mic_track
+        desktop_track = (
+            args.desktop_track if args.desktop_track is not None else app_config.desktop_track
         )
-        transcript_text_for_summary = extract_transcript_text(transcript_data)
-    else:
-        system_prompt = None
-        transcript_text_for_summary = summarize_transcript.prepare_transcript_for_summary(
-            transcript_data
+        whisper_model = args.whisper_model or app_config.whisper_model
+        summary_model = args.summary_model or app_config.summary_model
+
+        extract_audio(run_paths, mic_track, desktop_track)
+        transcripts = transcribe_audio(run_paths, whisper_model)
+
+        merged_transcript_path = run_paths.run_root / args.transcript_filename
+        transcript_data = merge_transcripts(
+            run_paths,
+            transcripts,
+            parse_overlaps=args.parse_overlaps,
+            target_path=merged_transcript_path,
         )
 
-    estimate_summary_cost(transcript_text_for_summary, args.summary_model)
+        personal_notes = read_personal_notes(args.personal_notes)
+        personal_info = read_personal_info(args.personal_info, args.personal_info_file)
+        markdown_notes = read_markdown_notes(args.markdown_notes)
 
-    summary_path: Path | None = None
-    markdown_path: Path | None = None
-
-    if args.skip_summary:
-        logger.info("Skipping summary generation (--skip-summary provided).")
-    else:
-        summary_path = run_paths.run_root / args.summary_filename
-        if args.timestamp_summary:
-            summary_path = summary_path.with_name(
-                f"{get_isodatetime()}-{summary_path.name}"
+        if personal_notes or personal_info or markdown_notes:
+            system_prompt = generate_meeting_summary_prompt(
+                personal_notes,
+                personal_info,
+                markdown_notes,
+            )
+            transcript_text_for_summary = extract_transcript_text(transcript_data)
+        else:
+            system_prompt = None
+            transcript_text_for_summary = summarize_transcript.prepare_transcript_for_summary(
+                transcript_data
             )
 
-        summary_text = summarise_transcript(
-            transcript_text=transcript_text_for_summary,
-            summary_path=summary_path,
-            model=args.summary_model,
-            use_long_summary=args.long_summary,
-            system_prompt=system_prompt,
-        )
+        estimate_summary_cost(transcript_text_for_summary, summary_model)
 
-        if args.generate_markdown:
-            markdown_path = create_markdown_report(
-                summary_text,
-                run_paths.run_root,
-                model_name=args.summary_model,
+        summary_path: Path | None = None
+        markdown_path: Path | None = None
+
+        if args.skip_summary:
+            logger.info("Skipping summary generation (--skip-summary provided).")
+        else:
+            summary_path = run_paths.run_root / args.summary_filename
+            if args.timestamp_summary:
+                summary_path = summary_path.with_name(
+                    f"{get_isodatetime()}-{summary_path.name}"
+                )
+
+            if not app_config.anthropic_api_key:
+                raise RuntimeError(
+                    "Anthropic API key not configured. Set ANTHROPIC_API_KEY or MINUTIA_ANTHROPIC_API_KEY."
+                )
+
+            summary_text = summarise_transcript(
+                transcript_text=transcript_text_for_summary,
+                summary_path=summary_path,
+                model=summary_model,
+                use_long_summary=args.long_summary,
+                system_prompt=system_prompt,
+                api_key=app_config.anthropic_api_key,
             )
 
-    return PipelineArtifacts(
-        run_paths=run_paths,
-        transcription_files=transcripts,
-        merged_transcript=merged_transcript_path,
-        summary_file=summary_path,
-        markdown_file=markdown_path,
-    )
+            if args.generate_markdown:
+                markdown_path = create_markdown_report(
+                    summary_text,
+                    run_paths.run_root,
+                    model_name=summary_model,
+                )
+
+        return PipelineArtifacts(
+            run_paths=run_paths,
+            transcription_files=transcripts,
+            merged_transcript=merged_transcript_path,
+            summary_file=summary_path,
+            markdown_file=markdown_path,
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -491,20 +495,20 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--whisper-model",
         type=str,
-        default="base",
-        help="Whisper model name (matches notebook default).",
+        default=None,
+        help="Whisper model name (defaults to configuration).",
     )
     parser.add_argument(
         "--mic-track",
         type=int,
-        default=3,
-        help="OBS track number for microphone audio (default: 3).",
+        default=None,
+        help="OBS track number for microphone audio (defaults to configuration).",
     )
     parser.add_argument(
         "--desktop-track",
         type=int,
-        default=2,
-        help="OBS track number for desktop audio (default: 2).",
+        default=None,
+        help="OBS track number for desktop audio (defaults to configuration).",
     )
     parser.add_argument(
         "--transcript-filename",
@@ -521,9 +525,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--summary-model",
         type=str,
-        default="claude-3-5-sonnet",
+        default=None,
         choices=list(summarize_transcript.anthropic_models.keys()),
-        help="Anthropic model to use when summarising.",
+        help="Anthropic model to use when summarising (defaults to configuration).",
     )
     parser.add_argument(
         "--skip-summary",

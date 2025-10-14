@@ -1,26 +1,12 @@
 import json
-import logging
 import re
-import sys
 
-
-def setup_logger(name="merge_transcript", level=logging.INFO):
-    logger = logging.getLogger(name)
-    logger.setLevel(level)
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(
-        logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    )
-    logger.addHandler(handler)
-    return logger
-
-
-logger = setup_logger()
+from .logging import logger
 
 
 def parse_transcript(file_path):
     transcript = []
-    logger.info(f"Parsing transcript file: {file_path}")
+    logger.info("Parsing transcript file: {}", file_path)
     with open(file_path) as f:
         for line in f:
             match = re.match(r"\[(\d+\.\d+) - (\d+\.\d+)\] (.+)", line.strip())
@@ -33,7 +19,7 @@ def parse_transcript(file_path):
                         "text": text,
                     }
                 )
-    logger.info(f"Parsed {len(transcript)} segments from {file_path}")
+    logger.info("Parsed {} segments from {}", len(transcript), file_path)
     return transcript
 
 
@@ -85,12 +71,12 @@ def merge_transcripts(mic_transcript, desktop_transcript, parse_overlaps=True):
                     }
                 )
 
-    logger.info(f"Merged transcript contains {len(merged_transcript)} segments")
+    logger.info("Merged transcript contains {} segments", len(merged_transcript))
     return merged_transcript
 
 
 def save_merged_transcript(merged_transcript, output_file, metadata=None):
-    logger.info(f"Saving merged transcript to {output_file}")
+    logger.info("Saving merged transcript to {}", output_file)
     output_data = {"metadata": metadata or {}, "transcript": merged_transcript}
 
     with open(output_file, "w") as f:
@@ -125,5 +111,5 @@ def process_transcripts(
     # Save merged transcript
     save_merged_transcript(merged_transcript, output_file, metadata)
 
-    logger.info(f"Transcript processing completed. Output saved to {output_file}")
+    logger.info("Transcript processing completed. Output saved to {}", output_file)
     return {"metadata": metadata, "transcript": merged_transcript}

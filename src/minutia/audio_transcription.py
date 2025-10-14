@@ -1,24 +1,7 @@
-import logging
 import os
-import sys
 
 import whisper
-
-
-def setup_logger(name="whisper", level=logging.INFO):
-    logger = logging.getLogger(name)
-    logger.propagate = False
-    logger.setLevel(level)
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(
-        logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    )
-    logger.addHandler(handler)
-    return logger
-
-
-# Usage
-logger = setup_logger()
+from .logging import logger
 
 
 def transcribe_audio(audio_path, model_name="base"):
@@ -32,13 +15,13 @@ def transcribe_audio(audio_path, model_name="base"):
         logger.info("Transcription completed successfully")
         return result
     except Exception as e:
-        logger.error(f"Error during transcription: {str(e)}")
+        logger.exception("Error during transcription: {}", e)
         raise
 
 
 def save_transcription(transcription, output_path):
     try:
-        logger.info(f"Saving transcription to: {output_path}")
+        logger.info("Saving transcription to: {}", output_path)
         with open(output_path, "w") as f:
             for segment in transcription["segments"]:
                 start = segment["start"]
@@ -47,7 +30,7 @@ def save_transcription(transcription, output_path):
                 f.write(f"[{start:.2f} - {end:.2f}] {text}\n")
         logger.info("Transcription saved successfully")
     except Exception as e:
-        logger.error(f"Error saving transcription: {str(e)}")
+        logger.exception("Error saving transcription: {}", e)
         raise
 
 
@@ -63,11 +46,11 @@ def process_audio_files(
         ]:
             if not os.path.exists(audio_path):
                 logger.error(
-                    f"{audio_type.capitalize()} audio file not found: {audio_path}"
+                    "{} audio file not found: {}", audio_type.capitalize(), audio_path
                 )
                 continue
 
-            logger.info(f"Processing {audio_type} audio")
+            logger.info("Processing {} audio", audio_type)
             transcription = transcribe_audio(audio_path, model_name=whisper_model_name)
 
             output_path = os.path.join(
@@ -79,5 +62,5 @@ def process_audio_files(
         logger.info("Audio processing completed")
         return filenames
     except Exception as e:
-        logger.error(f"Error processing audio files: {str(e)}")
+        logger.exception("Error processing audio files: {}", e)
         raise

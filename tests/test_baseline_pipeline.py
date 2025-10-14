@@ -72,6 +72,7 @@ def test_baseline_pipeline_smoke(tmp_path, monkeypatch):
     )
     monkeypatch.setattr(summarize_transcript, "save_summary", fake_save_summary, raising=False)
     monkeypatch.setattr(baseline_pipeline, "create_markdown_report", fake_create_markdown)
+    monkeypatch.setenv("MINUTIA_ANTHROPIC_API_KEY", "test-key")
 
     args = baseline_pipeline.build_parser().parse_args(
         [

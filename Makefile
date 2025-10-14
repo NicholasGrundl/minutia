@@ -70,7 +70,7 @@ test:
 .PHONY: test-codex
 test-codex:
 	@echo "Running tests via local .venv..."
-	.venv/bin/python -m pytest tests/
+	LOGURU_LEVEL=INFO .venv/bin/python -m pytest tests/ -vv --maxfail=4 -s
 
 .PHONY: test-unit
 test-unit:

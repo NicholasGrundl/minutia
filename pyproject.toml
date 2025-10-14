@@ -21,6 +21,7 @@ classifiers = [
     "Topic :: Office/Business",
 ]
 dependencies = [
+    "loguru",
     "tiktoken",
     "ffmpeg-python",
     "openai-whisper",
@@ -40,6 +41,7 @@ dependencies = [
     "matplotlib",
     "isodate",
     "nanoid",
+    "loguru>=0.7.3",
 ]
 
 [project.optional-dependencies]
@@ -102,6 +104,10 @@ addopts = [
     "--cov-report=term-missing",
     "--cov-report=html",
 ]
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s | %(levelname)s | %(message)s"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
 
 [build-system]
 requires = ["hatchling"]
