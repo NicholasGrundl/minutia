@@ -21,6 +21,7 @@ def test_pipeline_config_defaults(tmp_path):
     )
 
     assert config.whisper_model == "base"
+    assert config.summary_model == "claude-4-5-sonnet"
     assert config.mic_track == 3
     assert config.desktop_track == 2
     assert config.base_output_dir == Path("./runs")
@@ -65,3 +66,15 @@ def test_pipeline_result_failure_data(tmp_path):
     assert result.completed_steps == ["extract_audio"]
     assert result.artifacts["extract_audio"]["microphone"] == "mic.wav"
     assert result.duration_seconds == 12.5
+
+
+def test_pipeline_config_custom_summary_model(tmp_path):
+    run_paths = create_run_paths(tmp_path)
+    config = PipelineConfig(
+        input_path=run_paths.input_path,
+        run_paths=run_paths,
+        run_id="20250101T000000Z",
+        summary_model="claude-3-haiku",
+    )
+
+    assert config.summary_model == "claude-3-haiku"
