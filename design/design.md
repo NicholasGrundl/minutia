@@ -1290,9 +1290,120 @@ pytest -m "unit or integration or slow"  # < 30m total
 - Leave TODO markers for provider abstraction, cost tracking, and advanced overlap handling; keep interfaces narrow so replacements can slot in later.
 - Document gaps in the design doc appendices to revisit during the post-MVP planning cycle.
 
+## Backward Compatibility & Migration Strategy
+
+### Artifact Format Changes
+
+**Current Format → MVP Format:**
+- **Individual transcripts**: Plain text `.txt` files with bracketed timestamps → JSON files with structured metadata
+- **Merged transcript**: Plain text with source labels → JSON with metadata section
+- **Run metadata**: Not present → New `metadata.json` file
+
+**Compatibility Approach:**
+- **No backward compatibility required for MVP** - This is a ground-up refactor establishing new baseline
+- **Migration path**: Existing notebook outputs remain in their current locations, new CLI outputs go to `./runs/` directory
+- **Coexistence**: Notebook and CLI can run side-by-side during transition period
+
+**Future Compatibility Expectations:**
+- Once MVP ships, transcript JSON schema becomes stable contract
+- Schema changes require versioning in metadata (e.g., `"schema_version": "1.0"`)
+- Tools must handle unknown fields gracefully (forward compatibility)
+- Breaking changes require migration utilities and deprecation warnings
+
+### Idempotency Requirements for Resume-From-Failure
+
+Each pipeline step must be idempotent - safe to run multiple times with same inputs:
+
+**extract_audio (Video → Audio):**
+```python
+def extract_audio(video_path: Path, run_paths: RunPaths, mic_track: int, desk_track: int) -> Dict[str, Path]:
+    """Extract audio tracks from video.
+
+    Idempotency: Skip if valid audio files already exist.
+    Validation: Check file exists, has correct duration, is valid WAV format.
+    """
+    if _audio_files_valid(run_paths.microphone_audio, run_paths.desktop_audio):
+        logger.info("Valid audio files found, skipping extraction")
+        return {"mic_audio": run_paths.microphone_audio, "desk_audio": run_paths.desktop_audio}
+
+    # Proceed with extraction...
+```
+
+**transcribe (Audio → Text):**
+```python
+def transcribe_audio(audio_path: Path, output_path: Path, model_name: str) -> Path:
+    """Transcribe audio file to JSON transcript.
+
+    Idempotency: Skip if valid transcript JSON exists.
+    Validation: Check file exists, has valid JSON structure, contains segments array.
+    """
+    if _transcript_valid(output_path):
+        logger.info(f"Valid transcript found at {output_path}, skipping transcription")
+        return output_path
+
+    # Proceed with transcription...
+```
+
+**merge (Multiple Transcripts → Single Transcript):**
+```python
+def merge_transcripts(mic_transcript: Path, desk_transcript: Path, output_path: Path) -> Path:
+    """Merge dual-track transcripts chronologically.
+
+    Idempotency: Skip if valid merged transcript exists with matching source files.
+    Validation: Check file exists, has valid JSON structure, metadata matches input files.
+    """
+    if _merged_transcript_valid(output_path, mic_transcript, desk_transcript):
+        logger.info("Valid merged transcript found, skipping merge")
+        return output_path
+
+    # Proceed with merging...
+```
+
+**summarize (Transcript → Summary):**
+```python
+def generate_summary(transcript_path: Path, output_path: Path, api_key: str) -> Path:
+    """Generate AI summary from transcript.
+
+    Idempotency: Skip if non-empty summary file exists.
+    Validation: Check file exists and has content > 100 chars.
+
+    Note: Summaries may vary between runs due to AI non-determinism.
+    Resume logic allows rerunning for different summary if needed.
+    """
+    if _summary_valid(output_path):
+        logger.info("Valid summary found, skipping generation")
+        return output_path
+
+    # Proceed with summary generation...
+```
+
+**Validation Helper Pattern:**
+```python
+def _audio_files_valid(mic_path: Path, desk_path: Path) -> bool:
+    """Validate audio files are complete and usable."""
+    if not (mic_path.exists() and desk_path.exists()):
+        return False
+
+    try:
+        # Check files are valid WAV format with reasonable duration
+        mic_duration = get_audio_duration(mic_path)
+        desk_duration = get_audio_duration(desk_path)
+        return mic_duration > 0 and desk_duration > 0
+    except Exception:
+        return False
+```
+
+**Key Idempotency Principles:**
+1. **Validate before skip** - Don't trust file existence alone, validate structure/content
+2. **Log skip decisions** - Clear visibility when steps are skipped helps debugging
+3. **Fail forward** - If validation fails, proceed with regeneration rather than erroring
+4. **Metadata consistency** - Merged transcript checks source file references to detect stale artifacts
+
 ## Acceptance Criteria
 
 - End-to-end run starting from MKV produces extracted audio, transcript JSONs, merged transcript, and optional summary in a timestamped directory.
 - CLI progress output clearly shows each step and final artifact locations.
 - Logs are routed through loguru with contextual fields and stored alongside outputs.
 - Modules align with the contracts outlined above, enabling straightforward extension work for subsequent phases.
+- Pipeline state persists in run directory enabling resume-from-failure.
+- All pipeline steps are idempotent and safe to rerun with existing artifacts.
