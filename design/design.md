@@ -347,10 +347,13 @@ class StepProgress:
 @dataclass
 class PipelineConfig:
     input_path: Path
+    run_paths: RunPaths  # Added: explicit RunPaths reference for all pipeline steps
+    run_id: str  # Added: unique identifier for this pipeline run (ISO timestamp + hash)
     whisper_model: str = "base"
     skip_summary: bool = False
     mic_track: int = 3
     desktop_track: int = 2
+    base_output_dir: Path = Path("./runs")  # Added: for RunPaths creation
 
 class PipelineOrchestrator:
     def __init__(self, progress_callback: Callable[[StepProgress], None] = None):
