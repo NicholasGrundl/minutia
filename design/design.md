@@ -134,7 +134,30 @@ class RunPaths:
         desktop_audio_path: Union[str, Path],
         base_output_dir: Optional[Path] = None
     ) -> 'RunPaths':
-        """Create RunPaths when starting from pre-extracted audio files."""
+        """Create RunPaths when starting from pre-extracted audio files.
+
+        Directory naming strategy:
+        - Use parent directory name + timestamp for uniqueness
+        - Example: If audio files are in /data/meeting_audio/,
+          run directory becomes: ./runs/2024-01-15_meeting_audio/
+
+        Args:
+            mic_audio_path: Path to microphone audio file
+            desktop_audio_path: Path to desktop audio file
+            base_output_dir: Base directory for runs (default: ./runs)
+
+        Returns:
+            RunPaths with structure:
+            /project/runs/2024-01-15_audio_parent/
+            ├── audio/ (symlinks or copies of original files)
+            │   ├── microphone.wav -> /original/path/mic.wav
+            │   └── desktop.wav -> /original/path/desktop.wav
+            ├── transcripts/
+            ├── merged_transcript.json
+            ├── summary.txt
+            ├── metadata.json
+            └── minutia.log
+        """
         pass
     
     def ensure_directories(self) -> None:
