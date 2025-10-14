@@ -1,62 +1,101 @@
 # Minutia Project Tasks & TODO
 
-## High Priority - Code Quality & Cleanup
+*Implementation follows design/design.md phased approach with MVP focus*
 
-### 🧹 Import Cleanup (Critical)
+## Phase 1: Foundation & Verification (Critical Path - MVP)
+
+### 🔍 Pipeline Verification & Baseline Script
+- [ ] Verify CreateTranscriptProd.ipynb runs end-to-end with test recording
+- [ ] Convert notebook cells to standalone Python script preserving all working logic
+- [ ] Create basic integration test (smoke test) that runs full pipeline and validates outputs
+- [ ] Document current advanced features (personal notes, cost estimation, auto-filenames)
+
+### 🧹 Critical Code Cleanup
 - [ ] **video_extraction.py**: Remove unused imports (whisper, pandas, numpy, transformers, torch, openai, anthropic, pydantic, instructor, dotenv)
-- [ ] **audio_transcription.py**: Analyze and clean unused imports
-- [ ] **summarize_transcript.py**: Analyze and clean unused imports  
-- [ ] **transcript_merger.py**: Analyze and clean unused imports
-- [ ] Fix import sorting and formatting across all modules
-
-### 🐛 Code Issues from Diagnostics
 - [ ] **video_extraction.py**: Fix unused loop variable `stream` on line 72
-- [ ] **video_extraction.py**: Remove blank lines with whitespace
-- [ ] **video_extraction.py**: Add newline at end of file
+- [ ] **video_extraction.py**: Remove blank lines with whitespace and add newline at end
 - [ ] Run `uv run ruff check --fix .` to auto-fix formatting issues
+- [ ] Move notebooks to `notebooks/` directory
 
-### 🧪 Testing Infrastructure  
-- [ ] Set up basic pytest structure with test files
-- [ ] Create unit tests for core functions:
-  - [ ] `process_mkv_file()` function
-  - [ ] `identify_audio_tracks()` function  
-  - [ ] `extract_audio_track()` function
-- [ ] Add integration tests for CLI commands
-- [ ] Set up test fixtures and mock data
+## Phase 2: Core Data Structures (MVP - Foundation)
 
-## Medium Priority - Feature Development
+### 📁 RunPaths & Path Management 
+- [ ] Implement RunPaths dataclass with factory methods (`from_video_input`, `from_audio_inputs`)
+- [ ] Add directory collision handling and validation
+- [ ] Create PipelineConfig and PipelineResult data structures
+- [ ] Migrate existing modules to use RunPaths instead of ad-hoc path construction
+- [ ] Add unit tests for path resolution and data structures
 
-### 📁 Project Structure
-- [ ] Move Jupyter notebooks to `notebooks/` directory
-- [ ] Organize archive data and recordings in proper structure
-- [ ] Create proper data directory structure
-- [ ] Add `.gitignore` for build artifacts, .venv, __pycache__, etc.
+## Phase 3: Pipeline Architecture (MVP - Core)
 
-### 📖 Documentation
-- [ ] Create comprehensive README.md
+### ⚙️ Basic Pipeline Orchestration
+- [ ] Implement PipelineOrchestrator class with callback-based progress reporting
+- [ ] Add basic step execution with exception handling and error messages
+- [ ] Create step enumeration and execution framework
+- [ ] Add basic state tracking (defer full resume-from-failure to Phase 8)
+- [ ] Add unit tests for orchestrator logic
+
+## Phase 4: Logging & Configuration (MVP - Infrastructure)
+
+### 📝 Unified Logging System
+- [ ] Replace multiple basic loggers with unified loguru setup
+- [ ] Add contextual fields (`step`, `input_file`, `run_root`) for log correlation
+- [ ] Configure simple file sink for run directory and colored stderr sink
+- [ ] Integrate with pipeline orchestrator for structured logging
+
+### ⚙️ Basic Configuration System
+- [ ] Implement basic configuration system with environment variable support
+- [ ] Add configuration validation and API key handling
+- [ ] Add `.env` file support for configuration
+- [ ] Secure API key handling with fallback chain
+
+## Phase 5: Simple CLI Wrapper (MVP - Interface)
+
+### 🖥️ Basic CLI Interface
+- [ ] Wrap pipeline orchestrator with Click CLI interface
+- [ ] Add simple progress output using print/logging (not rich UI yet)
+- [ ] Display final artifact locations on completion
+- [ ] Map pipeline exceptions to clear error messages
+- [ ] Preserve all current CLI arguments and functionality
+
+## Phase 6: JSON Data Formats (Post-MVP)
+
+### 📄 Structured Data Migration
+- [ ] Convert individual transcripts from plain text to structured JSON
+- [ ] Update merged transcript format with metadata section
+- [ ] Add run metadata file generation
+- [ ] Update transcript merger to handle JSON inputs/outputs
+- [ ] Ensure backward compatibility during transition
+
+## Phase 7: Rich CLI Interface (Post-MVP)
+
+### 🎨 Enhanced User Experience
+- [ ] Replace simple progress output with rich progress bars
+- [ ] Add styled panels for status and artifact locations
+- [ ] Implement sophisticated CLI UX patterns with error formatting
+- [ ] Add interactive elements and enhanced user experience
+
+## Phase 8: Resume-From-Failure (Post-MVP)
+
+### 🔄 State Management & Recovery
+- [ ] Add PipelineState persistence to run directory
+- [ ] Implement state serialization helpers and JSON storage
+- [ ] Add idempotency checks to each pipeline step with artifact validation
+- [ ] Implement `resume_from_failure()` method with proper state loading
+
+## Deferred Tasks (Future Consideration)
+
+### 📖 Documentation (Lower Priority)
+- [ ] Create comprehensive README.md (design.md already comprehensive)
 - [ ] Add docstring documentation to all functions
 - [ ] Create API documentation
 - [ ] Add usage examples and tutorials
 
-### 🔧 CLI Enhancements
-- [ ] Add proper error handling and user-friendly error messages
-- [ ] Add progress bars for long-running operations
-- [ ] Add configuration file support
-- [ ] Add verbose/quiet output options
-
-## Low Priority - Polish & Optimization
-
-### 🎯 Performance 
+### 🎯 Performance & Optimization
 - [ ] Analyze dependency usage - some imports might be optional
 - [ ] Optimize audio processing pipeline
 - [ ] Add async support for I/O operations
 - [ ] Profile memory usage during large file processing
-
-### 🔒 Security & Best Practices
-- [ ] Add input validation for file paths and parameters
-- [ ] Secure API key handling
-- [ ] Add rate limiting for API calls
-- [ ] Add proper logging configuration
 
 ### 🚀 Packaging & Distribution
 - [ ] Add build scripts and CI/CD
@@ -64,9 +103,7 @@
 - [ ] Add installation instructions
 - [ ] Prepare for PyPI publication
 
-## Future Enhancements
-
-### 🎵 Audio Processing
+### 🎵 Audio Processing Enhancements
 - [ ] Support for more audio formats
 - [ ] Audio quality analysis and enhancement
 - [ ] Speaker diarization improvements
@@ -80,16 +117,22 @@
 
 ---
 
-## Working Notes
+## Implementation Notes
 
 ### Current Status
 ✅ **COMPLETED**: Successfully converted to uv project structure with proper packaging
-- All Python modules moved to `src/minutia/` 
+- All Python modules moved to `src/minutia/`
 - Dependencies migrated to pyproject.toml
 - CLI entry point working
 - Development tooling configured (ruff, pytest)
 
-### Next Chunk Recommendations
-1. **Start with Code Cleanup** - Fix the import issues and linting errors first
-2. **Add Basic Tests** - Set up pytest structure and basic unit tests  
-3. **Documentation** - Create README and improve docstrings
+### MVP Strategy
+- **Total MVP Timeline**: ~1 week of focused work (Phases 1-5)
+- **Key Principle**: Preserve working functionality first, enhance second
+- **Dependencies**: Phase 1 is sequential, Phases 2-4 can run in parallel, Phase 5 depends on 2-4
+- **Testing**: Start with minimal smoke test, expand to comprehensive testing post-MVP
+
+### Phase Boundaries
+- **MVP (Phases 1-5)**: Essential deliverables for refactored CLI with basic functionality
+- **Post-MVP (Phases 6-8)**: Enhanced features building on proven MVP foundation
+- **Future**: Advanced features and optimizations based on user feedback
