@@ -68,11 +68,13 @@ Minutia is a meeting recording, transcription, and summarization tool. It extrac
 
 ## Development Commands
 
-The project uses **UV** for package management and task execution. All development scripts are defined in `[tool.uv.scripts]` in `pyproject.toml`. You can run them either way:
-- **Make**: `make <target>` (convenient, traditional)
-- **UV direct**: `uv run <script>` (explicit, portable)
+The project uses **UV** for package management and **Make** for task running. UV does not have a built-in task runner feature like some other tools, so the Makefile serves as the primary way to run development tasks.
 
-For a complete list of commands, run: `make help`
+**Two ways to run commands:**
+- **Make** (recommended): `make <target>` - Convenient task runner with helpful output
+- **UV direct**: `uv run <command> <args>` - Direct command execution in project environment
+
+For a complete list of available tasks, run: `make help`
 
 ### Package Management
 
