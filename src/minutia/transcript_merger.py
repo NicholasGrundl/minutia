@@ -1,8 +1,8 @@
-import re
 import json
 import logging
+import re
 import sys
-import argparse
+
 
 def setup_logger(name="merge_transcript", level=logging.INFO):
     logger = logging.getLogger(name)
@@ -17,7 +17,7 @@ logger = setup_logger()
 def parse_transcript(file_path):
     transcript = []
     logger.info(f"Parsing transcript file: {file_path}")
-    with open(file_path, 'r') as f:
+    with open(file_path) as f:
         for line in f:
             match = re.match(r'\[(\d+\.\d+) - (\d+\.\d+)\] (.+)', line.strip())
             if match:
@@ -36,16 +36,16 @@ def merge_transcripts(mic_transcript, desktop_transcript, parse_overlaps=True):
         [{'source': 'microphone', **segment} for segment in mic_transcript] +
         [{'source': 'desktop', **segment} for segment in desktop_transcript]
     )
-    
+
     sorted_segments = sorted(combined_segments, key=lambda x: x['start_time'])
-    
+
     if not parse_overlaps:
         logger.info("Skipping overlap parsing")
         return sorted_segments
-    
+
     logger.info("Parsing overlaps")
     merged_transcript = []
-    
+
     for segment in sorted_segments:
         if not merged_transcript or segment['start_time'] >= merged_transcript[-1]['end_time']:
             # New non-overlapping segment
@@ -54,7 +54,7 @@ def merge_transcripts(mic_transcript, desktop_transcript, parse_overlaps=True):
             # Overlapping segment
             overlap_start = segment['start_time']
             overlap_end = min(segment['end_time'], merged_transcript[-1]['end_time'])
-            
+
             # Add overlapping part
             merged_transcript.append({
                 'start_time': overlap_start,
@@ -62,7 +62,7 @@ def merge_transcripts(mic_transcript, desktop_transcript, parse_overlaps=True):
                 'text': f"[{merged_transcript[-1]['source']}] {merged_transcript[-1]['text']} | [{segment['source']}] {segment['text']}",
                 'source': 'overlap'
             })
-            
+
             # Add remaining part of the new segment if it extends beyond the previous one
             if segment['end_time'] > merged_transcript[-1]['end_time']:
                 merged_transcript.append({
@@ -71,7 +71,7 @@ def merge_transcripts(mic_transcript, desktop_transcript, parse_overlaps=True):
                     'text': segment['text'],
                     'source': segment['source']
                 })
-    
+
     logger.info(f"Merged transcript contains {len(merged_transcript)} segments")
     return merged_transcript
 
@@ -81,7 +81,7 @@ def save_merged_transcript(merged_transcript, output_file, metadata=None):
         'metadata': metadata or {},
         'transcript': merged_transcript
     }
-    
+
     with open(output_file, 'w') as f:
         json.dump(output_data, f, indent=2)
     logger.info("Merged transcript saved successfully")
@@ -92,10 +92,10 @@ def process_transcripts(mic_transcript_file, desktop_transcript_file, output_fil
     # Parse transcripts
     mic_transcript = parse_transcript(mic_transcript_file)
     desktop_transcript = parse_transcript(desktop_transcript_file)
-    
+
     # Merge transcripts
     merged_transcript = merge_transcripts(mic_transcript, desktop_transcript, parse_overlaps)
-    
+
     # Prepare metadata
     metadata = {
         'source_files': {
@@ -106,10 +106,10 @@ def process_transcripts(mic_transcript_file, desktop_transcript_file, output_fil
         'segment_count': len(merged_transcript),
         'parse_overlaps': parse_overlaps
     }
-    
+
     # Save merged transcript
     save_merged_transcript(merged_transcript, output_file, metadata)
-    
+
     logger.info(f"Transcript processing completed. Output saved to {output_file}")
     return {
         'metadata': metadata,

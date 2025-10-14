@@ -1,6 +1,7 @@
+import io
+
 import panel as pn
 import param
-import io
 
 pn.extension()
 
@@ -14,7 +15,7 @@ class AudioSelectionWidget(param.Parameterized):
         self.file_input = pn.widgets.FileInput(accept='.wav')
         self.audio_player = pn.widgets.Audio(name='Audio Player', sizing_mode='stretch_width')
         self.play_button = pn.widgets.Button(name='Play', button_type='primary', disabled=True)
-        
+
         self.file_input.param.watch(self.update_audio, 'value')
         self.play_button.on_click(self.play_audio)
 
@@ -23,15 +24,15 @@ class AudioSelectionWidget(param.Parameterized):
         if event.new:
             filename = self.file_input.filename
             print(f"File name: {filename}")  # Debug print
-            
+
             # Create a BytesIO object from the uploaded file content
             audio_data = io.BytesIO(event.new)
-            
+
             # Update the audio player with the new file
             self.audio_player.object = audio_data
             self.audio_player.name = filename
             self.play_button.disabled = False
-            
+
             # Update audio info
             self.audio_info = f"Selected: {filename}"
             print(f"Audio info updated: {self.audio_info}")  # Debug print

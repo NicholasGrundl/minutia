@@ -1,10 +1,11 @@
 import json
+import logging
 import os
 import sys
-import logging
-from dotenv import load_dotenv
-from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
+
 import tiktoken
+from anthropic import Anthropic
+
 
 def setup_anthropic_logger(name="anthropic", level=logging.INFO):
     logger = logging.getLogger(name)
@@ -29,7 +30,7 @@ anthropic_models = {
         'price_per_1k_input_tokens': 0.003,
         'price_per_1k_output_tokens': 0.015,
     },
-    
+
     'claude-3-5-sonnet': {
         'name': 'claude-3-5-sonnet-20240620',
         'price_per_1k_input_tokens': 0.003,
@@ -46,7 +47,7 @@ anthropic_models = {
 def load_transcript(file_path):
     """Load the merged transcript from a JSON file."""
     try:
-        with open(file_path, 'r') as f:
+        with open(file_path) as f:
             data = json.load(f)
         return data
     except Exception as e:
@@ -102,7 +103,7 @@ def estimate_tokens(text):
     return len(encoding.encode(text))
 
 def estimate_price(
-    input_tokens, 
+    input_tokens,
     output_tokens,
     price_per_1k_input_tokens,
     price_per_1k_output_tokens
@@ -110,7 +111,7 @@ def estimate_price(
     """Estimate the price for the API call based on input and output tokens."""
     input_price = (input_tokens / 1000) * price_per_1k_input_tokens
     output_price = (output_tokens / 1000) * price_per_1k_output_tokens
-    
+
     price = input_price + output_price
     return price
 
@@ -118,22 +119,22 @@ def estimate_tokens_and_price(transcript_text, model='claude-3-5-sonnet', max_ou
     """Estimate tokens and price for summarizing the transcript."""
     if max_output_tokens is None:
         max_output_tokens = MAX_TOKENS_OUTPUT
-    
+
     if model not in anthropic_models:
         raise KeyError(f"model must be one of [{list(anthropic_models.keys())}]")
-    
+
     info = anthropic_models[model]
     price_per_1k_input_tokens = info['price_per_1k_input_tokens']
-    price_per_1k_output_tokens = info['price_per_1k_output_tokens'] 
-    
+    price_per_1k_output_tokens = info['price_per_1k_output_tokens']
+
     prompt = create_summary_prompt(transcript_text)
     input_tokens = estimate_tokens(prompt)
     output_tokens = max_output_tokens
     total_tokens = input_tokens + output_tokens
     estimated_price = estimate_price(
-        input_tokens, 
+        input_tokens,
         output_tokens,
-        price_per_1k_input_tokens, 
+        price_per_1k_input_tokens,
         price_per_1k_output_tokens
     )
     logger.info(f"Estimating metrics for {model}")
@@ -141,20 +142,20 @@ def estimate_tokens_and_price(transcript_text, model='claude-3-5-sonnet', max_ou
     logger.info(f"output tokens: {output_tokens}")
     logger.info(f"total tokens: {total_tokens}")
     logger.info(f"price: ${estimated_price:.4f}")
-    
+
     return total_tokens, estimated_price
 
 def generate_long_summary(transcript_text, model_name='claude-3-5-sonnet', max_output_tokens=None, system_prompt=None,**kwargs):
     """Generate a summary using the Anthropic API. Allow multiple continues for length"""
     if max_output_tokens is None:
         max_output_tokens = MAX_TOKENS_OUTPUT
-        
+
     if model_name not in anthropic_models:
         raise KeyError(f"model must be one of [{list(anthropic_models.keys())}]")
     model = anthropic_models.get(model_name)['name']
 
     client = Anthropic(api_key=ANTHROPIC_API_KEY)
-    
+
     if system_prompt is None:
         #old approach
         prompt = create_summary_prompt(transcript_text)
@@ -179,10 +180,10 @@ def generate_long_summary(transcript_text, model_name='claude-3-5-sonnet', max_o
                 messages=messages,
                 **kwargs
             )
-            
+
             summary_part = response.content[0].text
             full_summary += summary_part
-            
+
             if summary_part.endswith('[CONTINUE]'):
                 full_summary = full_summary[:-10]  # Remove the [CONTINUE] tag
                 messages.append({"role": "assistant", "content": summary_part})
@@ -200,7 +201,7 @@ def generate_summary(transcript_text, model_name='claude-3-5-sonnet', max_output
     """Generate a summary using the Anthropic API."""
     if max_output_tokens is None:
         max_output_tokens = MAX_TOKENS_OUTPUT
-        
+
     if model_name not in anthropic_models:
         raise KeyError(f"model must be one of [{list(anthropic_models.keys())}]")
     model = anthropic_models.get(model_name)['name']
@@ -217,7 +218,7 @@ def generate_summary(transcript_text, model_name='claude-3-5-sonnet', max_output
         messages = [
             {"role": "user", "content": user_prompt},
         ]
-        
+
     try:
         response = client.messages.create(
             model=model,

@@ -1,8 +1,9 @@
-import whisper
-import torch
-import sys
 import logging
 import os
+import sys
+
+import whisper
+
 
 def setup_logger(name="whisper", level=logging.INFO):
     logger = logging.getLogger(name)
@@ -55,7 +56,7 @@ def process_audio_files(mic_audio_path, desktop_audio_path, output_dir, whisper_
 
             logger.info(f"Processing {audio_type} audio")
             transcription = transcribe_audio(audio_path, model_name=whisper_model_name)
-            
+
             output_path = os.path.join(output_dir, f"{audio_type}-whisper-{whisper_model_name}_transcription.txt")
             save_transcription(transcription, output_path)
             filenames[audio_type] = output_path
