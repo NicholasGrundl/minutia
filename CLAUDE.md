@@ -63,46 +63,57 @@ Minutia is a meeting recording, transcription, and summarization tool. It extrac
 
 ## Development Commands
 
-### Package Management (UV)
-The project uses `uv` for fast, reliable Python package management:
+The project uses **UV** for package management and task execution. All development scripts are defined in `[tool.uv.scripts]` in `pyproject.toml`. You can run them either way:
+- **Make**: `make <target>` (convenient, traditional)
+- **UV direct**: `uv run <script>` (explicit, portable)
+
+For a complete list of commands, run: `make help`
+
+### Package Management
 
 ```bash
-# Install all dependencies
-make install
+# Install dependencies
+make install              # or: uv sync
+make install-dev          # or: uv sync --extra dev
+make install-all          # or: uv sync --extra dev --extra jupyter --extra media
 
-# Install with dev dependencies (includes ruff, pytest)
-make install-dev
-
-# Install everything including jupyter and media tools
-make install-all
-
-# Create .env file for API keys
+# Create .env file template
 make create-env-file
 ```
 
 ### Code Quality
 
 ```bash
-# Lint code
-make lint                    # Check for issues
-make lint-fix               # Auto-fix issues
-
-# Format code
-make format
-
-# Run tests
-make test
+# Linting and formatting
+make lint                 # or: uv run lint
+make lint-fix             # or: uv run lint-fix
+make format               # or: uv run format
+make check-all            # or: uv run check-all  (runs lint-fix + format + test)
 ```
 
-**Important**: Tests directory does not exist yet. When creating tests, place them in `tests/` following pytest conventions.
+### Testing
+
+```bash
+# Run tests (when implemented)
+make test                 # or: uv run test            (all tests)
+make test-unit            # or: uv run test-unit       (unit only, fast)
+make test-integration     # or: uv run test-integration (unit + integration)
+make test-all             # or: uv run test-all        (includes slow tests)
+make test-cov             # or: uv run test-cov        (with coverage report)
+```
+
+**Important**: Tests directory does not exist yet. When creating tests, place them in `tests/` following pytest conventions with markers: `@pytest.mark.unit`, `@pytest.mark.integration`, `@pytest.mark.slow`.
 
 ### Development Environment
 
 ```bash
 # Start Jupyter Lab (for notebook development)
-make jupyter
+make jupyter              # or: uv run jupyter
 
-# Run CLI commands with uv
+# Clean build artifacts
+make clean                # or: uv run clean
+
+# Run CLI commands
 uv run minutia --help
 ```
 
