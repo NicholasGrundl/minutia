@@ -62,6 +62,24 @@ media = [
 [project.scripts]
 minutia = "minutia:main"
 
+[tool.uv.scripts]
+# Code quality scripts
+lint = "ruff check ."
+lint-fix = "ruff check --fix ."
+format = "ruff format ."
+check-all = { chain = ["lint-fix", "format", "test"] }
+
+# Testing scripts
+test = "pytest"
+test-unit = "pytest -m unit"
+test-integration = "pytest -m 'unit or integration'"
+test-all = "pytest -m 'unit or integration or slow'"
+test-cov = "pytest --cov=src/minutia --cov-report=html --cov-report=term"
+
+# Development scripts
+jupyter = "jupyter lab --autoreload"
+clean = { shell = "rm -rf dist/ build/ *.egg-info/ .pytest_cache/ htmlcov/ .coverage" }
+
 [tool.ruff]
 target-version = "py310"
 line-length = 88
