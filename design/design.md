@@ -406,39 +406,89 @@ class PipelineResult:
 @dataclass
 class PipelineState:
     run_id: str
-    started_at: datetime
+    started_at: str  # ISO 8601 timestamp string for JSON serialization
     current_step: str
     completed_steps: List[str]
-    run_paths: RunPaths
-    config: PipelineConfig
-    
+    run_paths_dict: Dict[str, str]  # RunPaths serialized as string paths
+    config_dict: Dict[str, Any]  # PipelineConfig serialized as dict
+
+    @classmethod
+    def from_pipeline(cls, run_id: str, current_step: str, completed_steps: List[str],
+                     run_paths: RunPaths, config: PipelineConfig) -> 'PipelineState':
+        """Create PipelineState from pipeline objects with proper serialization."""
+        return cls(
+            run_id=run_id,
+            started_at=datetime.now().isoformat(),
+            current_step=current_step,
+            completed_steps=completed_steps,
+            run_paths_dict={k: str(v) for k, v in asdict(run_paths).items()},
+            config_dict={
+                'input_path': str(config.input_path),
+                'whisper_model': config.whisper_model,
+                'skip_summary': config.skip_summary,
+                'mic_track': config.mic_track,
+                'desktop_track': config.desktop_track,
+                'base_output_dir': str(config.base_output_dir)
+            }
+        )
+
+    def to_run_paths(self) -> RunPaths:
+        """Deserialize RunPaths from stored string paths."""
+        return RunPaths(**{k: Path(v) for k, v in self.run_paths_dict.items()})
+
+    def to_config(self, run_paths: RunPaths) -> PipelineConfig:
+        """Deserialize PipelineConfig from stored dict."""
+        return PipelineConfig(
+            input_path=Path(self.config_dict['input_path']),
+            run_paths=run_paths,
+            run_id=self.run_id,
+            whisper_model=self.config_dict['whisper_model'],
+            skip_summary=self.config_dict['skip_summary'],
+            mic_track=self.config_dict['mic_track'],
+            desktop_track=self.config_dict['desktop_track'],
+            base_output_dir=Path(self.config_dict['base_output_dir'])
+        )
+
 class PipelineOrchestrator:
-    def __init__(self, progress_callback=None, state_file=None):
+    def __init__(self, progress_callback=None):
         self.progress_callback = progress_callback or (lambda x: None)
-        self.state_file = state_file or ".minutia_state.json"
         self.steps = ["extract_audio", "transcribe", "merge", "summarize"]
-        
-    def save_state(self, state: PipelineState):
-        """Persist current pipeline state to JSON file."""
-        with open(self.state_file, 'w') as f:
-            json.dump(asdict(state), f, default=str)
-    
-    def load_state(self) -> Optional[PipelineState]:
-        """Load previous pipeline state if exists."""
-        if Path(self.state_file).exists():
-            with open(self.state_file, 'r') as f:
+
+    def _get_state_file_path(self, run_paths: RunPaths) -> Path:
+        """State file stored in run directory to avoid concurrent run conflicts."""
+        return run_paths.run_root / ".minutia_state.json"
+
+    def save_state(self, state: PipelineState, run_paths: RunPaths):
+        """Persist current pipeline state to JSON file in run directory."""
+        state_file = self._get_state_file_path(run_paths)
+        with open(state_file, 'w') as f:
+            json.dump(asdict(state), f, indent=2)
+
+    def load_state(self, run_paths: RunPaths) -> Optional[PipelineState]:
+        """Load previous pipeline state if exists in run directory."""
+        state_file = self._get_state_file_path(run_paths)
+        if state_file.exists():
+            with open(state_file, 'r') as f:
                 data = json.load(f)
                 return PipelineState(**data)
         return None
-    
-    def resume_from_failure(self) -> PipelineResult:
-        """Resume pipeline from last completed step."""
-        state = self.load_state()
+
+    def resume_from_failure(self, run_paths: RunPaths) -> PipelineResult:
+        """Resume pipeline from last completed step.
+
+        Idempotency: Steps check for existing artifacts and skip if present.
+        - extract_audio: Skip if audio files already exist with valid duration
+        - transcribe: Skip if transcript JSON files exist with valid structure
+        - merge: Skip if merged transcript exists with valid metadata
+        - summarize: Skip if summary file exists and is non-empty
+        """
+        state = self.load_state(run_paths)
         if not state:
             raise ValueError("No previous state found to resume from")
-        
+
+        restored_config = state.to_config(run_paths)
         remaining_steps = [s for s in self.steps if s not in state.completed_steps]
-        return self._execute_steps(remaining_steps, state.run_paths, state.config)
+        return self._execute_steps(remaining_steps, restored_config)
 ```
 
 **Progress Surfacing to CLI**
