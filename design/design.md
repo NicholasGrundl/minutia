@@ -783,14 +783,23 @@ def load_api_key() -> Optional[str]:
 
 def validate_config(config: MinutiaConfig) -> MinutiaConfig:
     """Basic validation - fail fast on critical errors."""
-    # Validate paths exist and are writable
-    if not config.output_dir.parent.exists():
-        raise ConfigError(f"Output directory parent doesn't exist: {config.output_dir.parent}")
-    
+    # Validate output directory is writable (create if needed)
+    # Note: We validate the parent exists but create the actual run directory later
+    output_parent = config.output_dir.resolve()
+    if output_parent.exists() and not os.access(output_parent, os.W_OK):
+        raise ConfigError(f"Output directory is not writable: {output_parent}")
+
+    # If output_dir doesn't exist, validate we can create it
+    if not output_parent.exists():
+        try:
+            output_parent.mkdir(parents=True, exist_ok=True)
+        except OSError as e:
+            raise ConfigError(f"Cannot create output directory: {e}")
+
     # Validate track numbers are reasonable
     if config.mic_track < 0 or config.system_track < 0:
         raise ConfigError("Track numbers must be non-negative")
-    
+
     return config
 ```
 
