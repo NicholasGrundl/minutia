@@ -3,20 +3,20 @@ from pathlib import Path
 
 import click
 
-from .audio_transcription import process_audio_files
+from .steps.audio_transcription import process_audio_files
 from .config import ConfigurationError, MinutiaConfig, load_config
 from .logging import configure_logging, logger
 from .paths import RunPaths
-from .pipeline import PipelineConfig, PipelineOrchestrator, PipelineResult, StepStatus
-from .summarize_transcript import (
+from .pipeline.orchestrator import PipelineConfig, PipelineOrchestrator, PipelineResult, StepStatus
+from .steps.summarize_transcript import (
     estimate_tokens_and_price,
     generate_summary,
     load_transcript,
     prepare_transcript_for_summary,
     save_summary,
 )
-from .transcript_merger import process_transcripts
-from .video_extraction import process_mkv_file
+from .steps.transcript_merger import process_transcripts
+from .steps.video_extraction import process_mkv_file
 
 
 @click.group()
