@@ -40,8 +40,8 @@ def test_pipeline_result_defaults(sample_run_paths):
     assert result.duration_seconds is None
 
 
-def test_pipeline_result_failure_data(tmp_path):
-    run_paths = create_run_paths(tmp_path)
+def test_pipeline_result_failure_data(sample_run_paths):
+    run_paths = sample_run_paths
     error = RuntimeError("boom")
     result = PipelineResult(
         success=False,
