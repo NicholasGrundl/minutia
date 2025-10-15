@@ -315,7 +315,7 @@ class PipelineOrchestrator:
             }
 
         def merge(config: PipelineConfig, artifacts: Mapping[str, Any]) -> dict[str, Any]:
-            from . import transcript_merger
+            from ..steps import transcript_merger
 
             microphone = artifacts.get("microphone_transcript")
             desktop = artifacts.get("desktop_transcript")
