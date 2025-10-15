@@ -21,7 +21,7 @@ from .paths import CleanupPolicy
 
 # Importing here avoids a circular dependency because pipeline does not import
 # this module.
-from .pipeline import SUMMARY_MODEL_CHOICES
+from .pipeline.orchestrator import SUMMARY_MODEL_CHOICES
 
 CONFIG_PREFIX = "MINUTIA_"
 DEFAULT_ENV_FILES: tuple[Path, ...] = (
