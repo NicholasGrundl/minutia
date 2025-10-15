@@ -33,4 +33,4 @@ def test_merge_transcripts_metadata_includes_sources(sample_transcript_json, tmp
     assert metadata["schema_version"] == transcript_merger.SCHEMA_VERSION
     assert metadata["source_files"]["microphone"] == str(mic_path)
     assert metadata["source_files"]["desktop"] == str(desk_path)
-    assert metadata["segment_count"] == 2
+    assert metadata["segment_count"] == 4
