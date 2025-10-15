@@ -73,8 +73,8 @@ def test_pipeline_config_custom_summary_model(sample_run_paths):
     assert config.summary_model == "claude-3-haiku"
 
 
-def test_pipeline_config_log_level_normalisation(tmp_path):
-    run_paths = create_run_paths(tmp_path)
+def test_pipeline_config_log_level_normalisation(sample_run_paths):
+    run_paths = sample_run_paths
     config = PipelineConfig(
         input_path=run_paths.input_path,
         run_paths=run_paths,
