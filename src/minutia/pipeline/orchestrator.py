@@ -298,7 +298,7 @@ class PipelineOrchestrator:
             }
 
         def transcribe(config: PipelineConfig, artifacts: Mapping[str, Any]) -> dict[str, Any]:
-            from . import audio_transcription
+            from ..steps import audio_transcription
 
             mic_audio = artifacts.get("microphone_audio") or config.run_paths.microphone_audio
             desk_audio = artifacts.get("desktop_audio") or config.run_paths.desktop_audio
