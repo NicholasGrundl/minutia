@@ -28,8 +28,8 @@ def test_step_progress_representation():
     assert progress.error is None
 
 
-def test_pipeline_result_defaults(tmp_path):
-    run_paths = create_run_paths(tmp_path)
+def test_pipeline_result_defaults(sample_run_paths):
+    run_paths = sample_run_paths
     result = PipelineResult(success=True, run_paths=run_paths)
 
     assert result.success is True
