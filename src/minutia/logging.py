@@ -17,7 +17,7 @@ from typing import Union
 
 from loguru import logger as _logger
 
-ContextValue = Union[str, Path]
+ContextValue = str | Path
 
 _CONTEXT_DEFAULTS = {"step": "-", "input_file": "-", "run_root": "-"}
 
