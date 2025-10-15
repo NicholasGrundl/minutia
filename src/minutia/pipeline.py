@@ -19,7 +19,7 @@ from types import MappingProxyType
 from typing import Any
 
 from .logging import configure_logging, logger, logging_context
-from .paths import RunPaths
+from .paths import CleanupPolicy, RunPaths
 from .run_metadata import build_run_metadata, write_run_metadata
 
 # Anthropic model choices sourced from Claude model overview:
