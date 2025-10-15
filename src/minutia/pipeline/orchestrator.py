@@ -332,7 +332,7 @@ class PipelineOrchestrator:
             }
 
         def summarize(config: PipelineConfig, artifacts: Mapping[str, Any]) -> dict[str, Any]:
-            from . import summarize_transcript
+            from ..steps import summarize_transcript
 
             merged_path = artifacts.get("merged_transcript") or config.run_paths.merged_transcript
             transcript_data = summarize_transcript.load_transcript(str(merged_path))
