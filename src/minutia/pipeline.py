@@ -477,8 +477,8 @@ class PipelineOrchestrator:
         )
         write_run_metadata(config.run_paths.metadata_file, run_metadata)
 
-        # Apply cleanup policy on successful completion
-        if config.cleanup_policy in (CleanupPolicy.KEEP_FINAL, CleanupPolicy.CLEANUP_ON_ERROR):
+        # Apply cleanup policy on successful completion  
+        if config.cleanup_policy == CleanupPolicy.KEEP_FINAL:
             logger.info("Applying cleanup policy: {}", config.cleanup_policy.value)
             config.run_paths.cleanup(config.cleanup_policy)
 
