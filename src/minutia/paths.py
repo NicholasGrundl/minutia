@@ -349,3 +349,95 @@ class RunPaths:
             return
 
         raise ValueError(f"Unknown cleanup policy: {policy}")
+
+    def _safe_cleanup_on_error(self) -> None:
+        """
+        Safely remove run directory and contents with defensive checks.
+        
+        This method explicitly removes known files/directories rather than
+        using shutil.rmtree() to avoid potential security issues with
+        corrupted paths, symlinks, or race conditions.
+        """
+        if not self.run_root.exists():
+            return
+            
+        # Safety check: ensure run_root looks like a minutia directory
+        if not self._is_minutia_directory():
+            raise RuntimeError(
+                f"Refusing to cleanup directory that doesn't appear to be a minutia run: {self.run_root}"
+            )
+        
+        # Explicitly remove known files first
+        known_files = [
+            self.microphone_audio,
+            self.desktop_audio, 
+            self.merged_transcript,
+            self.summary_file,
+            self.metadata_file,
+            self.logs_file,
+        ]
+        
+        for file_path in known_files:
+            if file_path.exists() and file_path.is_file():
+                file_path.unlink()
+        
+        # Remove known directories if empty
+        known_dirs = [self.transcripts_dir, self.audio_dir]
+        for dir_path in known_dirs:
+            if dir_path.exists() and dir_path.is_dir():
+                try:
+                    dir_path.rmdir()  # Only removes if empty
+                except OSError:
+                    # Directory not empty - leave it for manual inspection
+                    pass
+        
+        # Finally, attempt to remove run_root if it's empty
+        if self.run_root.exists() and self.run_root.is_dir():
+            try:
+                self.run_root.rmdir()  # Only removes if empty
+            except OSError:
+                # Directory not empty - this is safer than forcing removal
+                pass
+
+    def _is_minutia_directory(self) -> bool:
+        """
+        Check if run_root appears to be a valid minutia run directory.
+        
+        Returns
+        -------
+        bool
+            True if the directory structure matches minutia conventions.
+        """
+        # Basic safety checks
+        if not self.run_root.is_dir():
+            return False
+            
+        # Check if it's too high in the filesystem hierarchy (dangerous)
+        try:
+            # Resolve to absolute path and count parts
+            abs_path = self.run_root.resolve()
+            path_parts = abs_path.parts
+            
+            # Refuse to clean anything with fewer than 3 path components
+            # (e.g., "/", "/home", "/usr" would be rejected)
+            if len(path_parts) < 3:
+                return False
+                
+            # Check if it looks like a minutia run directory name
+            # Should be in format YYYY-MM-DD_something or similar
+            dir_name = abs_path.name
+            
+            # Basic pattern check - should start with date-like pattern
+            import re
+            if not re.match(r'^\d{4}-\d{2}-\d{2}_', dir_name):
+                return False
+                
+            # Additional check: should be under a "runs" directory or similar
+            parent_name = abs_path.parent.name.lower()
+            if parent_name not in ('runs', 'output', 'outputs', 'minutia'):
+                return False
+                
+            return True
+            
+        except (OSError, ValueError):
+            return False
