@@ -3,8 +3,8 @@ import json
 import tiktoken
 from anthropic import Anthropic
 
-from .config import resolve_anthropic_api_key
-from .logging import logger
+from ..config import resolve_anthropic_api_key
+from ..logging import logger
 
 MAX_TOKENS_OUTPUT = (
     8192  # Max model output. Around 3.1K words (6-7 single spaced pages)
