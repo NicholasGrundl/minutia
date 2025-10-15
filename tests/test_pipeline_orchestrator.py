@@ -14,13 +14,10 @@ from minutia.pipeline import (
 )
 
 
-def _make_config(tmp_path: Path, **overrides) -> PipelineConfig:
-    input_video = tmp_path / "input.mkv"
-    input_video.write_text("video-bytes", encoding="utf-8")
-    run_paths = RunPaths.from_video_input(input_video, base_output_dir=tmp_path / "runs")
+def _make_config(sample_run_paths: RunPaths, **overrides) -> PipelineConfig:
     return PipelineConfig(
-        input_path=run_paths.input_path,
-        run_paths=run_paths,
+        input_path=sample_run_paths.input_path,
+        run_paths=sample_run_paths,
         run_id="test-run",
         **overrides,
     )
