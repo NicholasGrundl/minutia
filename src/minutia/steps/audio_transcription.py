@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 import whisper
 
-from .logging import logger
+from ..logging import logger
 
 TRANSCRIPT_SCHEMA_VERSION = "1.0"
 
