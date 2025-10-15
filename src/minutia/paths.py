@@ -345,8 +345,7 @@ class RunPaths:
             return
 
         if policy == CleanupPolicy.CLEANUP_ON_ERROR:
-            if self.run_root.exists():
-                shutil.rmtree(self.run_root)
+            self._safe_cleanup_on_error()
             return
 
         raise ValueError(f"Unknown cleanup policy: {policy}")
