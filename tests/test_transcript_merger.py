@@ -6,9 +6,8 @@ from pathlib import Path
 from minutia import transcript_merger
 
 
-def test_parse_transcript_supports_legacy_format(tmp_path: Path) -> None:
-    legacy_file = tmp_path / "microphone_transcript.txt"
-    legacy_file.write_text("[0.00 - 1.00] Hello legacy\n", encoding="utf-8")
+def test_parse_transcript_supports_legacy_format(sample_legacy_transcript) -> None:
+    legacy_file = sample_legacy_transcript
 
     parsed = transcript_merger.parse_transcript(legacy_file)
 
