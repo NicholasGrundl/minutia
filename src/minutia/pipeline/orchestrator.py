@@ -282,7 +282,7 @@ class PipelineOrchestrator:
         """
 
         def extract_audio(config: PipelineConfig, _: Mapping[str, Any]) -> dict[str, Any]:
-            from . import video_extraction
+            from ..steps import video_extraction
 
             config.run_paths.ensure_directories()
             outputs = video_extraction.process_mkv_file(
