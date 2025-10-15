@@ -240,6 +240,7 @@ def _build_pipeline_config(
         base_output_dir=output_directory,
         anthropic_api_key=cli_config.anthropic_api_key,
         log_level=cli_config.log_level,
+        cleanup_policy=cli_config.cleanup_policy,
     )
 
 
