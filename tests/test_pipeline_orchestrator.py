@@ -4,7 +4,7 @@ import json
 from collections.abc import Mapping
 
 from minutia.paths import CleanupPolicy, RunPaths
-from minutia.pipeline import (
+from minutia.pipeline.orchestrator import (
     PipelineConfig,
     PipelineOrchestrator,
     PipelineStepDefinition,
