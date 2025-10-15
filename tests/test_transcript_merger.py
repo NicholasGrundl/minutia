@@ -11,7 +11,7 @@ def test_parse_transcript_supports_legacy_format(sample_legacy_transcript) -> No
 
     parsed = transcript_merger.parse_transcript(legacy_file)
 
-    assert parsed["segments"][0]["text"] == "Hello legacy"
+    assert parsed["segments"][0]["text"] == "Hello from legacy format"
     assert parsed["segments"][0]["start_time"] == 0.0
     assert parsed["metadata"]["schema_version"] == transcript_merger.SCHEMA_VERSION
 
