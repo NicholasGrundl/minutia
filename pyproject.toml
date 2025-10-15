@@ -117,6 +117,11 @@ addopts = [
     "--cov-report=term-missing",
     "--cov-report=html",
 ]
+markers = [
+    "unit: Unit tests (fast, < 1s each)",
+    "integration: Integration tests (medium, < 30s)",
+    "slow: Slow tests (full pipeline, manual runs)",
+]
 log_cli = true
 log_cli_level = "INFO"
 log_cli_format = "%(asctime)s | %(levelname)s | %(message)s"
