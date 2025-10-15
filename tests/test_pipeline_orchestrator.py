@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from collections.abc import Mapping
 
-from minutia.paths import RunPaths
+from minutia.paths import CleanupPolicy, RunPaths
 from minutia.pipeline import (
     PipelineConfig,
     PipelineOrchestrator,
