@@ -16,19 +16,9 @@ def test_parse_transcript_supports_legacy_format(sample_legacy_transcript) -> No
     assert parsed["metadata"]["schema_version"] == transcript_merger.SCHEMA_VERSION
 
 
-def test_merge_transcripts_metadata_includes_sources(tmp_path: Path) -> None:
-    mic_path = tmp_path / "microphone.json"
-    desk_path = tmp_path / "desktop.json"
-    mic_payload = {
-        "metadata": {"source_file": str(mic_path), "schema_version": "1.0"},
-        "segments": [{"start_time": 0.0, "end_time": 1.0, "text": "Mic"}],
-    }
-    desk_payload = {
-        "metadata": {"source_file": str(desk_path), "schema_version": "1.0"},
-        "segments": [{"start_time": 0.5, "end_time": 1.5, "text": "Desk"}],
-    }
-    mic_path.write_text(json.dumps(mic_payload), encoding="utf-8")
-    desk_path.write_text(json.dumps(desk_payload), encoding="utf-8")
+def test_merge_transcripts_metadata_includes_sources(sample_transcript_json, tmp_path) -> None:
+    mic_path = sample_transcript_json["microphone"]
+    desk_path = sample_transcript_json["desktop"]
 
     output_path = tmp_path / "merged.json"
     merged = transcript_merger.process_transcripts(
