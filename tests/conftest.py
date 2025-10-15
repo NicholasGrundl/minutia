@@ -15,7 +15,7 @@ from minutia.pipeline import PipelineConfig
 @pytest.fixture
 def sample_video_file(tmp_path):
     """Create a sample video file for testing.
-    
+
     Returns a Path object to a temporary .mkv file with dummy content.
     Useful for tests that need video input files.
     """
@@ -27,7 +27,7 @@ def sample_video_file(tmp_path):
 @pytest.fixture
 def sample_run_paths(sample_video_file, tmp_path):
     """Create a standard RunPaths structure for testing.
-    
+
     Uses the sample_video_file fixture and creates RunPaths with standard
     output directory structure. This is the most commonly needed fixture
     across multiple test modules.
@@ -41,7 +41,7 @@ def sample_run_paths(sample_video_file, tmp_path):
 @pytest.fixture
 def sample_pipeline_config(sample_run_paths):
     """Create a basic PipelineConfig for testing.
-    
+
     Provides a valid PipelineConfig with sensible defaults for most tests.
     Tests can override specific fields as needed.
     """
@@ -55,7 +55,7 @@ def sample_pipeline_config(sample_run_paths):
 @pytest.fixture
 def sample_transcript_json(tmp_path):
     """Create sample transcript JSON files for testing transcript merging.
-    
+
     Returns a dict with 'microphone' and 'desktop' keys pointing to
     Path objects of JSON transcript files with realistic structure.
     """
@@ -102,7 +102,7 @@ def sample_transcript_json(tmp_path):
 @pytest.fixture
 def sample_legacy_transcript(tmp_path):
     """Create a sample legacy transcript file for testing backward compatibility.
-    
+
     Returns a Path to a legacy format transcript file with bracketed timestamps.
     """
     legacy_file = tmp_path / "legacy_transcript.txt"
@@ -117,7 +117,7 @@ def sample_legacy_transcript(tmp_path):
 @pytest.fixture
 def sample_personal_notes(tmp_path):
     """Create sample personal notes files for testing.
-    
+
     Returns a dict with 'json' and 'markdown' keys pointing to Path objects
     of sample notes files that can be used in pipeline testing.
     """
@@ -136,7 +136,7 @@ def sample_personal_notes(tmp_path):
     ]
 
     markdown_content = """# Meeting Context
-    
+
 ## Background
 Important context for this meeting.
 
@@ -160,13 +160,13 @@ Important context for this meeting.
 @pytest.fixture
 def run_paths_factory(tmp_path):
     """Factory fixture to create multiple RunPaths instances.
-    
+
     Useful for tests that need multiple different RunPaths configurations.
-    
+
     Usage:
         def test_multiple_runs(run_paths_factory):
             run1 = run_paths_factory("meeting1.mkv")
-            run2 = run_paths_factory("meeting2.mkv") 
+            run2 = run_paths_factory("meeting2.mkv")
     """
     def _create_run_paths(video_filename: str, **kwargs):
         video_file = tmp_path / video_filename
@@ -180,7 +180,7 @@ def run_paths_factory(tmp_path):
 @pytest.fixture
 def pipeline_config_factory(run_paths_factory):
     """Factory fixture to create PipelineConfig instances with custom settings.
-    
+
     Usage:
         def test_custom_config(pipeline_config_factory):
             config = pipeline_config_factory(
