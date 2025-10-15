@@ -9,7 +9,7 @@ import json
 import pytest
 
 from minutia.paths import RunPaths
-from minutia.pipeline import PipelineConfig
+from minutia.pipeline.orchestrator import PipelineConfig
 
 
 @pytest.fixture
