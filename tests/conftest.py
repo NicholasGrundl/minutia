@@ -5,11 +5,69 @@ https://docs.pytest.org/en/stable/how-to/fixtures.html#conftest-py-sharing-fixtu
 """
 
 import json
+from pathlib import Path
 
 import pytest
 
 from minutia.paths import RunPaths
 from minutia.pipeline.orchestrator import PipelineConfig
+
+
+# Session-scoped fixtures for expensive resources
+
+@pytest.fixture(scope="session")
+def test_fixtures_dir():
+    """Path to test fixtures directory."""
+    return Path(__file__).parent / "fixtures"
+
+
+@pytest.fixture(scope="session") 
+def whisper_tiny_model():
+    """Load tiny Whisper model once per test session."""
+    try:
+        import whisper
+        model = whisper.load_model("tiny")
+        yield model
+        del model
+    except ImportError:
+        pytest.skip("Whisper not available for integration tests")
+
+
+@pytest.fixture(scope="session")
+def test_video_files(test_fixtures_dir):
+    """Load test video files created by fixture generation scripts."""
+    video_dir = test_fixtures_dir / "video"
+    return {
+        "short": video_dir / "sample_short.mkv",
+        "overlap": video_dir / "sample_overlap.mkv", 
+        "quiet": video_dir / "sample_quiet.mkv",
+        "noisy": video_dir / "sample_noisy.mkv"
+    }
+
+
+@pytest.fixture(scope="session")
+def golden_samples(test_fixtures_dir):
+    """Load golden sample outputs for regression testing."""
+    golden_dir = test_fixtures_dir / "golden_samples"
+    samples = {}
+    if golden_dir.exists():
+        for sample_dir in golden_dir.iterdir():
+            if sample_dir.is_dir():
+                samples[sample_dir.name] = sample_dir
+    return samples
+
+
+@pytest.fixture
+def isolated_tmp_dir(tmp_path):
+    """Create isolated temporary directory for each test."""
+    return tmp_path
+
+
+@pytest.fixture
+def mock_anthropic():
+    """Mock Anthropic API for unit/integration tests."""
+    # TODO: Implement proper Anthropic API mocking
+    pass
 
 
 @pytest.fixture
