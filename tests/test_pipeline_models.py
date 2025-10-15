@@ -61,8 +61,8 @@ def test_pipeline_result_failure_data(sample_run_paths):
     assert result.duration_seconds == 12.5
 
 
-def test_pipeline_config_custom_summary_model(tmp_path):
-    run_paths = create_run_paths(tmp_path)
+def test_pipeline_config_custom_summary_model(sample_run_paths):
+    run_paths = sample_run_paths
     config = PipelineConfig(
         input_path=run_paths.input_path,
         run_paths=run_paths,
