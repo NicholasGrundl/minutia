@@ -6,10 +6,9 @@ from minutia.cli import cli
 from minutia.pipeline import PipelineResult, StepProgress, StepStatus
 
 
-def test_process_all_runs_pipeline_orchestrator(tmp_path, monkeypatch):
+def test_process_all_runs_pipeline_orchestrator(sample_video_file, tmp_path, monkeypatch):
     """Ensure the CLI wraps the pipeline orchestrator and reports artifacts."""
-    input_video = tmp_path / "meeting.mkv"
-    input_video.write_text("video-bytes", encoding="utf-8")
+    input_video = sample_video_file
 
     env = {
         "MINUTIA_OUTPUT_DIR": str(tmp_path / "runs"),
