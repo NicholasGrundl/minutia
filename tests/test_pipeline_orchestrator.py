@@ -67,8 +67,8 @@ def test_orchestrator_executes_steps_and_collects_artifacts(sample_run_paths) ->
     assert metadata["run_info"]["status"] == "completed"
 
 
-def test_orchestrator_handles_step_failure(tmp_path: Path) -> None:
-    config = _make_config(tmp_path)
+def test_orchestrator_handles_step_failure(sample_run_paths) -> None:
+    config = _make_config(sample_run_paths)
     progress_events: list[StepProgress] = []
 
     def succeeds(_: PipelineConfig, __: Mapping[str, str]) -> dict[str, str]:
