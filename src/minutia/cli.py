@@ -71,7 +71,7 @@ def extract_audio(ctx, input_video, output_dir, mic_track, desktop_track):
         click.echo(f"Audio files extracted: {audio_files}")
     except Exception as e:
         logger.exception("Audio extraction failed: {}", e)
-        raise click.ClickException(str(e))
+        raise click.ClickException(str(e)) from e
 
 
 @cli.command()
@@ -88,7 +88,7 @@ def transcribe(ctx, mic_audio, desktop_audio, output_dir):
         click.echo(f"Transcriptions created: {transcriptions}")
     except Exception as e:
         logger.exception("Transcription failed: {}", e)
-        raise click.ClickException(str(e))
+        raise click.ClickException(str(e)) from e
 
 
 @cli.command()
@@ -103,7 +103,7 @@ def merge_transcripts(ctx, mic_transcript, desktop_transcript, output_file):
         click.echo(f"Merged transcript saved to: {output_file}")
     except Exception as e:
         logger.exception("Transcript merging failed: {}", e)
-        raise click.ClickException(str(e))
+        raise click.ClickException(str(e)) from e
 
 
 @cli.command()
@@ -153,7 +153,7 @@ def summarize(ctx, merged_transcript, output_file, model, dry_run):
         click.echo(f"Summary saved to: {output_file}")
     except Exception as e:
         logger.exception("Summary generation failed: {}", e)
-        raise click.ClickException(str(e))
+        raise click.ClickException(str(e)) from e
 
 
 @cli.command()
