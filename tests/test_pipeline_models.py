@@ -1,17 +1,10 @@
 from pathlib import Path
 
-from minutia.paths import RunPaths
 from minutia.pipeline import PipelineConfig, PipelineResult, StepProgress, StepStatus
 
 
-def create_run_paths(tmp_path):
-    video = tmp_path / "meeting.mkv"
-    video.write_text("video", encoding="utf-8")
-    return RunPaths.from_video_input(video, base_output_dir=tmp_path / "runs")
-
-
-def test_pipeline_config_defaults(tmp_path):
-    run_paths = create_run_paths(tmp_path)
+def test_pipeline_config_defaults(sample_run_paths):
+    run_paths = sample_run_paths
     config = PipelineConfig(
         input_path=run_paths.input_path,
         run_paths=run_paths,
