@@ -52,11 +52,11 @@
 ## Phase 5: Simple CLI Wrapper (MVP - Interface)
 
 ### 🖥️ Basic CLI Interface
-- [ ] Wrap pipeline orchestrator with Click CLI interface
-- [ ] Add simple progress output using print/logging (not rich UI yet)
-- [ ] Display final artifact locations on completion
-- [ ] Map pipeline exceptions to clear error messages
-- [ ] Preserve all current CLI arguments and functionality
+- [x] Wrap pipeline orchestrator with Click CLI interface
+- [x] Add simple progress output using print/logging (not rich UI yet)
+- [x] Display final artifact locations on completion
+- [x] Map pipeline exceptions to clear error messages
+- [x] Preserve all current CLI arguments and functionality
 
 ## Phase 6: JSON Data Formats (Post-MVP)
 

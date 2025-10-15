@@ -1,11 +1,14 @@
 import os
 from pathlib import Path
+from typing import Iterable, Tuple
 
 import click
 
 from .audio_transcription import process_audio_files
-from .config import ConfigurationError, load_config
+from .config import ConfigurationError, MinutiaConfig, load_config
 from .logging import configure_logging, logger
+from .paths import RunPaths
+from .pipeline import PipelineConfig, PipelineOrchestrator, PipelineResult, StepStatus
 from .summarize_transcript import (
     estimate_tokens_and_price,
     generate_summary,
@@ -182,65 +185,103 @@ def process_all(ctx, input_video, output_dir, mic_track, desktop_track, model):
     model_name = model or config.summary_model
     mic_track = mic_track if mic_track is not None else config.mic_track
     desktop_track = desktop_track if desktop_track is not None else config.desktop_track
-    output_directory = Path(output_dir).expanduser() if output_dir else config.base_output_dir
+    output_directory = _resolve_output_dir(config, output_dir)
+
+    pipeline_config = _build_pipeline_config(
+        cli_config=config,
+        input_video=input_video,
+        output_directory=output_directory,
+        mic_track=mic_track,
+        desktop_track=desktop_track,
+        summary_model=model_name,
+    )
 
     try:
-        # Step 1: Process MKV file
-        click.echo("Step 1: Processing MKV file")
-        audio_files = process_mkv_file(
-            input_video,
-            str(output_directory),
-            mic_track_number=mic_track,
-            desktop_track_number=desktop_track,
-        )
+        orchestrator = PipelineOrchestrator(progress_callback=_render_progress)
+        result = orchestrator.execute(pipeline_config)
+    except Exception as exc:  # noqa: BLE001 - surface human readable error
+        logger.exception("Pipeline orchestration failed: {}", exc)
+        raise click.ClickException(f"Pipeline execution failed: {exc}") from exc
 
-        # Step 2: Transcribe audio files
-        click.echo("Step 2: Transcribing audio files")
-        transcriptions = process_audio_files(
-            audio_files["microphone"],
-            audio_files["desktop"],
-            str(output_directory),
-        )
+    if not result.success:
+        error_message = _format_failure_message(result)
+        logger.error(error_message)
+        raise click.ClickException(error_message)
 
-        # Step 3: Merge transcripts
-        click.echo("Step 3: Merging transcripts")
-        merged_transcript_file = os.path.join(output_directory, "merged_transcript.json")
-        process_transcripts(
-            transcriptions["microphone"],
-            transcriptions["desktop"],
-            merged_transcript_file,
-        )
+    _render_success_message(result)
 
-        # Step 4: Generate summary
-        click.echo("Step 4: Generating summary")
-        transcript_data = load_transcript(merged_transcript_file)
-        transcript_text = prepare_transcript_for_summary(transcript_data)
 
-        total_tokens, estimated_price = estimate_tokens_and_price(
-            transcript_text, model_name
-        )
-        click.echo(f"Estimated tokens for summary: {total_tokens}")
-        click.echo(f"Estimated price for summary: ${estimated_price:.4f}")
+def _resolve_output_dir(config: MinutiaConfig, output_dir: str | None) -> Path:
+    """Return the output directory for the run respecting CLI overrides."""
+    if output_dir:
+        return Path(output_dir).expanduser()
+    return config.base_output_dir
 
-        if not config.anthropic_api_key:
-            raise click.ClickException(
-                "Anthropic API key not configured. Set ANTHROPIC_API_KEY or MINUTIA_ANTHROPIC_API_KEY."
-            )
 
-        summary = generate_summary(
-            transcript_text,
-            model_name=model_name,
-            api_key=config.anthropic_api_key,
-        )
+def _build_pipeline_config(
+    *,
+    cli_config: MinutiaConfig,
+    input_video: str,
+    output_directory: Path,
+    mic_track: int,
+    desktop_track: int,
+    summary_model: str,
+) -> PipelineConfig:
+    """Construct a PipelineConfig object from CLI parameters and configuration."""
+    run_paths = RunPaths.from_video_input(input_video, base_output_dir=output_directory)
+    return PipelineConfig(
+        input_path=run_paths.input_path,
+        run_paths=run_paths,
+        run_id=run_paths.run_root.name,
+        whisper_model=cli_config.whisper_model,
+        skip_summary=False,
+        summary_model=summary_model,
+        mic_track=mic_track,
+        desktop_track=desktop_track,
+        base_output_dir=output_directory,
+        anthropic_api_key=cli_config.anthropic_api_key,
+        log_level=cli_config.log_level,
+    )
 
-        # Save summary
-        summary_file = os.path.join(output_directory, "meeting_summary.txt")
-        save_summary(summary, summary_file)
 
-        click.echo(f"Workflow completed successfully. Summary saved to: {summary_file}")
-    except Exception as e:
-        logger.exception("An error occurred: {}", e)
-        raise click.ClickException(str(e))
+def _render_progress(progress) -> None:
+    """Display lightweight progress information for pipeline steps."""
+    status_label = progress.status.value.upper()
+    message = progress.message or ""
+    if progress.status is StepStatus.RUNNING:
+        click.echo(f"[{status_label}] {progress.step_name}: {message or 'Starting...'}")
+        return
+    if progress.status is StepStatus.COMPLETED:
+        click.echo(f"[{status_label}] {progress.step_name}: {message or 'Completed'}")
+        return
+    if progress.status is StepStatus.FAILED:
+        error_text = str(progress.error or message or "Step failed")
+        click.echo(f"[{status_label}] {progress.step_name}: {error_text}")
+
+
+def _render_success_message(result: PipelineResult) -> None:
+    """Emit user-facing summary of pipeline outputs."""
+    click.echo("Pipeline completed successfully.")
+    artifact_lines: Iterable[Tuple[str, Path]] = (
+        ("Run directory", result.run_paths.run_root),
+        ("Audio directory", result.run_paths.audio_dir),
+        ("Microphone audio", result.run_paths.microphone_audio),
+        ("Desktop audio", result.run_paths.desktop_audio),
+        ("Transcripts directory", result.run_paths.transcripts_dir),
+        ("Merged transcript", result.run_paths.merged_transcript),
+        ("Summary", result.run_paths.summary_file),
+        ("Log file", result.run_paths.logs_file),
+    )
+    for label, path in artifact_lines:
+        click.echo(f"  {label}: {path}")
+
+
+def _format_failure_message(result: PipelineResult) -> str:
+    """Create a friendly error message for failed pipeline runs."""
+    failed_step = result.failed_step or "unknown step"
+    error_message = str(result.error or "Unknown error")
+    logs_hint = f" See logs at {result.run_paths.logs_file}" if result.run_paths.logs_file else ""
+    return f"Pipeline failed during '{failed_step}': {error_message}.{logs_hint}"
 
 
 if __name__ == "__main__":
