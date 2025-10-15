@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+import json
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Dict, Mapping
 
-import pytest
-
+from minutia.paths import RunPaths
 from minutia.pipeline import (
     PipelineConfig,
     PipelineOrchestrator,
@@ -12,7 +12,6 @@ from minutia.pipeline import (
     StepProgress,
     StepStatus,
 )
-from minutia.paths import RunPaths
 
 
 def _make_config(tmp_path: Path, **overrides) -> PipelineConfig:
@@ -31,10 +30,10 @@ def test_orchestrator_executes_steps_and_collects_artifacts(tmp_path: Path) -> N
     config = _make_config(tmp_path)
     progress_events: list[StepProgress] = []
 
-    def first_step(_: PipelineConfig, __: Mapping[str, str]) -> Dict[str, str]:
+    def first_step(_: PipelineConfig, __: Mapping[str, str]) -> dict[str, str]:
         return {"first": "done"}
 
-    def second_step(_: PipelineConfig, artifacts: Mapping[str, str]) -> Dict[str, str]:
+    def second_step(_: PipelineConfig, artifacts: Mapping[str, str]) -> dict[str, str]:
         assert artifacts["first"] == "done"
         return {"second": "done"}
 
@@ -65,15 +64,20 @@ def test_orchestrator_executes_steps_and_collects_artifacts(tmp_path: Path) -> N
         ("second", StepStatus.COMPLETED),
     ]
 
+    metadata_path = config.run_paths.metadata_file
+    assert metadata_path.exists()
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    assert metadata["run_info"]["status"] == "completed"
+
 
 def test_orchestrator_handles_step_failure(tmp_path: Path) -> None:
     config = _make_config(tmp_path)
     progress_events: list[StepProgress] = []
 
-    def succeeds(_: PipelineConfig, __: Mapping[str, str]) -> Dict[str, str]:
+    def succeeds(_: PipelineConfig, __: Mapping[str, str]) -> dict[str, str]:
         return {"ok": "done"}
 
-    def fails(_: PipelineConfig, artifacts: Mapping[str, str]) -> Dict[str, str]:
+    def fails(_: PipelineConfig, artifacts: Mapping[str, str]) -> dict[str, str]:
         assert artifacts["ok"] == "done"
         raise RuntimeError("boom")
 
@@ -100,13 +104,18 @@ def test_orchestrator_handles_step_failure(tmp_path: Path) -> None:
     assert progress_events[-1].status is StepStatus.FAILED
     assert progress_events[-1].step_name == "failure"
 
+    metadata_path = config.run_paths.metadata_file
+    assert metadata_path.exists()
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    assert metadata["run_info"]["status"] == "failed"
+
 
 def test_orchestrator_skips_disabled_steps(tmp_path: Path) -> None:
     config = _make_config(tmp_path, skip_summary=True)
 
     progress_events: list[StepProgress] = []
 
-    def runner(_: PipelineConfig, __: Mapping[str, str]) -> Dict[str, str]:
+    def runner(_: PipelineConfig, __: Mapping[str, str]) -> dict[str, str]:
         return {"ran": "yes"}
 
     orchestrator = PipelineOrchestrator(
@@ -127,3 +136,8 @@ def test_orchestrator_skips_disabled_steps(tmp_path: Path) -> None:
     assert emitted[0] == ("always", StepStatus.RUNNING, "")
     assert emitted[1] == ("always", StepStatus.COMPLETED, "Completed")
     assert emitted[2] == ("maybe", StepStatus.COMPLETED, "Skipped")
+
+    metadata_path = config.run_paths.metadata_file
+    assert metadata_path.exists()
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    assert metadata["run_info"]["status"] == "completed"

@@ -1,6 +1,5 @@
-import os
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable, Tuple
 
 import click
 
@@ -262,7 +261,7 @@ def _render_progress(progress) -> None:
 def _render_success_message(result: PipelineResult) -> None:
     """Emit user-facing summary of pipeline outputs."""
     click.echo("Pipeline completed successfully.")
-    artifact_lines: Iterable[Tuple[str, Path]] = (
+    artifact_lines: Iterable[tuple[str, Path]] = (
         ("Run directory", result.run_paths.run_root),
         ("Audio directory", result.run_paths.audio_dir),
         ("Microphone audio", result.run_paths.microphone_audio),

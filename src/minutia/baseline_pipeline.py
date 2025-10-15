@@ -23,11 +23,18 @@ from pathlib import Path
 from typing import Any
 
 import isodate
-from . import audio_transcription, summarize_transcript, transcript_merger, video_extraction
+
+from . import (
+    audio_transcription,
+    summarize_transcript,
+    transcript_merger,
+    video_extraction,
+)
 from .config import load_config
 from .logging import configure_logging as setup_logging
-from .logging import logging_context, logger
+from .logging import logger, logging_context
 from .paths import RunPaths
+from .run_metadata import build_run_metadata, write_run_metadata
 
 
 def get_isodatetime() -> str:
@@ -382,88 +389,122 @@ def run_pipeline(args: argparse.Namespace) -> PipelineArtifacts:
     setup_logging(level=app_config.log_level, logs_file=run_paths.logs_file)
     run_paths.ensure_directories()
 
-    with logging_context(
-        input_file=run_paths.input_path, run_root=run_paths.run_root
-    ):
-        logger.info("Writing run artifacts to {}", run_paths.run_root)
+    started_at = datetime.datetime.now(datetime.timezone.utc)
+    status = "failed"
+    error: Exception | None = None
+    merged_metadata: Mapping[str, Any] | None = None
+    outputs: dict[str, Any] = {"run_root": str(run_paths.run_root)}
 
-        mic_track = args.mic_track if args.mic_track is not None else app_config.mic_track
-        desktop_track = (
-            args.desktop_track if args.desktop_track is not None else app_config.desktop_track
-        )
-        whisper_model = args.whisper_model or app_config.whisper_model
-        summary_model = args.summary_model or app_config.summary_model
+    try:
+        with logging_context(
+            input_file=run_paths.input_path, run_root=run_paths.run_root
+        ):
+            logger.info("Writing run artifacts to {}", run_paths.run_root)
 
-        extract_audio(run_paths, mic_track, desktop_track)
-        transcripts = transcribe_audio(run_paths, whisper_model)
-
-        merged_transcript_path = run_paths.run_root / args.transcript_filename
-        transcript_data = merge_transcripts(
-            run_paths,
-            transcripts,
-            parse_overlaps=args.parse_overlaps,
-            target_path=merged_transcript_path,
-        )
-
-        personal_notes = read_personal_notes(args.personal_notes)
-        personal_info = read_personal_info(args.personal_info, args.personal_info_file)
-        markdown_notes = read_markdown_notes(args.markdown_notes)
-
-        if personal_notes or personal_info or markdown_notes:
-            system_prompt = generate_meeting_summary_prompt(
-                personal_notes,
-                personal_info,
-                markdown_notes,
+            mic_track = args.mic_track if args.mic_track is not None else app_config.mic_track
+            desktop_track = (
+                args.desktop_track if args.desktop_track is not None else app_config.desktop_track
             )
-            transcript_text_for_summary = extract_transcript_text(transcript_data)
-        else:
-            system_prompt = None
-            transcript_text_for_summary = summarize_transcript.prepare_transcript_for_summary(
-                transcript_data
+            whisper_model = args.whisper_model or app_config.whisper_model
+            summary_model = args.summary_model or app_config.summary_model
+
+            extract_audio(run_paths, mic_track, desktop_track)
+
+            transcripts = transcribe_audio(run_paths, whisper_model)
+            outputs["transcripts"] = {
+                name: str(path) for name, path in transcripts.items()
+            }
+
+            merged_transcript_path = run_paths.run_root / args.transcript_filename
+            transcript_data = merge_transcripts(
+                run_paths,
+                transcripts,
+                parse_overlaps=args.parse_overlaps,
+                target_path=merged_transcript_path,
             )
+            outputs["merged_transcript"] = str(merged_transcript_path)
+            merged_metadata = transcript_data.get("metadata")
 
-        estimate_summary_cost(transcript_text_for_summary, summary_model)
+            personal_notes = read_personal_notes(args.personal_notes)
+            personal_info = read_personal_info(args.personal_info, args.personal_info_file)
+            markdown_notes = read_markdown_notes(args.markdown_notes)
 
-        summary_path: Path | None = None
-        markdown_path: Path | None = None
-
-        if args.skip_summary:
-            logger.info("Skipping summary generation (--skip-summary provided).")
-        else:
-            summary_path = run_paths.run_root / args.summary_filename
-            if args.timestamp_summary:
-                summary_path = summary_path.with_name(
-                    f"{get_isodatetime()}-{summary_path.name}"
+            if personal_notes or personal_info or markdown_notes:
+                system_prompt = generate_meeting_summary_prompt(
+                    personal_notes,
+                    personal_info,
+                    markdown_notes,
+                )
+                transcript_text_for_summary = extract_transcript_text(transcript_data)
+            else:
+                system_prompt = None
+                transcript_text_for_summary = summarize_transcript.prepare_transcript_for_summary(
+                    transcript_data
                 )
 
-            if not app_config.anthropic_api_key:
-                raise RuntimeError(
-                    "Anthropic API key not configured. Set ANTHROPIC_API_KEY or MINUTIA_ANTHROPIC_API_KEY."
+            estimate_summary_cost(transcript_text_for_summary, summary_model)
+
+            summary_path: Path | None = None
+            markdown_path: Path | None = None
+
+            if args.skip_summary:
+                logger.info("Skipping summary generation (--skip-summary provided).")
+            else:
+                summary_path = run_paths.run_root / args.summary_filename
+                if args.timestamp_summary:
+                    summary_path = summary_path.with_name(
+                        f"{get_isodatetime()}-{summary_path.name}"
+                    )
+
+                if not app_config.anthropic_api_key:
+                    raise RuntimeError(
+                        "Anthropic API key not configured. Set ANTHROPIC_API_KEY or MINUTIA_ANTHROPIC_API_KEY."
+                    )
+
+                summary_text = summarise_transcript(
+                    transcript_text=transcript_text_for_summary,
+                    summary_path=summary_path,
+                    model=summary_model,
+                    use_long_summary=args.long_summary,
+                    system_prompt=system_prompt,
+                    api_key=app_config.anthropic_api_key,
                 )
 
-            summary_text = summarise_transcript(
-                transcript_text=transcript_text_for_summary,
-                summary_path=summary_path,
-                model=summary_model,
-                use_long_summary=args.long_summary,
-                system_prompt=system_prompt,
-                api_key=app_config.anthropic_api_key,
+                outputs["summary"] = str(summary_path)
+
+                if args.generate_markdown:
+                    markdown_path = create_markdown_report(
+                        summary_text,
+                        run_paths.run_root,
+                        model_name=summary_model,
+                    )
+                    outputs["markdown"] = str(markdown_path)
+
+            status = "completed"
+            return PipelineArtifacts(
+                run_paths=run_paths,
+                transcription_files=transcripts,
+                merged_transcript=merged_transcript_path,
+                summary_file=summary_path,
+                markdown_file=markdown_path,
             )
-
-            if args.generate_markdown:
-                markdown_path = create_markdown_report(
-                    summary_text,
-                    run_paths.run_root,
-                    model_name=summary_model,
-                )
-
-        return PipelineArtifacts(
-            run_paths=run_paths,
-            transcription_files=transcripts,
-            merged_transcript=merged_transcript_path,
-            summary_file=summary_path,
-            markdown_file=markdown_path,
+    except Exception as exc:
+        error = exc
+        raise
+    finally:
+        completed_at = datetime.datetime.now(datetime.timezone.utc)
+        outputs.setdefault("logs", str(run_paths.logs_file))
+        run_metadata_payload = build_run_metadata(
+            run_root=run_paths.run_root,
+            input_path=run_paths.input_path,
+            status=status,
+            started_at=started_at,
+            completed_at=completed_at,
+            outputs=outputs,
+            merged_metadata=merged_metadata,
+            error=error,
         )
+        write_run_metadata(run_paths.metadata_file, run_metadata_payload)
 
 
 # ---------------------------------------------------------------------------

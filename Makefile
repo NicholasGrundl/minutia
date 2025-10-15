@@ -67,11 +67,6 @@ test:
 	@echo "Running tests via uv..."
 	uv run pytest
 
-.PHONY: test-codex
-test-codex:
-	@echo "Running tests via local .venv..."
-	LOGURU_LEVEL=INFO .venv/bin/python -m pytest tests/ -v
-
 .PHONY: test-unit
 test-unit:
 	@echo "Running unit tests..."
@@ -148,3 +143,16 @@ help:
 commit:
 	@echo "Committing changes with LLM summarization..."
 	.claude/hooks/macro-commit.sh --force
+
+# Codex specific (permissions issues for calling uv run in sandbox)
+
+.PHONY: test-codex
+test-codex:
+	@echo "Running tests via local .venv..."
+	LOGURU_LEVEL=INFO .venv/bin/python -m pytest tests/ -v
+
+
+.PHONY: lint-codex
+lint-codex:
+	@echo "Running tests via local .venv..."
+	.venv/bin/python -m ruff check .

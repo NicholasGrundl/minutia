@@ -21,7 +21,6 @@ import shutil
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Optional, Union
 
 
 class CleanupPolicy(Enum):
@@ -188,10 +187,10 @@ class RunPaths:
     @classmethod
     def from_video_input(
         cls,
-        input_path: Union[str, Path],
-        base_output_dir: Optional[Path] = None,
-        run_suffix: Optional[str] = None,
-    ) -> "RunPaths":
+        input_path: str | Path,
+        base_output_dir: Path | None = None,
+        run_suffix: str | None = None,
+    ) -> RunPaths:
         """
         Create :class:`RunPaths` from a source video file (e.g., an OBS recording).
 
@@ -238,10 +237,10 @@ class RunPaths:
     @classmethod
     def from_audio_inputs(
         cls,
-        mic_audio_path: Union[str, Path],
-        desktop_audio_path: Union[str, Path],
-        base_output_dir: Optional[Path] = None,
-    ) -> "RunPaths":
+        mic_audio_path: str | Path,
+        desktop_audio_path: str | Path,
+        base_output_dir: Path | None = None,
+    ) -> RunPaths:
         """
         Create :class:`RunPaths` from pre-extracted audio files.
 
@@ -285,7 +284,7 @@ class RunPaths:
         return cls._build(run_root=run_root, input_path=mic_audio_path)
 
     @classmethod
-    def _build(cls, run_root: Path, input_path: Path) -> "RunPaths":
+    def _build(cls, run_root: Path, input_path: Path) -> RunPaths:
         """Construct the full set of paths from the run root."""
         audio_dir = run_root / "audio"
         transcripts_dir = run_root / "transcripts"

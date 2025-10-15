@@ -61,11 +61,11 @@
 ## Phase 6: JSON Data Formats (Post-MVP)
 
 ### 📄 Structured Data Migration
-- [ ] Convert individual transcripts from plain text to structured JSON
-- [ ] Update merged transcript format with metadata section
-- [ ] Add run metadata file generation
-- [ ] Update transcript merger to handle JSON inputs/outputs
-- [ ] Ensure backward compatibility during transition
+- [x] Convert individual transcripts from plain text to structured JSON
+- [x] Update merged transcript format with metadata section
+- [x] Add run metadata file generation
+- [x] Update transcript merger to handle JSON inputs/outputs
+- [x] Ensure backward compatibility during transition
 
 ## Phase 7: Rich CLI Interface (Post-MVP)
 

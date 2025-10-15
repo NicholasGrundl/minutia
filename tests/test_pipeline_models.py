@@ -1,7 +1,5 @@
 from pathlib import Path
 
-import pytest
-
 from minutia.paths import RunPaths
 from minutia.pipeline import PipelineConfig, PipelineResult, StepProgress, StepStatus
 

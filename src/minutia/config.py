@@ -11,9 +11,9 @@ modules.
 from __future__ import annotations
 
 import os
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable, Mapping, Optional
 
 from dotenv import load_dotenv
 
@@ -35,7 +35,7 @@ class ConfigurationError(ValueError):
     """Raised when configuration values are invalid."""
 
 
-def _load_env_files(env_file: Optional[Path]) -> None:
+def _load_env_files(env_file: Path | None) -> None:
     """Load `.env` style files into the process environment."""
     if env_file is not None:
         path = Path(env_file)
@@ -48,7 +48,7 @@ def _load_env_files(env_file: Optional[Path]) -> None:
             load_dotenv(candidate, override=False)
 
 
-def _get_env(env: Mapping[str, str], key: str) -> Optional[str]:
+def _get_env(env: Mapping[str, str], key: str) -> str | None:
     """Return the environment value for ``key`` with whitespace trimmed."""
     value = env.get(key)
     if value is None:
@@ -57,7 +57,7 @@ def _get_env(env: Mapping[str, str], key: str) -> Optional[str]:
     return value or None
 
 
-def _coerce_int(value: Optional[str], *, option: str) -> Optional[int]:
+def _coerce_int(value: str | None, *, option: str) -> int | None:
     """Convert an optional string value to int, raising a configuration error."""
     if value is None:
         return None
@@ -67,14 +67,14 @@ def _coerce_int(value: Optional[str], *, option: str) -> Optional[int]:
         raise ConfigurationError(f"{option} must be an integer (got {value!r})") from exc
 
 
-def _coerce_path(value: Optional[str]) -> Optional[Path]:
+def _coerce_path(value: str | None) -> Path | None:
     """Convert an optional string value to a Path instance."""
     if value is None:
         return None
     return Path(value).expanduser()
 
 
-def resolve_anthropic_api_key(env: Optional[Mapping[str, str]] = None) -> Optional[str]:
+def resolve_anthropic_api_key(env: Mapping[str, str] | None = None) -> str | None:
     """
     Resolve the Anthropic API key using a fallback chain.
 
@@ -92,7 +92,7 @@ def resolve_anthropic_api_key(env: Optional[Mapping[str, str]] = None) -> Option
     return None
 
 
-def _mask_secret(value: Optional[str]) -> str:
+def _mask_secret(value: str | None) -> str:
     """Return a masked representation of secret values for logs."""
     if not value:
         return "<unset>"
@@ -112,7 +112,7 @@ class MinutiaConfig:
     base_output_dir: Path = field(default_factory=lambda: Path("./runs"))
     log_level: str = "INFO"
     cleanup_policy: CleanupPolicy = CleanupPolicy.KEEP_ALL
-    anthropic_api_key: Optional[str] = None
+    anthropic_api_key: str | None = None
     env_sources: Iterable[Path] = field(default_factory=tuple)
 
     def validate(self) -> None:
@@ -144,8 +144,8 @@ class MinutiaConfig:
 
 def load_config(
     *,
-    env_file: Optional[Path] = None,
-    env: Optional[Mapping[str, str]] = None,
+    env_file: Path | None = None,
+    env: Mapping[str, str] | None = None,
 ) -> MinutiaConfig:
     """
     Load Minutia configuration from `.env` files and environment variables.

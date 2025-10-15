@@ -10,9 +10,10 @@ file sink placed inside the active run directory.
 from __future__ import annotations
 
 import sys
+from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Generator, Optional, Union
+from typing import Union
 
 from loguru import logger as _logger
 
@@ -49,7 +50,7 @@ def _format_record(record: dict) -> str:
 def configure_logging(
     *,
     level: str = "INFO",
-    logs_file: Optional[Union[str, Path]] = None,
+    logs_file: str | Path | None = None,
 ) -> None:
     """
     Configure loguru sinks for the current process.
@@ -89,9 +90,9 @@ def configure_logging(
 @contextmanager
 def logging_context(
     *,
-    step: Optional[str] = None,
-    input_file: Optional[ContextValue] = None,
-    run_root: Optional[ContextValue] = None,
+    step: str | None = None,
+    input_file: ContextValue | None = None,
+    run_root: ContextValue | None = None,
 ) -> Generator[None, None, None]:
     """
     Temporarily enrich log records with contextual fields.

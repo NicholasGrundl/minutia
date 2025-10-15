@@ -4,7 +4,8 @@ This repository uses the `uv` Python toolchain and a Makefile-driven workflow. U
 
 ## Core Context
 - Primary goal: evolve the Minutia CLI that ingests OBS recordings, extracts audio, transcribes with Whisper, and summarizes with Claude.
-- Reference materials: `CLAUDE.md` (deep dive), `design/design.md` (architecture), `TASKS-TODO.md` (priorities), and `README.md` (public overview).
+
+- Reference materials: `design/design.md` (architecture), `TASKS-TODO.md` (priorities), and `README.md` (public overview).
 - Python version: 3.10+. Formatting and linting are enforced via Ruff; line length is 88 characters.
 
 ## Environment Setup
@@ -29,7 +30,7 @@ This repository uses the `uv` Python toolchain and a Makefile-driven workflow. U
 - Document new commands or behaviors in `README.md` and update internal guides when necessary.
 
 ## Quality and Verification
-- Run `make lint` and `make test` (or their `uv` equivalents) before finalizing changes.
+- Run `make lint-codex` and `make test-codex` (or their `uv` equivalents) before finalizing changes.
 - For AI/LLM integrations or external API calls, provide mockable interfaces so tests remain deterministic.
 - When modifying notebooks, mirror critical changes in the CLI implementation to avoid divergence.
 

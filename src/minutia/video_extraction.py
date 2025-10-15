@@ -7,6 +7,7 @@ from collections.abc import Iterable
 from pathlib import Path
 
 import ffmpeg
+
 from .logging import logger
 
 

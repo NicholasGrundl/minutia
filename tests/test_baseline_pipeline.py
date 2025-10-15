@@ -37,10 +37,34 @@ def test_baseline_pipeline_smoke(tmp_path, monkeypatch):
     def fake_process_audio_files(mic_audio, desktop_audio, output_dir, whisper_model_name="base"):
         out_dir = Path(output_dir)
         out_dir.mkdir(parents=True, exist_ok=True)
-        mic_transcript = out_dir / "microphone-whisper-fake_transcription.txt"
-        desk_transcript = out_dir / "desktop-whisper-fake_transcription.txt"
-        mic_transcript.write_text("[0.00 - 1.00] Hello from mic\n", encoding="utf-8")
-        desk_transcript.write_text("[0.25 - 1.25] Hello from desktop\n", encoding="utf-8")
+        mic_transcript = out_dir / "microphone-whisper-fake_transcription.json"
+        desk_transcript = out_dir / "desktop-whisper-fake_transcription.json"
+        mic_data = {
+            "metadata": {
+                "source_file": str(mic_audio),
+                "model": whisper_model_name,
+                "schema_version": "1.0",
+                "processed_at": "2024-01-01T00:00:00+00:00",
+            },
+            "segments": [
+                {"start_time": 0.0, "end_time": 1.0, "text": "Hello from mic"},
+            ],
+            "text": "Hello from mic",
+        }
+        desk_data = {
+            "metadata": {
+                "source_file": str(desktop_audio),
+                "model": whisper_model_name,
+                "schema_version": "1.0",
+                "processed_at": "2024-01-01T00:00:00+00:00",
+            },
+            "segments": [
+                {"start_time": 0.25, "end_time": 1.25, "text": "Hello from desktop"},
+            ],
+            "text": "Hello from desktop",
+        }
+        mic_transcript.write_text(json.dumps(mic_data), encoding="utf-8")
+        desk_transcript.write_text(json.dumps(desk_data), encoding="utf-8")
         created_transcripts.append((mic_transcript, desk_transcript))
         return {"microphone": str(mic_transcript), "desktop": str(desk_transcript)}
 
@@ -105,6 +129,7 @@ def test_baseline_pipeline_smoke(tmp_path, monkeypatch):
     assert artifacts.merged_transcript.exists()
     merged_data = json.loads(artifacts.merged_transcript.read_text(encoding="utf-8"))
     assert merged_data["metadata"]["segment_count"] > 0
+    assert merged_data["metadata"]["source_files"]["microphone"].endswith(".json")
 
     # Validate summary artifact
     assert artifacts.summary_file is not None
@@ -113,3 +138,10 @@ def test_baseline_pipeline_smoke(tmp_path, monkeypatch):
     # Validate markdown artifact
     assert artifacts.markdown_file is not None
     assert artifacts.markdown_file.read_text(encoding="utf-8") == "Summary content"
+
+    # Validate run metadata artifact
+    metadata_file = artifacts.run_paths.metadata_file
+    assert metadata_file.exists()
+    run_metadata = json.loads(metadata_file.read_text(encoding="utf-8"))
+    assert run_metadata["run_info"]["status"] == "completed"
+    assert run_metadata["outputs"]["merged_transcript"].endswith(".json")

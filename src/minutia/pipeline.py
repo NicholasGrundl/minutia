@@ -10,14 +10,17 @@ management and clear communication between pipeline steps.
 from __future__ import annotations
 
 import time
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
 from types import MappingProxyType
-from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence
+from typing import Any
 
-from .logging import configure_logging, logging_context, logger
+from .logging import configure_logging, logger, logging_context
 from .paths import RunPaths
+from .run_metadata import build_run_metadata, write_run_metadata
 
 # Anthropic model choices sourced from Claude model overview:
 # https://docs.claude.com/en/docs/about-claude/models/overview
@@ -73,7 +76,7 @@ class StepProgress:
     step_name: str
     status: StepStatus
     message: str = ""
-    error: Optional[Exception] = None
+    error: Exception | None = None
 
 
 class PipelineStep(Enum):
@@ -173,7 +176,7 @@ class PipelineConfig:
     mic_track: int = 3
     desktop_track: int = 2
     base_output_dir: Path = Path("./runs")
-    anthropic_api_key: Optional[str] = None
+    anthropic_api_key: str | None = None
     log_level: str = "INFO"
 
     def __post_init__(self) -> None:
@@ -187,7 +190,7 @@ class PipelineConfig:
         object.__setattr__(self, "log_level", self.log_level.upper())
 
 
-StepRunner = Callable[[PipelineConfig, Mapping[str, Any]], Dict[str, Any]]
+StepRunner = Callable[[PipelineConfig, Mapping[str, Any]], dict[str, Any]]
 ProgressCallback = Callable[[StepProgress], None]
 
 
@@ -221,11 +224,11 @@ class PipelineResult:
 
     success: bool
     run_paths: RunPaths
-    completed_steps: List[str] = field(default_factory=list)
-    failed_step: Optional[str] = None
-    error: Optional[Exception] = None
-    artifacts: Dict[str, Any] = field(default_factory=dict)
-    duration_seconds: Optional[float] = None
+    completed_steps: list[str] = field(default_factory=list)
+    failed_step: str | None = None
+    error: Exception | None = None
+    artifacts: dict[str, Any] = field(default_factory=dict)
+    duration_seconds: float | None = None
 
     @property
     def is_partial(self) -> bool:
@@ -242,12 +245,12 @@ class PipelineExecutionState:
     any failure information so callers can inspect progress in real time.
     """
 
-    current_step: Optional[str] = None
-    completed_steps: List[str] = field(default_factory=list)
-    artifacts: Dict[str, Any] = field(default_factory=dict)
-    failed_step: Optional[str] = None
-    error: Optional[Exception] = None
-    success: Optional[bool] = None
+    current_step: str | None = None
+    completed_steps: list[str] = field(default_factory=list)
+    artifacts: dict[str, Any] = field(default_factory=dict)
+    failed_step: str | None = None
+    error: Exception | None = None
+    success: bool | None = None
 
 
 class PipelineOrchestrator:
@@ -260,14 +263,14 @@ class PipelineOrchestrator:
 
     def __init__(
         self,
-        steps: Optional[Sequence[PipelineStepDefinition]] = None,
-        progress_callback: Optional[ProgressCallback] = None,
+        steps: Sequence[PipelineStepDefinition] | None = None,
+        progress_callback: ProgressCallback | None = None,
     ) -> None:
         self._custom_steps = list(steps) if steps is not None else None
         self._progress_callback = progress_callback or (lambda progress: None)
         self.state = PipelineExecutionState()
 
-    def _build_default_steps(self) -> List[PipelineStepDefinition]:
+    def _build_default_steps(self) -> list[PipelineStepDefinition]:
         """
         Construct the default pipeline step sequence.
 
@@ -275,7 +278,7 @@ class PipelineOrchestrator:
         dependencies during module import (e.g., Whisper, ffmpeg).
         """
 
-        def extract_audio(config: PipelineConfig, _: Mapping[str, Any]) -> Dict[str, Any]:
+        def extract_audio(config: PipelineConfig, _: Mapping[str, Any]) -> dict[str, Any]:
             from . import video_extraction
 
             config.run_paths.ensure_directories()
@@ -291,7 +294,7 @@ class PipelineOrchestrator:
                 "extract_audio": {key: Path(value) for key, value in outputs.items()},
             }
 
-        def transcribe(config: PipelineConfig, artifacts: Mapping[str, Any]) -> Dict[str, Any]:
+        def transcribe(config: PipelineConfig, artifacts: Mapping[str, Any]) -> dict[str, Any]:
             from . import audio_transcription
 
             mic_audio = artifacts.get("microphone_audio") or config.run_paths.microphone_audio
@@ -308,21 +311,24 @@ class PipelineOrchestrator:
                 "transcribe": {key: Path(value) for key, value in outputs.items()},
             }
 
-        def merge(config: PipelineConfig, artifacts: Mapping[str, Any]) -> Dict[str, Any]:
+        def merge(config: PipelineConfig, artifacts: Mapping[str, Any]) -> dict[str, Any]:
             from . import transcript_merger
 
             microphone = artifacts.get("microphone_transcript")
             desktop = artifacts.get("desktop_transcript")
             if microphone is None or desktop is None:
                 raise RuntimeError("Transcription artifacts missing for merge step.")
-            transcript_merger.process_transcripts(
+            merged_data = transcript_merger.process_transcripts(
                 str(microphone),
                 str(desktop),
                 str(config.run_paths.merged_transcript),
             )
-            return {"merged_transcript": config.run_paths.merged_transcript}
+            return {
+                "merged_transcript": config.run_paths.merged_transcript,
+                "merged_transcript_metadata": merged_data.get("metadata"),
+            }
 
-        def summarize(config: PipelineConfig, artifacts: Mapping[str, Any]) -> Dict[str, Any]:
+        def summarize(config: PipelineConfig, artifacts: Mapping[str, Any]) -> dict[str, Any]:
             from . import summarize_transcript
 
             merged_path = artifacts.get("merged_transcript") or config.run_paths.merged_transcript
@@ -364,11 +370,11 @@ class PipelineOrchestrator:
         ]
 
     @property
-    def steps(self) -> List[PipelineStepDefinition]:
+    def steps(self) -> list[PipelineStepDefinition]:
         """Return the active step sequence."""
         return list(self._custom_steps if self._custom_steps is not None else self._build_default_steps())
 
-    def _report_progress(self, step_name: str, status: StepStatus, message: str = "", error: Optional[Exception] = None) -> None:
+    def _report_progress(self, step_name: str, status: StepStatus, message: str = "", error: Exception | None = None) -> None:
         """Emit a progress update to the registered callback."""
         progress = StepProgress(step_name=step_name, status=status, message=message, error=error)
         self._progress_callback(progress)
@@ -383,9 +389,10 @@ class PipelineOrchestrator:
         configure_logging(level=config.log_level, logs_file=config.run_paths.logs_file)
         config.run_paths.ensure_directories()
 
-        artifacts: Dict[str, Any] = {}
-        completed_steps: List[str] = []
+        artifacts: dict[str, Any] = {}
+        completed_steps: list[str] = []
         start_time = time.perf_counter()
+        started_at = datetime.now(timezone.utc)
         self.state = PipelineExecutionState()
         self.state.success = None
 
@@ -422,6 +429,19 @@ class PipelineOrchestrator:
                             step.name, StepStatus.FAILED, str(exc), error=exc
                         )
                         logger.exception("Step failed with error: {}", exc)
+                        outputs = _prepare_outputs(config, artifacts)
+                        completed_at = datetime.now(timezone.utc)
+                        run_metadata = build_run_metadata(
+                            run_root=config.run_paths.run_root,
+                            input_path=config.input_path,
+                            status="failed",
+                            started_at=started_at,
+                            completed_at=completed_at,
+                            outputs=outputs,
+                            merged_metadata=artifacts.get("merged_transcript_metadata"),
+                            error=exc,
+                        )
+                        write_run_metadata(config.run_paths.metadata_file, run_metadata)
                         return PipelineResult(
                             success=False,
                             run_paths=config.run_paths,
@@ -435,6 +455,18 @@ class PipelineOrchestrator:
 
         self.state.current_step = None
         self.state.success = True
+        outputs = _prepare_outputs(config, artifacts)
+        completed_at = datetime.now(timezone.utc)
+        run_metadata = build_run_metadata(
+            run_root=config.run_paths.run_root,
+            input_path=config.input_path,
+            status="completed",
+            started_at=started_at,
+            completed_at=completed_at,
+            outputs=outputs,
+            merged_metadata=artifacts.get("merged_transcript_metadata"),
+        )
+        write_run_metadata(config.run_paths.metadata_file, run_metadata)
 
         return PipelineResult(
             success=True,
@@ -443,3 +475,37 @@ class PipelineOrchestrator:
             artifacts=dict(artifacts),
             duration_seconds=time.perf_counter() - start_time,
         )
+
+
+def _prepare_outputs(config: PipelineConfig, artifacts: Mapping[str, Any]) -> dict[str, Any]:
+    """Construct a serialisable view of pipeline outputs for run metadata."""
+
+    def _serialise(value: Any) -> str | None:
+        if isinstance(value, Path):
+            return str(value)
+        if value:
+            return str(Path(value))
+        return None
+
+    transcript_files: dict[str, str] = {}
+    for key in ("microphone_transcript", "desktop_transcript"):
+        path = artifacts.get(key)
+        if path:
+            transcript_files[key.replace("_transcript", "")] = _serialise(path)
+
+    outputs: dict[str, Any] = {
+        "merged_transcript": _serialise(
+            artifacts.get("merged_transcript") or config.run_paths.merged_transcript
+        ),
+        "summary": _serialise(
+            artifacts.get("summary") if artifacts.get("summary") else None
+        ),
+        "markdown": _serialise(artifacts.get("markdown_file")),
+        "logs": str(config.run_paths.logs_file),
+    }
+    if transcript_files:
+        outputs["transcripts"] = {k: v for k, v in transcript_files.items() if v}
+
+    outputs = {key: value for key, value in outputs.items() if value}
+    outputs.setdefault("run_root", str(config.run_paths.run_root))
+    return outputs
