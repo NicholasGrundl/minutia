@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from minutia.pipeline import PipelineConfig, PipelineResult, StepProgress, StepStatus
+from minutia.pipeline.orchestrator import PipelineConfig, PipelineResult, StepProgress, StepStatus
 
 
 def test_pipeline_config_defaults(sample_run_paths):
