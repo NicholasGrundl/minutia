@@ -3,7 +3,7 @@ from __future__ import annotations
 from click.testing import CliRunner
 
 from minutia.cli import cli
-from minutia.pipeline import PipelineResult, StepProgress, StepStatus
+from minutia.pipeline.orchestrator import PipelineResult, StepProgress, StepStatus
 
 
 def test_process_all_runs_pipeline_orchestrator(sample_video_file, tmp_path, monkeypatch):
