@@ -445,6 +445,12 @@ class PipelineOrchestrator:
                             error=exc,
                         )
                         write_run_metadata(config.run_paths.metadata_file, run_metadata)
+                        
+                        # Apply cleanup policy on error
+                        if config.cleanup_policy == CleanupPolicy.CLEANUP_ON_ERROR:
+                            logger.info("Applying cleanup policy: {}", config.cleanup_policy.value)
+                            config.run_paths.cleanup(config.cleanup_policy)
+                        
                         return PipelineResult(
                             success=False,
                             run_paths=config.run_paths,
