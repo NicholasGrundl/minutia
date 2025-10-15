@@ -13,7 +13,6 @@ import sys
 from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Union
 
 from loguru import logger as _logger
 
