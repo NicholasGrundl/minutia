@@ -23,8 +23,8 @@ def _make_config(sample_run_paths: RunPaths, **overrides) -> PipelineConfig:
     )
 
 
-def test_orchestrator_executes_steps_and_collects_artifacts(tmp_path: Path) -> None:
-    config = _make_config(tmp_path)
+def test_orchestrator_executes_steps_and_collects_artifacts(sample_run_paths) -> None:
+    config = _make_config(sample_run_paths)
     progress_events: list[StepProgress] = []
 
     def first_step(_: PipelineConfig, __: Mapping[str, str]) -> dict[str, str]:
