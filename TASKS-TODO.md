@@ -1,115 +1,154 @@
 # Minutia Project Tasks & TODO
 
-*Implementation follows design/design.md phased approach with MVP focus*
+*Implementation follows design/design-test-refactor-plan.md for comprehensive test infrastructure*
 
-## Phase 1: Foundation & Verification (Critical Path - MVP)
+## Current Priority: Test Infrastructure Implementation
 
-### 🔍 Pipeline Verification & Baseline Script
-- [x] Verify CreateTranscriptProd.ipynb runs end-to-end with test recording
-- [x] Convert notebook cells to standalone Python script preserving all working logic
-- [x] Create basic integration test (smoke test) that runs full pipeline and validates outputs
-- [x] Document current advanced features (personal notes, cost estimation, auto-filenames)
+### Overview
+Focus has shifted to building comprehensive test infrastructure before further feature development. This provides regression protection during refactoring and establishes quality patterns for future work.
 
-### 🧹 Critical Code Cleanup
-- [x] **video_extraction.py**: Remove unused imports (whisper, pandas, numpy, transformers, torch, openai, anthropic, pydantic, instructor, dotenv)
-- [x] **video_extraction.py**: Fix unused loop variable `stream` on line 72
-- [x] **video_extraction.py**: Remove blank lines with whitespace and add newline at end
-- [x] Run `uv run ruff check --fix .` to auto-fix formatting issues
-- [x] Move notebooks to `notebooks/` directory
+## Phase 1: Test Foundation & Fixture Generation (2-3 days) ⭐ CRITICAL
 
-## Phase 2: Core Data Structures (MVP - Foundation)
+**Priority: HIGHEST - Everything else depends on this**
 
-### 📁 RunPaths & Path Management 
-- [x] Implement RunPaths dataclass with factory methods (`from_video_input`, `from_audio_inputs`)
-- [x] Add directory collision handling and validation
-- [x] Create PipelineConfig and PipelineResult data structures
-- [x] Migrate existing modules to use RunPaths instead of ad-hoc path construction
-- [x] Add unit tests for path resolution and data structures
+### 🏗️ Test Directory Structure
+- [ ] Create complete test directory structure following design-test-refactor-plan.md
+- [ ] Set up `tests/conftest.py` with global fixtures and pytest configuration
+- [ ] Create subdirectories: `fixtures/`, `unit/`, `integration/`, `slow/`, `scripts/`
+- [ ] Add `pytest.ini` with markers for unit/integration/slow tests
 
-## Phase 3: Pipeline Architecture (MVP - Core)
+### 🎬 Fixture Generation Scripts
+- [ ] Implement `tests/scripts/generate_test_fixtures.py` to extract 10-30s clips from real recordings
+- [ ] Create diverse test scenarios: clear speech, overlapping audio, quiet/noisy samples
+- [ ] Ensure all fixtures have multiple audio tracks extractable by FFmpeg
+- [ ] Validate fixture properties and document characteristics
 
-### ⚙️ Basic Pipeline Orchestration
-- [x] Implement PipelineOrchestrator class with callback-based progress reporting
-- [x] Add basic step execution with exception handling and error messages
-- [x] Create step enumeration and execution framework
-- [x] Add basic state tracking (defer full resume-from-failure to Phase 8)
-- [x] Add unit tests for orchestrator logic
+### 🏆 Golden Sample Generation
+- [ ] Implement `tests/scripts/create_golden_samples.py` using existing CreateTranscriptProd.ipynb
+- [ ] Generate known-good outputs for all fixtures: audio files, transcripts, merged JSON, summaries
+- [ ] Store outputs as regression baseline with documented pipeline parameters
+- [ ] Create validation utilities for comparing test outputs against golden samples
 
-## Phase 4: Logging & Configuration (MVP - Infrastructure)
+### ⚙️ Core Test Infrastructure
+- [ ] Set up session-scoped fixtures for Whisper models and test files
+- [ ] Configure module-scoped fixtures for shared test data
+- [ ] Create function-scoped fixtures for isolated temporary directories
+- [ ] Implement Anthropic API mocking for unit/integration tests
 
-### 📝 Unified Logging System
-- [x] Replace multiple basic loggers with unified loguru setup
-- [x] Add contextual fields (`step`, `input_file`, `run_root`) for log correlation
-- [x] Configure simple file sink for run directory and colored stderr sink
-- [x] Integrate with pipeline orchestrator for structured logging
+### 📋 Makefile Integration
+- [ ] Add `make generate-fixtures` command
+- [ ] Add `make update-golden` command for regenerating samples
+- [ ] Add `make test-regression` for golden sample validation
+- [ ] Update existing test commands to use new architecture
 
-### ⚙️ Basic Configuration System
-- [x] Implement basic configuration system with environment variable support
-- [x] Add configuration validation and API key handling
-- [x] Add `.env` file support for configuration
-- [x] Secure API key handling with fallback chain
+## Phase 2: Core Model & Configuration Testing (2-3 days)
 
-## Phase 5: Simple CLI Wrapper (MVP - Interface)
+### 📁 RunPaths & Data Structure Testing
+- [ ] Implement `tests/unit/test_models.py` for RunPaths class
+- [ ] Test directory creation, collision handling, path resolution
+- [ ] Test validation with real fixture files from Phase 1
+- [ ] Test PipelineConfig and PipelineResult serialization
 
-### 🖥️ Basic CLI Interface
-- [x] Wrap pipeline orchestrator with Click CLI interface
-- [x] Add simple progress output using print/logging (not rich UI yet)
-- [x] Display final artifact locations on completion
-- [x] Map pipeline exceptions to clear error messages
-- [x] Preserve all current CLI arguments and functionality
+### ⚙️ Configuration System Testing
+- [ ] Implement `tests/unit/test_config.py` for configuration loading
+- [ ] Test precedence: CLI flags > env vars > config file > defaults
+- [ ] Test config file discovery and API key handling
+- [ ] Test error cases and validation edge conditions
 
-## Phase 6: JSON Data Formats (Post-MVP)
+### 🎯 Performance Target
+- [ ] Ensure all unit tests complete in < 10s total
+- [ ] Optimize fixtures and test setup for fast feedback
 
-### 📄 Structured Data Migration
-- [x] Convert individual transcripts from plain text to structured JSON
-- [x] Update merged transcript format with metadata section
-- [x] Add run metadata file generation
-- [x] Update transcript merger to handle JSON inputs/outputs
-- [x] Ensure backward compatibility during transition
+## Phase 3: Pipeline Step Testing (3-4 days)
 
-## Phase 7: Rich CLI Interface (Post-MVP)
+### 🎥 Video Extraction Testing
+- [ ] Implement `tests/integration/test_video_extraction.py`
+- [ ] Test with real .mkv fixtures from Phase 1
+- [ ] Test track detection, extraction, and audio file validation
+- [ ] Test error handling for missing tracks and corrupted files
 
-### 🎨 Enhanced User Experience
+### 🎤 Audio Transcription Testing
+- [ ] Implement `tests/integration/test_audio_transcription.py`
+- [ ] Use real Whisper tiny model for integration tests
+- [ ] Test various audio qualities and edge cases from fixtures
+- [ ] Test JSON output format and schema validation
+
+### 📝 Transcript Merging Testing
+- [ ] Implement `tests/integration/test_transcript_merging.py`
+- [ ] Use real transcript files generated in Phase 1
+- [ ] Test chronological ordering and overlap detection
+- [ ] Test metadata generation and consistency
+
+### 🤖 Summary Generation Testing
+- [ ] Implement `tests/integration/test_summary_generation.py`
+- [ ] Mock Anthropic API for fast, cost-free testing
+- [ ] Test prompt generation and token estimation
+- [ ] Test error handling and output validation
+
+### 🎯 Performance Target
+- [ ] Ensure integration tests complete in < 2m total
+- [ ] Use session-scoped model loading for efficiency
+
+## Phase 4: End-to-End & Regression Testing (1-2 days)
+
+### 🔄 Future Architecture Stubs
+- [ ] Create placeholder tests for PipelineOrchestrator (future state management)
+- [ ] Add TODO comments for resume-from-failure testing
+- [ ] Basic structure for state persistence testing
+
+### 🧪 Comprehensive End-to-End Testing
+- [ ] Implement `tests/slow/test_end_to_end.py` for complete pipeline
+- [ ] Test MKV → transcripts → summary flow with real fixtures
+- [ ] Compare outputs against golden samples for regression detection
+- [ ] Validate all intermediate files and final artifacts
+
+### 📊 Regression Protection
+- [ ] Implement golden sample comparison utilities
+- [ ] Add tolerance for acceptable variation in transcription
+- [ ] Validate structural consistency across pipeline changes
+- [ ] Document regression criteria and thresholds
+
+---
+
+## Future Feature Development (Deferred)
+
+*These features will be implemented after test infrastructure is complete*
+
+### Phase 7: Rich CLI Interface (Post-Testing)
 - [ ] Replace simple progress output with rich progress bars
 - [ ] Add styled panels for status and artifact locations
 - [ ] Implement sophisticated CLI UX patterns with error formatting
-- [ ] Add interactive elements and enhanced user experience
 
-## Phase 8: Resume-From-Failure (Post-MVP)
-
-### 🔄 State Management & Recovery
+### Phase 8: Resume-From-Failure (Post-Testing)
 - [ ] Add PipelineState persistence to run directory
 - [ ] Implement state serialization helpers and JSON storage
-- [ ] Add idempotency checks to each pipeline step with artifact validation
-- [ ] Implement `resume_from_failure()` method with proper state loading
+- [ ] Add idempotency checks to each pipeline step
+- [ ] Implement `resume_from_failure()` method
 
-## Deferred Tasks (Future Consideration)
-
-### 📖 Documentation (Lower Priority)
-- [ ] Create comprehensive README.md (design.md already comprehensive)
+### Documentation & Polish
+- [ ] Create comprehensive README.md
 - [ ] Add docstring documentation to all functions
-- [ ] Create API documentation
-- [ ] Add usage examples and tutorials
+- [ ] Create API documentation and usage examples
 
-### 🎯 Performance & Optimization
-- [ ] Analyze dependency usage - some imports might be optional
+### Performance & Optimization
+- [ ] Analyze dependency usage for optional imports
 - [ ] Optimize audio processing pipeline
 - [ ] Add async support for I/O operations
 - [ ] Profile memory usage during large file processing
 
-### 🚀 Packaging & Distribution
+### Packaging & Distribution
 - [ ] Add build scripts and CI/CD
 - [ ] Create Docker container
 - [ ] Add installation instructions
 - [ ] Prepare for PyPI publication
 
-### 🎵 Audio Processing Enhancements
+### Audio Processing Enhancements
 - [ ] Support for more audio formats
 - [ ] Audio quality analysis and enhancement
 - [ ] Speaker diarization improvements
 - [ ] Real-time processing capabilities
 
-### 🤖 AI/ML Features
+### AI/ML Features
 - [ ] Improved summarization with different models
 - [ ] Custom model fine-tuning options
 - [ ] Sentiment analysis of meetings
@@ -117,22 +156,29 @@
 
 ---
 
-## Implementation Notes
+## Implementation Strategy
 
 ### Current Status
-✅ **COMPLETED**: Successfully converted to uv project structure with proper packaging
-- All Python modules moved to `src/minutia/`
-- Dependencies migrated to pyproject.toml
-- CLI entry point working
-- Development tooling configured (ruff, pytest)
+✅ **FOUNDATION COMPLETE**: Working CLI with pipeline orchestration
+- Complete uv project structure with proper packaging
+- All core pipeline functionality working (Phases 1-6 from previous plan)
+- Unified logging, configuration, and data structures in place
+- JSON-structured data formats implemented
 
-### MVP Strategy
-- **Total MVP Timeline**: ~1 week of focused work (Phases 1-5)
-- **Key Principle**: Preserve working functionality first, enhance second
-- **Dependencies**: Phase 1 is sequential, Phases 2-4 can run in parallel, Phase 5 depends on 2-4
-- **Testing**: Start with minimal smoke test, expand to comprehensive testing post-MVP
+### Test Infrastructure Strategy
+- **Total Timeline**: ~1-2 weeks of focused work (4 phases)
+- **Key Principle**: Build robust testing foundation before further feature development
+- **Dependencies**: Phase 1 is critical foundation, Phases 2-3 can run in parallel, Phase 4 depends on 1-3
+- **Regression Protection**: Every change validated against golden samples
 
-### Phase Boundaries
-- **MVP (Phases 1-5)**: Essential deliverables for refactored CLI with basic functionality
-- **Post-MVP (Phases 6-8)**: Enhanced features building on proven MVP foundation
-- **Future**: Advanced features and optimizations based on user feedback
+### Success Criteria
+**Phase 1**: Complete test structure, fixtures, golden samples, < 1s setup time
+**Phase 2**: Core models fully tested, configuration validated, < 10s unit tests
+**Phase 3**: All pipeline steps tested with real data, < 2m integration tests
+**Phase 4**: End-to-end regression protection, golden sample validation working
+
+### Quality Gates
+- All tests must pass before merging any code changes
+- Golden sample validation prevents breaking changes
+- Performance targets ensure fast development feedback
+- Real fixture testing catches edge cases early
