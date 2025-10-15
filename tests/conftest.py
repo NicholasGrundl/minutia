@@ -5,7 +5,6 @@ https://docs.pytest.org/en/stable/how-to/fixtures.html#conftest-py-sharing-fixtu
 """
 
 import json
-from pathlib import Path
 
 import pytest
 
@@ -34,7 +33,7 @@ def sample_run_paths(sample_video_file, tmp_path):
     across multiple test modules.
     """
     return RunPaths.from_video_input(
-        sample_video_file, 
+        sample_video_file,
         base_output_dir=tmp_path / "runs"
     )
 
@@ -62,7 +61,7 @@ def sample_transcript_json(tmp_path):
     """
     mic_path = tmp_path / "microphone.json"
     desktop_path = tmp_path / "desktop.json"
-    
+
     mic_data = {
         "metadata": {
             "source_file": str(mic_path),
@@ -76,11 +75,11 @@ def sample_transcript_json(tmp_path):
         ],
         "text": "Hello from microphone Second mic segment",
     }
-    
+
     desktop_data = {
         "metadata": {
             "source_file": str(desktop_path),
-            "model": "whisper-base", 
+            "model": "whisper-base",
             "schema_version": "1.0",
             "processed_at": "2024-01-01T00:00:00+00:00",
         },
@@ -90,10 +89,10 @@ def sample_transcript_json(tmp_path):
         ],
         "text": "Hello from desktop Second desktop segment",
     }
-    
+
     mic_path.write_text(json.dumps(mic_data), encoding="utf-8")
     desktop_path.write_text(json.dumps(desktop_data), encoding="utf-8")
-    
+
     return {
         "microphone": mic_path,
         "desktop": desktop_path,
@@ -124,7 +123,7 @@ def sample_personal_notes(tmp_path):
     """
     json_notes = tmp_path / "personal_notes.json"
     markdown_notes = tmp_path / "notes.md"
-    
+
     json_content = [
         {
             "note": "Follow up with team on action items",
@@ -135,7 +134,7 @@ def sample_personal_notes(tmp_path):
             "bullets": ["Review architecture", "Finalize timeline"]
         }
     ]
-    
+
     markdown_content = """# Meeting Context
     
 ## Background
@@ -146,10 +145,10 @@ Important context for this meeting.
 - Timeline and milestones
 - Resource allocation
 """
-    
+
     json_notes.write_text(json.dumps(json_content), encoding="utf-8")
     markdown_notes.write_text(markdown_content, encoding="utf-8")
-    
+
     return {
         "json": json_notes,
         "markdown": markdown_notes,
@@ -174,7 +173,7 @@ def run_paths_factory(tmp_path):
         video_file.write_text("video-content", encoding="utf-8")
         base_output_dir = kwargs.get("base_output_dir", tmp_path / "runs")
         return RunPaths.from_video_input(video_file, base_output_dir=base_output_dir)
-    
+
     return _create_run_paths
 
 
@@ -198,5 +197,5 @@ def pipeline_config_factory(run_paths_factory):
         }
         base_config.update(overrides)
         return PipelineConfig(**base_config)
-    
+
     return _create_config
