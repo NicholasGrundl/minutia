@@ -369,7 +369,7 @@ class RunPaths:
         # Explicitly remove known files first
         known_files = [
             self.microphone_audio,
-            self.desktop_audio, 
+            self.desktop_audio,
             self.merged_transcript,
             self.summary_file,
             self.metadata_file,

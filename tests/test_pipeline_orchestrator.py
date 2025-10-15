@@ -228,7 +228,7 @@ def test_cleanup_policy_safety_checks(tmp_path) -> None:
         run_root=dangerous_path,
         input_path=tmp_path / "fake.mkv",
         audio_dir=dangerous_path / "audio",
-        transcripts_dir=dangerous_path / "transcripts", 
+        transcripts_dir=dangerous_path / "transcripts",
         microphone_audio=dangerous_path / "audio" / "mic.wav",
         desktop_audio=dangerous_path / "audio" / "desktop.wav",
         merged_transcript=dangerous_path / "merged.json",
@@ -240,7 +240,7 @@ def test_cleanup_policy_safety_checks(tmp_path) -> None:
     # This should raise RuntimeError due to safety checks
     try:
         fake_run_paths.cleanup(CleanupPolicy.CLEANUP_ON_ERROR)
-        assert False, "Expected RuntimeError for unsafe directory"
+        raise AssertionError("Expected RuntimeError for unsafe directory")
     except RuntimeError as e:
         assert "doesn't appear to be a minutia run" in str(e)
     
@@ -253,7 +253,7 @@ def test_cleanup_policy_safety_checks(tmp_path) -> None:
         input_path=tmp_path / "meeting.mkv",
         audio_dir=proper_minutia_dir / "audio",
         transcripts_dir=proper_minutia_dir / "transcripts",
-        microphone_audio=proper_minutia_dir / "audio" / "mic.wav", 
+        microphone_audio=proper_minutia_dir / "audio" / "mic.wav",
         desktop_audio=proper_minutia_dir / "audio" / "desktop.wav",
         merged_transcript=proper_minutia_dir / "merged.json",
         summary_file=proper_minutia_dir / "summary.txt",
