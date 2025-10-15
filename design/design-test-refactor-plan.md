@@ -100,13 +100,6 @@ tests/
 - Store as known-good baseline for regression testing
 - Document exact pipeline parameters used
 
-**scripts/validate_golden_samples.py**
-- Compare current pipeline output against golden samples
-- Identify regressions in:
-  - Audio extraction quality/format
-  - Transcript accuracy (approximate - transcription can vary)
-  - Merge logic correctness
-  - Summary structure (if not content)
 
 #### 1.3 Core Test Infrastructure
 
