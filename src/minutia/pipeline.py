@@ -165,6 +165,8 @@ class PipelineConfig:
         API key used when performing summarisation with Anthropic models.
     log_level : str, default='INFO'
         Minimum log level applied to pipeline logging output.
+    cleanup_policy : CleanupPolicy, default=CleanupPolicy.KEEP_ALL
+        The cleanup policy to apply to intermediate files after pipeline completion.
     """
 
     input_path: Path
@@ -178,6 +180,7 @@ class PipelineConfig:
     base_output_dir: Path = Path("./runs")
     anthropic_api_key: str | None = None
     log_level: str = "INFO"
+    cleanup_policy: CleanupPolicy = CleanupPolicy.KEEP_ALL
 
     def __post_init__(self) -> None:
         if self.summary_model not in SUMMARY_MODEL_CHOICES:
