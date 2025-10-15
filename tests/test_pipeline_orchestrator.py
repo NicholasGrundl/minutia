@@ -107,8 +107,8 @@ def test_orchestrator_handles_step_failure(sample_run_paths) -> None:
     assert metadata["run_info"]["status"] == "failed"
 
 
-def test_orchestrator_skips_disabled_steps(tmp_path: Path) -> None:
-    config = _make_config(tmp_path, skip_summary=True)
+def test_orchestrator_skips_disabled_steps(sample_run_paths) -> None:
+    config = _make_config(sample_run_paths, skip_summary=True)
 
     progress_events: list[StepProgress] = []
 
