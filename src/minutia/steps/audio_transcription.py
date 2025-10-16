@@ -132,7 +132,7 @@ def save_transcription(transcription, output_path, source_audio, model_name):
 
 
 def process_audio_files(
-    mic_audio_path, desktop_audio_path, output_dir, whisper_model_name="base"
+    mic_audio_path, desktop_audio_path, output_dir, whisper_model_name="base", use_gpu=True
 ):
     try:
         os.makedirs(output_dir, exist_ok=True)
