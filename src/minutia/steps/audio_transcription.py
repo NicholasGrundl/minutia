@@ -148,7 +148,7 @@ def process_audio_files(
                 continue
 
             logger.info("Processing {} audio", audio_type)
-            transcription = transcribe_audio(audio_path, model_name=whisper_model_name)
+            transcription = transcribe_audio(audio_path, model_name=whisper_model_name, use_gpu=use_gpu)
 
             output_path = os.path.join(
                 output_dir,
