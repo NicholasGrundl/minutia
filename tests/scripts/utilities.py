@@ -6,9 +6,8 @@ importing minutia modules, avoiding circular dependencies.
 """
 
 import json
-import subprocess
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Any
 
 import ffmpeg
 
