@@ -12,7 +12,7 @@ from typing import Any
 import ffmpeg
 
 
-def get_video_info(file_path: Path) -> Dict[str, Any]:
+def get_video_info(file_path: Path) -> dict[str, Any]:
     """Get video information using ffmpeg probe."""
     probe = ffmpeg.probe(str(file_path))
     video_streams = [s for s in probe["streams"] if s["codec_type"] == "video"]
