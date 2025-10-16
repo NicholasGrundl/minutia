@@ -1,7 +1,9 @@
 import json
 import os
+import time
 from datetime import datetime, timezone
 
+import torch
 import whisper
 
 from ..logging import logger
@@ -28,20 +30,73 @@ def _normalise_segment(segment):
     return {key: value for key, value in serialised.items() if value is not None}
 
 
-def transcribe_audio(audio_path, model_name="base"):
+def transcribe_audio(audio_path, model_name="base", use_gpu=True):
+    """
+    Transcribe audio using Whisper with optional GPU acceleration.
+    
+    Args:
+        audio_path: Path to audio file
+        model_name: Whisper model to use ("tiny", "base", "small", "medium", "large")
+        use_gpu: Whether to use GPU acceleration if available
+    """
     try:
-        logger.info(f"Loading Whisper model: {model_name}")
-        model = whisper.load_model(model_name)
-
+        # Determine device
+        if use_gpu and torch.cuda.is_available():
+            device = "cuda"
+            logger.info(f"Using GPU: {torch.cuda.get_device_name(0)}")
+            logger.info(f"GPU Memory: {torch.cuda.get_device_properties(0).total_memory / 1e9:.2f} GB")
+            torch.cuda.empty_cache()
+        else:
+            device = "cpu"
+            logger.info("Using CPU for transcription")
+            if use_gpu and not torch.cuda.is_available():
+                logger.warning("GPU requested but CUDA is not available, falling back to CPU")
+        
+        logger.info(f"Loading Whisper model: {model_name} on {device}")
+        model = whisper.load_model(model_name, device=device)
+        
+        # Log model info
+        model_params = sum(p.numel() for p in model.parameters()) / 1e6
+        logger.info(f"Model loaded: {model_params:.0f}M parameters")
+        
         logger.info(f"Transcribing audio file: {audio_path}")
-        result = model.transcribe(audio_path)
-
-        logger.info("Transcription completed successfully")
+        
+        # Start timing
+        start_time = time.time()
+        
+        # Transcribe with GPU optimization
+        result = model.transcribe(
+            audio_path,
+            fp16=(device == "cuda"),  # Use FP16 on GPU for faster processing
+            verbose=False  # Disable whisper's verbose output to use our logger
+        )
+        
+        # Calculate processing metrics
+        elapsed_time = time.time() - start_time
+        audio_duration = result.get("duration", 0)
+        
+        if audio_duration > 0:
+            speed_ratio = audio_duration / elapsed_time
+            logger.info(f"Transcription completed in {elapsed_time:.1f}s")
+            logger.info(f"Audio duration: {audio_duration:.1f}s")
+            logger.info(f"Processing speed: {speed_ratio:.2f}x realtime")
+        else:
+            logger.info(f"Transcription completed in {elapsed_time:.1f}s")
+        
+        # Log GPU memory usage if using CUDA
+        if device == "cuda":
+            memory_used = torch.cuda.max_memory_allocated() / 1e9
+            logger.info(f"Peak GPU memory used: {memory_used:.2f} GB")
+            torch.cuda.empty_cache()
+        
         return result
+        
+    except torch.cuda.OutOfMemoryError:
+        logger.error("GPU out of memory! Try a smaller model")
+        raise
     except Exception as e:
         logger.exception("Error during transcription: {}", e)
         raise
-
 
 def save_transcription(transcription, output_path, source_audio, model_name):
     try:

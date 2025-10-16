@@ -1217,6 +1217,12 @@ wheels = [
 ]
 
 [[package]]
+name = "gputil"
+version = "1.4.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ed/0e/5c61eedde9f6c87713e89d794f01e378cfd9565847d4576fa627d758c554/GPUtil-1.4.0.tar.gz", hash = "sha256:099e52c65e512cdfa8c8763fca67f5a5c2afb63469602d5dcb4d296b3661efb9", size = 5545, upload-time = "2018-12-18T09:12:13.63Z" }
+
+[[package]]
 name = "h11"
 version = "0.16.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2244,6 +2250,7 @@ dependencies = [
     { name = "anthropic" },
     { name = "click" },
     { name = "ffmpeg-python" },
+    { name = "gputil" },
     { name = "instructor" },
     { name = "isodate" },
     { name = "loguru" },
@@ -2254,6 +2261,7 @@ dependencies = [
     { name = "openai" },
     { name = "openai-whisper" },
     { name = "pandas" },
+    { name = "psutil" },
     { name = "pyaudio" },
     { name = "pydantic" },
     { name = "python-dotenv" },
@@ -2287,6 +2295,7 @@ requires-dist = [
     { name = "anthropic" },
     { name = "click" },
     { name = "ffmpeg-python" },
+    { name = "gputil", specifier = ">=1.4.0" },
     { name = "instructor" },
     { name = "ipywidgets", marker = "extra == 'jupyter'" },
     { name = "isodate" },
@@ -2302,6 +2311,7 @@ requires-dist = [
     { name = "openai-whisper" },
     { name = "pandas" },
     { name = "panel", marker = "extra == 'jupyter'" },
+    { name = "psutil", specifier = ">=7.1.0" },
     { name = "pyaudio" },
     { name = "pydantic" },
     { name = "pydub", marker = "extra == 'media'" },

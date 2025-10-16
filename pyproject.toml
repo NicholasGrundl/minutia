@@ -42,6 +42,8 @@ dependencies = [
     "isodate",
     "nanoid",
     "loguru>=0.7.3",
+    "gputil>=1.4.0",
+    "psutil>=7.1.0",
 ]
 
 [project.optional-dependencies]
