@@ -76,7 +76,7 @@ def extract_video_clip(
         return False
 
 
-def extract_all_audio_tracks(video_file: Path, output_dir: Path) -> List[Path]:
+def extract_all_audio_tracks(video_file: Path, output_dir: Path) -> list[Path]:
     """
     Extract all audio tracks from a video file.
     
