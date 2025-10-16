@@ -53,8 +53,8 @@ class FixtureGenerator:
         self, 
         source_mkv: str,
         output_name: str, 
-        start_seconds: float,
-        duration_seconds: float
+        start_seconds: float | None,
+        duration_seconds: float | None
     ) -> Path:
         """
         Extract a video clip from the specified MKV file.
@@ -74,13 +74,18 @@ class FixtureGenerator:
             
         output_path = self.video_dir / f"{output_name}.mkv"
         
-        logger.info("Creating video clip: {} -> {} ({:.1f}s @ {:.1f}s)", 
-                   source_mkv, output_name, duration_seconds, start_seconds)
+        if start_seconds is None:
+            start_seconds = 0.0
         
         # Validate source has sufficient duration
         probe = ffmpeg.probe(str(source_path))
         source_duration = float(probe["format"]["duration"])
-        
+        if duration_seconds is None:
+            duration_seconds = source_duration
+
+        logger.info("Creating video clip: {} -> {} ({:.1f}s @ {:.1f}s)", 
+                   source_mkv, output_name, duration_seconds, start_seconds)
+    
         if start_seconds + duration_seconds > source_duration:
             raise ValueError(
                 f"Requested clip ({start_seconds:.1f}s + {duration_seconds:.1f}s = "
