@@ -200,7 +200,7 @@ def validate_video_clip(clip_path: Path) -> dict[str, Any]:
         }
 
 
-def save_fixture_metadata(fixtures_dir: Path, metadata: Dict[str, Any]) -> Path:
+def save_fixture_metadata(fixtures_dir: Path, metadata: dict[str, Any]) -> Path:
     """
     Save fixture metadata to JSON file.
     
