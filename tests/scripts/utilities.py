@@ -227,7 +227,7 @@ def create_test_fixture(
     start_seconds: float = 0.0,
     duration_seconds: float = None,
     description: str = ""
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Create a complete test fixture: video clip + audio tracks + metadata.
     
