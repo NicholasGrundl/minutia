@@ -12,7 +12,6 @@ import pytest
 from minutia.paths import RunPaths
 from minutia.pipeline.orchestrator import PipelineConfig
 
-
 # Session-scoped fixtures for expensive resources
 
 @pytest.fixture(scope="session")
@@ -21,7 +20,7 @@ def test_fixtures_dir():
     return Path(__file__).parent / "fixtures"
 
 
-@pytest.fixture(scope="session") 
+@pytest.fixture(scope="session")
 def whisper_tiny_model():
     """Load tiny Whisper model once per test session."""
     try:
@@ -39,7 +38,7 @@ def test_video_files(test_fixtures_dir):
     video_dir = test_fixtures_dir / "video"
     return {
         "short": video_dir / "sample_short.mkv",
-        "overlap": video_dir / "sample_overlap.mkv", 
+        "overlap": video_dir / "sample_overlap.mkv",
         "quiet": video_dir / "sample_quiet.mkv",
         "noisy": video_dir / "sample_noisy.mkv"
     }

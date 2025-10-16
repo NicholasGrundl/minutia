@@ -28,9 +28,9 @@ def get_video_info(file_path: Path) -> dict[str, Any]:
 
 
 def extract_video_clip(
-    source_file: Path, 
-    output_file: Path, 
-    start_seconds: float = 0.0, 
+    source_file: Path,
+    output_file: Path,
+    start_seconds: float = 0.0,
     duration_seconds: float = None
 ) -> bool:
     """
