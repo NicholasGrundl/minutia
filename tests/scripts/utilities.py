@@ -41,7 +41,6 @@ def extract_video_clip(
         output_file: Output clip file
         start_seconds: Start time in seconds
         duration_seconds: Duration in seconds (None = entire file)
-        
     Returns:
         True if successful, False otherwise
     """
