@@ -164,7 +164,7 @@ def list_mkv_recordings(recordings_dir: Path) -> list[Path]:
     return mkv_files
 
 
-def validate_video_clip(clip_path: Path) -> Dict[str, Any]:
+def validate_video_clip(clip_path: Path) -> dict[str, Any]:
     """
     Validate a video clip and return metadata.
     
