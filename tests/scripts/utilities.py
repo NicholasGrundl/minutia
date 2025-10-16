@@ -134,7 +134,7 @@ def extract_all_audio_tracks(video_file: Path, output_dir: Path) -> list[Path]:
         return []
 
 
-def list_mkv_recordings(recordings_dir: Path) -> List[Path]:
+def list_mkv_recordings(recordings_dir: Path) -> list[Path]:
     """
     List all MKV files in recordings directory with metadata.
     
