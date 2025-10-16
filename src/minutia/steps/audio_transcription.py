@@ -36,8 +36,28 @@ def transcribe_audio(audio_path, model_name="base", use_gpu=True):
     
     Args:
         audio_path: Path to audio file
-        model_name: Whisper model to use ("tiny", "base", "small", "medium", "large")
-        use_gpu: Whether to use GPU acceleration if available
+        model_name: Whisper model to use. Available models:
+            - "tiny" (~39M params, ~32MB, fastest, lowest quality)
+            - "tiny.en" (English-only version of tiny)
+            - "base" (~74M params, ~142MB, good balance of speed/quality) [DEFAULT]
+            - "base.en" (English-only version of base)
+            - "small" (~244M params, ~466MB, better quality, slower)
+            - "small.en" (English-only version of small)
+            - "medium" (~769M params, ~1.5GB, high quality, much slower)
+            - "medium.en" (English-only version of medium)
+            - "large" (~1550M params, ~3GB, highest quality, very slow)
+            - "large-v1" (same as large, earlier version)
+            - "large-v2" (improved large model)
+            - "large-v3" (latest large model with best accuracy)
+            
+            Recommendations:
+            - For quick testing/development: "tiny" or "base"
+            - For production English meetings: "base.en" or "small.en" 
+            - For multilingual content: "base", "small", or "medium"
+            - For maximum accuracy (if time/resources allow): "large-v3"
+            - English-only models (.en) are faster and more accurate for English audio
+            
+        use_gpu: Whether to use GPU acceleration if available (recommended for medium+ models)
     """
     try:
         # Determine device
