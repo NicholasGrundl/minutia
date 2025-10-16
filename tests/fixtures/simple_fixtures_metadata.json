@@ -1,0 +1,19 @@
+{
+  "generated_by": "tests/scripts/generate_test_fixtures_simple.ipynb",
+  "description": "Simple test fixtures created with direct FFmpeg commands",
+  "video_fixtures": [
+    "basic.mkv",
+    "complex.mkv",
+    "noisy.mkv"
+  ],
+  "audio_fixtures": [
+    "basic_track_1.wav",
+    "complex_track_1.wav",
+    "noisy_track_1.wav"
+  ],
+  "notes": [
+    "These are minimal test fixtures for fast unit/integration testing",
+    "Video clips are 5-10 seconds to keep test suite fast",
+    "Audio tracks extracted separately for direct audio testing"
+  ]
+}
