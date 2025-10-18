@@ -1,19 +1,21 @@
 {
+  "status": "migrated",
   "generated_by": "tests/scripts/generate_test_fixtures_simple.ipynb",
-  "description": "Simple test fixtures created with direct FFmpeg commands",
-  "video_fixtures": [
-    "basic.mkv",
-    "complex.mkv",
-    "noisy.mkv"
-  ],
-  "audio_fixtures": [
-    "basic_track_1.wav",
-    "complex_track_1.wav",
-    "noisy_track_1.wav"
+  "description": "Simple test fixtures - MIGRATED to new scenario-based structure",
+  "migration_info": {
+    "old_structure": "simple flat files (basic.mkv, complex.mkv, noisy.mkv)",
+    "new_structure": "scenarios/ with complete pipeline artifacts",
+    "migration_date": "2025-10-18T00:00:00Z",
+    "new_location": "See metadata.json for current fixture registry"
+  },
+  "legacy_fixtures": [
+    "basic.mkv - now represented by microphone_only scenario",
+    "complex.mkv - now represented by youtube_desktop scenario", 
+    "noisy.mkv - now represented by noisy_microphone scenario"
   ],
   "notes": [
-    "These are minimal test fixtures for fast unit/integration testing",
-    "Video clips are 5-10 seconds to keep test suite fast",
-    "Audio tracks extracted separately for direct audio testing"
+    "DEPRECATED: This file maintained for reference only",
+    "Use tests/fixtures/metadata.json for current fixture registry",
+    "New structure provides complete pipeline artifacts for each scenario"
   ]
 }
