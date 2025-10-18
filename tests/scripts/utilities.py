@@ -15,6 +15,82 @@ import ffmpeg
 import isodate
 
 
+# =============================================================================
+# DateTime and Metadata Utilities
+# =============================================================================
+
+def get_isodatetime() -> str:
+    """Get the current time as an ISO datetime string."""
+    current = datetime.datetime.now(tz=datetime.timezone.utc)
+    iso_value = isodate.datetime_isoformat(current)
+    return iso_value
+
+def get_isodate() -> str:
+    """Get the current date as an ISO date string."""
+    current = datetime.datetime.now(tz=datetime.timezone.utc)
+    iso_value = isodate.date_isoformat(current)
+    return iso_value
+
+def create_scenario_metadata(
+    scenario_name: str,
+    description: str,
+    characteristics: List[str],
+    pipeline_parameters: Dict[str, Any],
+    original_source: str = ""
+) -> Dict[str, Any]:
+    """Create metadata structure for a test scenario."""
+    return {
+        "scenario_name": scenario_name,
+        "description": description,
+        "characteristics": characteristics,
+        "source_file": "input.mkv",
+        "pipeline_parameters": pipeline_parameters,
+        "stages": {
+            "01_extracted": {
+                "description": "FFmpeg audio extraction outputs",
+                "files": [
+                    "audio_track_1.wav",
+                    "audio_track_2.wav", 
+                    "audio_track_3.wav",
+                    "microphone_audio.wav",
+                    "desktop_audio.wav"
+                ]
+            },
+            "02_transcribed": {
+                "description": "Whisper transcription outputs",
+                "files": [
+                    "microphone-whisper-medium.en_transcription.json",
+                    "desktop-whisper-medium.en_transcription.json"
+                ]
+            },
+            "03_merged": {
+                "description": "Chronologically merged transcript",
+                "files": ["merged_transcript.json"]
+            },
+            "04_summarized": {
+                "description": "AI-generated meeting summary", 
+                "files": ["*.md"]  # Will be filled with actual filename
+            }
+        },
+        "generated_at": get_isodatetime(),
+        "original_source": original_source
+    }
+
+def save_scenario_metadata(scenario_dir: Path, metadata: Dict[str, Any]) -> Path:
+    """Save scenario metadata to JSON file."""
+    metadata_file = scenario_dir / "metadata.json"
+    
+    with open(metadata_file, 'w') as f:
+        json.dump(metadata, f, indent=2)
+        
+    print(f"📋 Scenario metadata saved to {metadata_file}")
+    return metadata_file
+
+
+# =============================================================================
+# Video and Audio Processing Utilities  
+# =============================================================================
+
 def get_video_info(file_path: Path) -> dict[str, Any]:
     """Get video information using ffmpeg probe."""
     probe = ffmpeg.probe(str(file_path))
