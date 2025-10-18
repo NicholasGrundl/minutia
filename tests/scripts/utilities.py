@@ -1,15 +1,18 @@
 """
-Utilities for test fixture generation using python-ffmpeg wrapper.
+Utilities for test fixture generation and complete pipeline execution.
 
-This module provides helper functions for creating test fixtures without
-importing minutia modules, avoiding circular dependencies.
+This module provides helper functions for creating test fixtures and running
+complete pipeline workflows without importing minutia modules directly,
+avoiding circular dependencies during test setup.
 """
 
+import datetime
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, List, Optional
 
 import ffmpeg
+import isodate
 
 
 def get_video_info(file_path: Path) -> dict[str, Any]:
