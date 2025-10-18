@@ -1,0 +1,78 @@
+{
+  "metadata": {
+    "source_file": "../../+outputs/microphone_audio.wav",
+    "model": "medium.en",
+    "language": "en",
+    "processed_at": "2025-10-18T00:14:07.717569+00:00",
+    "schema_version": "1.0"
+  },
+  "segments": [
+    {
+      "id": 0,
+      "start_time": 0.0,
+      "end_time": 2.7600000000000002,
+      "text": "This is a microphone only track.",
+      "tokens": [
+        50363,
+        770,
+        318,
+        257,
+        21822,
+        691,
+        2610,
+        13,
+        50501
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.3577907008509482,
+      "compression_ratio": 1.118279569892473,
+      "no_speech_prob": 0.013038168661296368
+    },
+    {
+      "id": 1,
+      "start_time": 2.7600000000000002,
+      "end_time": 5.44,
+      "text": "I don't have anything running on the desktop part,",
+      "tokens": [
+        50501,
+        314,
+        836,
+        470,
+        423,
+        1997,
+        2491,
+        319,
+        262,
+        11364,
+        636,
+        11,
+        50635
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.3577907008509482,
+      "compression_ratio": 1.118279569892473,
+      "no_speech_prob": 0.013038168661296368
+    },
+    {
+      "id": 2,
+      "start_time": 5.44,
+      "end_time": 6.72,
+      "text": "and it's very short.",
+      "tokens": [
+        50635,
+        290,
+        340,
+        338,
+        845,
+        1790,
+        13,
+        50699
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.3577907008509482,
+      "compression_ratio": 1.118279569892473,
+      "no_speech_prob": 0.013038168661296368
+    }
+  ],
+  "text": "This is a microphone only track. I don't have anything running on the desktop part, and it's very short."
+}

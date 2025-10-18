@@ -1,0 +1,103 @@
+{
+  "metadata": {
+    "schema_version": "1.0",
+    "parse_overlaps": false,
+    "segment_count": 3,
+    "total_duration": 6.72,
+    "sources": {
+      "microphone": {
+        "source_file": "../../+outputs/microphone_audio.wav",
+        "model": "medium.en",
+        "language": "en",
+        "processed_at": "2025-10-18T00:14:07.717569+00:00",
+        "schema_version": "1.0",
+        "format": "json",
+        "segment_count": 3
+      },
+      "desktop": {
+        "source_file": "../../+outputs/desktop_audio.wav",
+        "model": "medium.en",
+        "language": "en",
+        "processed_at": "2025-10-18T00:14:16.422674+00:00",
+        "schema_version": "1.0",
+        "format": "json",
+        "segment_count": 0
+      }
+    },
+    "source_files": {
+      "microphone": "../../+outputs/microphone-whisper-medium.en_transcription.json",
+      "desktop": "../../+outputs/desktop-whisper-medium.en_transcription.json"
+    }
+  },
+  "transcript": [
+    {
+      "start_time": 0.0,
+      "end_time": 2.7600000000000002,
+      "text": "This is a microphone only track.",
+      "id": 0,
+      "tokens": [
+        50363,
+        770,
+        318,
+        257,
+        21822,
+        691,
+        2610,
+        13,
+        50501
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.3577907008509482,
+      "compression_ratio": 1.118279569892473,
+      "no_speech_prob": 0.013038168661296368,
+      "source": "microphone"
+    },
+    {
+      "start_time": 2.7600000000000002,
+      "end_time": 5.44,
+      "text": "I don't have anything running on the desktop part,",
+      "id": 1,
+      "tokens": [
+        50501,
+        314,
+        836,
+        470,
+        423,
+        1997,
+        2491,
+        319,
+        262,
+        11364,
+        636,
+        11,
+        50635
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.3577907008509482,
+      "compression_ratio": 1.118279569892473,
+      "no_speech_prob": 0.013038168661296368,
+      "source": "microphone"
+    },
+    {
+      "start_time": 5.44,
+      "end_time": 6.72,
+      "text": "and it's very short.",
+      "id": 2,
+      "tokens": [
+        50635,
+        290,
+        340,
+        338,
+        845,
+        1790,
+        13,
+        50699
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.3577907008509482,
+      "compression_ratio": 1.118279569892473,
+      "no_speech_prob": 0.013038168661296368,
+      "source": "microphone"
+    }
+  ]
+}

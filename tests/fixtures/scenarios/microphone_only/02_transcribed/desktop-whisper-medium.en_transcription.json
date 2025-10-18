@@ -1,0 +1,11 @@
+{
+  "metadata": {
+    "source_file": "../../+outputs/desktop_audio.wav",
+    "model": "medium.en",
+    "language": "en",
+    "processed_at": "2025-10-18T00:14:16.422674+00:00",
+    "schema_version": "1.0"
+  },
+  "segments": [],
+  "text": ""
+}
