@@ -369,3 +369,260 @@ def create_test_fixture(
     print(f"   Audio: {len(audio_files)} tracks in {audio_output_dir.name}/")
     
     return metadata
+
+
+# =============================================================================
+# Pipeline Execution Utilities
+# =============================================================================
+
+def setup_directories(output_dir: Path, recording_dir: Path) -> tuple[Path, Path, List[Path]]:
+    """Set up output directory and discover MKV recordings."""
+    # Setup Output Directory
+    print(f"Output dir: {output_dir.resolve()}")
+    if output_dir.exists() is False:
+        output_dir.mkdir(parents=True, exist_ok=True)
+        print(f"    Created output dir")
+    print(f"    '{output_dir.resolve()}'")
+    
+    # Analyze Recordings directory
+    print(f"Recording dir: {recording_dir.resolve()}")
+    mkv_filepaths = list(recording_dir.glob("*.mkv"))
+    if len(mkv_filepaths) == 0:
+        print(f"❌ No *.mkv files found in '{recording_dir.resolve()}'")
+        return output_dir, recording_dir, []
+    else:
+        print(f"Found {len(mkv_filepaths)} *.mkv files:")
+        for p in mkv_filepaths:
+            print(f"   '../{recording_dir.stem}/{str(p.name)}'")
+    
+    return output_dir, recording_dir, mkv_filepaths
+
+def select_recording_file(recording_dir: Path, preferred_name: Optional[str] = None) -> Optional[Path]:
+    """Select a recording file from available MKV files."""
+    mkv_filepaths = list(recording_dir.glob("*.mkv"))
+    
+    if len(mkv_filepaths) == 0:
+        print("❌ No recording file selected and no files found.")
+        return None
+    
+    if preferred_name:
+        recording_filepath = recording_dir / preferred_name
+        if recording_filepath in mkv_filepaths:
+            print(f"Selected *.mkv File:")
+            print(f"    '../{recording_dir.stem}/{recording_filepath.name}'")
+            return recording_filepath
+    
+    # Default to first found
+    recording_filepath = mkv_filepaths[0]
+    print(f"Could not find preferred file, defaulting to first found:")
+    print(f"    '../{recording_dir.stem}/{recording_filepath.name}'")
+    return recording_filepath
+
+def create_scenario_directories(fixtures_dir: Path, scenario_name: str) -> Path:
+    """Create the full directory structure for a scenario."""
+    scenario_dir = fixtures_dir / "scenarios" / scenario_name
+    
+    # Create stage directories
+    stage_dirs = ["01_extracted", "02_transcribed", "03_merged", "04_summarized"]
+    for stage_dir in stage_dirs:
+        (scenario_dir / stage_dir).mkdir(parents=True, exist_ok=True)
+    
+    print(f"✅ Created scenario directories for '{scenario_name}'")
+    return scenario_dir
+
+def organize_outputs_to_scenario(output_dir: Path, scenario_dir: Path, input_mkv: Path):
+    """Organize pipeline outputs into scenario-based structure."""
+    # Copy input video
+    input_dest = scenario_dir / "input.mkv"
+    if input_mkv.exists():
+        import shutil
+        shutil.copy2(input_mkv, input_dest)
+        print(f"📁 Copied input: {input_mkv.name} -> input.mkv")
+    
+    # Organize outputs by stage
+    file_mappings = {
+        "01_extracted": [
+            "audio_track_1.wav", "audio_track_2.wav", "audio_track_3.wav",
+            "microphone_audio.wav", "desktop_audio.wav"
+        ],
+        "02_transcribed": [
+            "*transcription.json"
+        ],
+        "03_merged": [
+            "merged_transcript.json"
+        ],
+        "04_summarized": [
+            "*summary.md"
+        ]
+    }
+    
+    import shutil
+    for stage, patterns in file_mappings.items():
+        stage_dir = scenario_dir / stage
+        for pattern in patterns:
+            if "*" in pattern:
+                # Handle glob patterns
+                for file_path in output_dir.glob(pattern):
+                    if file_path.is_file():
+                        dest = stage_dir / file_path.name
+                        shutil.copy2(file_path, dest)
+                        print(f"📁 Moved: {file_path.name} -> {stage}/{file_path.name}")
+            else:
+                # Handle exact filenames
+                file_path = output_dir / pattern
+                if file_path.exists():
+                    dest = stage_dir / pattern
+                    shutil.copy2(file_path, dest)
+                    print(f"📁 Moved: {pattern} -> {stage}/{pattern}")
+
+def get_filename_prompt(content: str) -> str:
+    """Generate prompt for getting a good filename from content."""
+    current_date = get_isodate()
+    prompt = f"""Please read the <content> completely and provide a filename that can be used to write the file to disk as a markdown. The filename should be concise but also descriptive so its clear what the content contains.
+
+    <filenamerules>
+    - only use lowercase letters, numbers, and underscores or dashes
+    - prefer underscores where possible as they are operating system independent
+    - make the filename convenient for all operating systems (windows, macOS, linux)
+    - include the current date in the filename as YYYMMDD (e.g. July 4th , 2024 would be 20240704)
+    - include a concise but descriptive name related to the <content>
+    - keep the filename as short as possible while containing a useful name and date
+    - DONOT include the suffix of the filename and make sure their are no period characters in the filename
+    - the current date is {current_date}
+    </filenamerules>
+
+    <content>
+    {content}
+    </content>
+
+    remember ONLY return the filename as a string and follow the <filenamerules>
+    """
+    return prompt
+
+def create_markdown_report(content: str, output_path: Path, model_name: str = 'claude-3-5-sonnet') -> Path:
+    """Create markdown report with AI-generated filename."""
+    # Note: This would require anthropic client, so we'll use a simple fallback
+    # In the actual script, this would call the AI model
+    timestamp = get_isodate().replace("-", "")
+    filename = f"{timestamp}_meeting_summary"
+    filepath = output_path / f"{filename}.md"
+    
+    print(f"Writing markdown file to {filepath}")
+    with open(filepath, 'w', encoding='utf-8') as file:
+        file.write(content)
+    return filepath
+
+
+# =============================================================================
+# Pipeline Workflow Functions
+# =============================================================================
+
+def generate_meeting_summary_prompt(markdown_notes: str = "", personal_info: str = "") -> str:
+    """Generate the system prompt for meeting summarization."""
+    prompt = f"""# 🧙‍♂️ Comprehensive and Detailed Meeting Insight Generator
+
+#CONTEXT: Your task is to create a thorough and detailed summary of a meeting transcript. The summary should be comprehensive, capturing the nuances of discussions, technical details, and decisions made. The target audience may not have been present at the meeting but requires an in-depth understanding of the topics discussed.
+
+#ROLE: You are an expert meeting analyst and technical communicator with a keen eye for detail. Your goal is to distill complex discussions into a structured, informative summary that provides significant value to both attendees and non-attendees.
+
+#RESPONSE GUIDELINES:
+1. Begin with an executive summary (who, what, where, when) that provides a high-level overview of the meeting's key points.
+2. Analyze the transcript and determine the appropriate number of major topics discussed. Create a numbered list of these topics.
+3. For each major topic:
+   a. Create a detailed heading
+   b. Provide an in-depth expansion on technical content, quoting relevant parts of the transcript where appropriate
+   c. Describe existing or proposed projects/efforts in detail
+   d. Outline decisions made, including the reasoning behind them
+   e. Specify timelines and next steps
+   f. Integrate relevant personal notes, highlighting them distinctly
+   g. Analyze potential implications or impacts of the discussed items
+4. Review and add any additional relevant information, including context from your knowledge base if applicable
+5. Conclude with a comprehensive list of action items, responsibilities, and overall meeting outcomes
+6. Create a section specifically addressing personal notes not covered in the main topics, explaining their context and importance
+
+#TASK CRITERIA:
+- Use markdown formatting for headers, lists, and emphasis
+- Aim for a highly detailed summary, typically 3-6 pages of content
+- Focus on technical accuracy and clarity, providing examples or elaborations where necessary
+- Ensure the summary is self-contained and understandable without additional context
+- Highlight personal notes using blockquotes and the 📝 emoji
+- Prioritize addressing all personal notes, ensuring they are contextually integrated
+- The number of major topics should be determined based on the meeting's content and complexity
+- Use code blocks for any technical snippets or data presented in the meeting
+
+#INFORMATION ABOUT ME: 
+{personal_info}
+
+#PERSONAL NOTES:
+{markdown_notes}
+
+#OUTPUT:
+Provide the detailed comprehensive summary in the following structure:
+
+## Executive Summary
+
+[Comprehensive overview, including high-priority personal notes and key decisions]
+
+## Major Topics Discussed
+
+1. [Topic 1]
+2. [Topic 2]
+3. [Topic 3]
+... (continue as needed based on the meeting's content)
+
+## Detailed Discussion
+
+### [Topic 1]
+
+[In-depth technical details, projects, decisions, timelines, and analysis]
+
+> 📝 Personal Note: [Relevant personal note integrated and highlighted]
+> * [Related bullet point with additional context]
+> * [Related bullet point with additional context]
+
+[Additional content addressing the personal note, including potential implications]
+
+[Relevant quotes from the transcript]
+
+### [Topic 2]
+
+[Same structure as Topic 1, with different content]
+
+... (continue for all identified topics)
+
+## Additional Notes and Context
+
+[Any relevant information not covered in the main sections, including personal notes that didn't fit elsewhere and additional context from your knowledge base]
+
+## Action Items and Conclusion
+
+[Comprehensive list of action items, responsibilities, deadlines, and overall meeting outcomes]
+
+## Personal Notes Summary
+
+[A detailed section addressing any remaining personal notes that weren't integrated into the main summary, explaining their context, importance, and potential future implications]
+
+Please summarize the meeting transcript based on the instructions given above, integrating and highlighting the provided personal notes throughout the summary. Ensure that the summary is as detailed and comprehensive as possible, capturing the full essence of the meeting discussions.
+
+If the summary exceeds the token limit, please end your response with '[CONTINUE]' and I will prompt you to continue in a new message.
+"""
+    return prompt
+
+def extract_transcript_text(transcript_data: Dict[str, Any]) -> str:
+    """
+    Extract text from the JSON transcript, combine it into a single string,
+    including speaker and timestamp, and ensuring chronological order.
+    """
+    transcript_entries = transcript_data["transcript"]
+    # Sort entries by start_time to ensure chronological order
+    sorted_entries = sorted(transcript_entries, key=lambda x: x["start_time"])
+
+    formatted_lines = []
+    for entry in sorted_entries:
+        speaker = entry["source"].capitalize()
+        start_time = f"{entry['start_time']:.2f}"
+        text = entry["text"].strip()
+        formatted_line = f"[{speaker} {start_time}] {text}"
+        formatted_lines.append(formatted_line)
+
+    return "\n".join(formatted_lines)
