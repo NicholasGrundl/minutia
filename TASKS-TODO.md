@@ -7,26 +7,29 @@
 ### Overview
 Focus has shifted to building comprehensive test infrastructure before further feature development. This provides regression protection during refactoring and establishes quality patterns for future work.
 
-## Phase 1: Test Foundation & Fixture Generation (2-3 days) ⭐ CRITICAL
+## Phase 1: Test Foundation & Fixture Generation (2-3 days) ⭐ COMPLETED
 
-**Priority: HIGHEST - Everything else depends on this**
+**Priority: COMPLETED ✅ - Fixtures migrated from +outputs to scenario-based structure**
 
-### 🏗️ Test Directory Structure
+### 🏗️ Test Directory Structure ✅ COMPLETED
 - [x] Create complete test directory structure following design-test-refactor-plan.md
 - [x] Set up `tests/conftest.py` with global fixtures and pytest configuration
 - [x] Create subdirectories: `fixtures/`, `unit/`, `integration/`, `slow/`, `scripts/`
 - [x] Add `pytest.ini` with markers for unit/integration/slow tests
 
-### 🎬 Fixture Generation Scripts
-- [ ] Implement `tests/scripts/generate_test_fixtures.py` to extract 10-30s clips from real recordings
-- [ ] Create diverse test scenarios: clear speech, overlapping audio, quiet/noisy samples
-- [ ] Ensure all fixtures have multiple audio tracks extractable by FFmpeg
-- [ ] Validate fixture properties and document characteristics
+### 🎬 Fixture Generation & Organization ✅ COMPLETED
+- [x] ~~Implement `tests/scripts/generate_test_fixtures.py` to extract 10-30s clips from real recordings~~ **REPLACED**: Used `CreateNewFixtureSet.ipynb` to generate complete fixtures
+- [x] Create diverse test scenarios: microphone_only, noisy_microphone, podcast_desktop, youtube_desktop
+- [x] Ensure all fixtures have multiple audio tracks extractable by FFmpeg
+- [x] Validate fixture properties and document characteristics
+- [x] **NEW**: Migrate +outputs to scenario-based structure with pipeline stage organization
+- [x] **NEW**: Create comprehensive metadata.json for each scenario and master registry
 
-### 🏆 Golden Sample Generation
-- [ ] Implement `tests/scripts/create_golden_samples.py` using existing CreateTranscriptProd.ipynb
-- [ ] Generate known-good outputs for all fixtures: audio files, transcripts, merged JSON, summaries
-- [ ] Store outputs as regression baseline with documented pipeline parameters
+### 🏆 Golden Sample Generation ✅ COMPLETED
+- [x] ~~Implement `tests/scripts/create_golden_samples.py` using existing CreateTranscriptProd.ipynb~~ **REPLACED**: Used `CreateNewFixtureSet.ipynb` for end-to-end golden samples
+- [x] Generate known-good outputs for all fixtures: audio files, transcripts, merged JSON, summaries
+- [x] Store outputs as regression baseline with documented pipeline parameters (in scenario metadata)
+- [x] **NEW**: Organized golden samples by pipeline stage (01_extracted → 04_summarized)
 - [ ] Create validation utilities for comparing test outputs against golden samples
 
 ### ⚙️ Core Test Infrastructure
@@ -36,10 +39,16 @@ Focus has shifted to building comprehensive test infrastructure before further f
 - [ ] Implement Anthropic API mocking for unit/integration tests
 
 ### 📋 Makefile Integration
-- [ ] Add `make generate-fixtures` command
+- [ ] Add `make generate-fixtures` command (update to use new structure)
 - [ ] Add `make update-golden` command for regenerating samples
 - [ ] Add `make test-regression` for golden sample validation
 - [ ] Update existing test commands to use new architecture
+
+### 🔄 Fixture Refactoring Tasks ⭐ NEW PRIORITY
+- [ ] Remove obsolete notebooks: `DEV_create_complete_fixtures.ipynb`, `DEV_generate_test_fixtures_simple*.ipynb`
+- [ ] Extract reusable code from `CreateNewFixtureSet.ipynb` to `tests/scripts/utilities.py`
+- [ ] Create standalone script `tests/scripts/generate_complete_fixtures.py` based on notebook
+- [ ] Update `simple/` fixtures to use new structure (create small unit test clips)
 
 ## Phase 2: Core Model & Configuration Testing (2-3 days)
 
