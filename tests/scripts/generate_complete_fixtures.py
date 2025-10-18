@@ -43,7 +43,7 @@ def create_complete_fixture(
     markdown_notes: str = ""
 ) -> bool:
     """
-    Create a complete fixture set by running the full pipeline.
+    Create a complete fixture set by running the full pipeline directly in the target directory.
     
     Args:
         recording_name: Name of the MKV file in +recordings
@@ -59,7 +59,6 @@ def create_complete_fixture(
     # Setup directories
     project_root = Path(__file__).parent.parent.parent
     recording_dir = project_root / "+recordings"
-    temp_output_dir = project_root / "+temp_output"
     fixtures_dir = project_root / "tests" / "fixtures"
     
     logger.info(f"Creating complete fixture: {scenario_name}")
@@ -67,40 +66,55 @@ def create_complete_fixture(
     logger.info(f"Description: {description}")
     
     # Setup and validate
-    temp_output_dir.mkdir(exist_ok=True)
-    recording_filepath = select_recording_file(recording_dir, recording_name)
-    
-    if not recording_filepath:
-        logger.error(f"Could not find recording: {recording_name}")
+    recording_filepath = recording_dir / recording_name
+    if not recording_filepath.exists():
+        logger.error(f"Could not find recording: {recording_filepath}")
         return False
     
+    # Create scenario directory structure
+    scenario_dir = create_scenario_directories(fixtures_dir, scenario_name)
+    
+    # Copy input video to scenario (safe single file copy)
+    input_dest = scenario_dir / "input.mkv"
     try:
-        # Step 1: Extract Audio
+        import shutil
+        shutil.copy2(recording_filepath, input_dest)
+        logger.info(f"📁 Copied input: {recording_name} -> input.mkv")
+    except Exception as e:
+        logger.error(f"Failed to copy input video: {e}")
+        return False
+    
+    # Run pipeline directly in organized directories
+    try:
+        # Step 1: Extract Audio -> 01_extracted/
         logger.info("Step 1: Extracting Audio...")
-        result = video_extraction.process_mkv_file(str(recording_filepath), str(temp_output_dir))
+        extracted_dir = scenario_dir / "01_extracted"
+        result = video_extraction.process_mkv_file(str(recording_filepath), str(extracted_dir))
         if not result:
             logger.error("Audio extraction failed")
             return False
         
-        # Step 2: Transcribe Audio
+        # Step 2: Transcribe Audio -> 02_transcribed/
         logger.info("Step 2: Transcribing Audio...")
-        microphone_audio_path = temp_output_dir / "microphone_audio.wav"
-        desktop_audio_path = temp_output_dir / "desktop_audio.wav"
+        transcribed_dir = scenario_dir / "02_transcribed"
+        microphone_audio_path = extracted_dir / "microphone_audio.wav"
+        desktop_audio_path = extracted_dir / "desktop_audio.wav"
         
         filenames = audio_transcription.process_audio_files(
             mic_audio_path=str(microphone_audio_path),
             desktop_audio_path=str(desktop_audio_path),
-            output_dir=str(temp_output_dir),
+            output_dir=str(transcribed_dir),
             whisper_model_name='medium.en',
             use_gpu=True,
         )
         logger.info(f"Transcribed Files: {list(filenames.keys())}")
         
-        # Step 3: Merge Transcripts
+        # Step 3: Merge Transcripts -> 03_merged/
         logger.info("Step 3: Merging Transcripts...")
+        merged_dir = scenario_dir / "03_merged"
         mic_transcript_path = filenames['microphone']
         desktop_transcript_path = filenames['desktop']
-        transcript_file_path = temp_output_dir / "merged_transcript.json"
+        transcript_file_path = merged_dir / "merged_transcript.json"
         
         transcript_json = transcript_merger.process_transcripts(
             mic_transcript_file=str(mic_transcript_path),
@@ -109,8 +123,9 @@ def create_complete_fixture(
             parse_overlaps=False
         )
         
-        # Step 4: Generate Summary
+        # Step 4: Generate Summary -> 04_summarized/
         logger.info("Step 4: Generating Summary...")
+        summarized_dir = scenario_dir / "04_summarized"
         transcript_data = summarize_transcript.load_transcript(str(transcript_file_path))
         transcript_text = summarize_transcript.prepare_transcript_for_summary(transcript_data)
         
@@ -122,22 +137,17 @@ def create_complete_fixture(
                 model_name='claude-4-5-sonnet', 
                 system_prompt=system_prompt
             )
-            summary_filepath = create_markdown_report(content=summary, output_path=temp_output_dir)
+            summary_filepath = create_markdown_report(content=summary, output_path=summarized_dir)
             logger.info(f"Summary generated: {summary_filepath}")
         except Exception as e:
             logger.warning(f"Summary generation failed: {str(e)}")
             # Create a placeholder summary
-            summary_filepath = temp_output_dir / f"{get_isodate().replace('-', '')}_summary.md"
+            summary_filepath = summarized_dir / f"{get_isodate().replace('-', '')}_summary.md"
             with open(summary_filepath, 'w') as f:
                 f.write(f"# Meeting Summary - {scenario_name}\n\nSummary generation skipped.\n\nTranscript:\n```\n{transcript_text}\n```")
         
-        # Step 5: Organize into Scenario Structure
-        logger.info("Step 5: Organizing into Scenario Structure...")
-        scenario_dir = create_scenario_directories(fixtures_dir, scenario_name)
-        organize_outputs_to_scenario(temp_output_dir, scenario_dir, recording_filepath)
-        
-        # Step 6: Create Metadata
-        logger.info("Step 6: Creating Metadata...")
+        # Step 5: Create Metadata
+        logger.info("Step 5: Creating Metadata...")
         pipeline_parameters = {
             "whisper_model": "medium.en",
             "mic_track": 3,
@@ -158,15 +168,15 @@ def create_complete_fixture(
         
         save_scenario_metadata(scenario_dir, metadata)
         
-        # Cleanup
-        import shutil
-        shutil.rmtree(temp_output_dir)
-        
         logger.info(f"✅ Complete fixture '{scenario_name}' created successfully")
+        logger.info(f"📁 Location: {scenario_dir}")
+        logger.info("ℹ️  All files generated directly in target directories - no cleanup needed")
         return True
         
     except Exception as e:
         logger.error(f"Error creating fixture '{scenario_name}': {str(e)}")
+        logger.info(f"⚠️  Partial files may exist in: {scenario_dir}")
+        logger.info("ℹ️  Manual cleanup: You can safely delete the scenario directory if needed")
         return False
 
 
