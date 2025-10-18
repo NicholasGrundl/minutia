@@ -29,7 +29,7 @@ from minutia.logging import logger
 from utilities import (
     get_isodatetime, get_isodate, create_scenario_metadata, save_scenario_metadata,
     setup_directories, select_recording_file, create_scenario_directories,
-    organize_outputs_to_scenario, generate_meeting_summary_prompt, 
+    copy_single_file_safely, generate_meeting_summary_prompt, 
     extract_transcript_text, create_markdown_report
 )
 
