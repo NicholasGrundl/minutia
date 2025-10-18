@@ -430,50 +430,22 @@ def create_scenario_directories(fixtures_dir: Path, scenario_name: str) -> Path:
     print(f"✅ Created scenario directories for '{scenario_name}'")
     return scenario_dir
 
-def organize_outputs_to_scenario(output_dir: Path, scenario_dir: Path, input_mkv: Path):
-    """Organize pipeline outputs into scenario-based structure."""
-    # Copy input video
-    input_dest = scenario_dir / "input.mkv"
-    if input_mkv.exists():
+def copy_single_file_safely(source: Path, dest: Path) -> bool:
+    """Safely copy a single file with explicit confirmation."""
+    if not source.exists():
+        print(f"❌ Source file does not exist: {source}")
+        return False
+    
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    
+    try:
         import shutil
-        shutil.copy2(input_mkv, input_dest)
-        print(f"📁 Copied input: {input_mkv.name} -> input.mkv")
-    
-    # Organize outputs by stage
-    file_mappings = {
-        "01_extracted": [
-            "audio_track_1.wav", "audio_track_2.wav", "audio_track_3.wav",
-            "microphone_audio.wav", "desktop_audio.wav"
-        ],
-        "02_transcribed": [
-            "*transcription.json"
-        ],
-        "03_merged": [
-            "merged_transcript.json"
-        ],
-        "04_summarized": [
-            "*summary.md"
-        ]
-    }
-    
-    import shutil
-    for stage, patterns in file_mappings.items():
-        stage_dir = scenario_dir / stage
-        for pattern in patterns:
-            if "*" in pattern:
-                # Handle glob patterns
-                for file_path in output_dir.glob(pattern):
-                    if file_path.is_file():
-                        dest = stage_dir / file_path.name
-                        shutil.copy2(file_path, dest)
-                        print(f"📁 Moved: {file_path.name} -> {stage}/{file_path.name}")
-            else:
-                # Handle exact filenames
-                file_path = output_dir / pattern
-                if file_path.exists():
-                    dest = stage_dir / pattern
-                    shutil.copy2(file_path, dest)
-                    print(f"📁 Moved: {pattern} -> {stage}/{pattern}")
+        shutil.copy2(source, dest)
+        print(f"✅ Copied: {source.name} -> {dest.relative_to(dest.parent.parent)}")
+        return True
+    except Exception as e:
+        print(f"❌ Failed to copy {source.name}: {e}")
+        return False
 
 def get_filename_prompt(content: str) -> str:
     """Generate prompt for getting a good filename from content."""
