@@ -1,0 +1,74 @@
+{
+  "fixture_registry": {
+    "schema_version": "1.0",
+    "generated_at": "2025-10-18T00:00:00Z",
+    "description": "Test fixture registry for Minutia pipeline testing",
+    "structure": "scenario-based organization with pipeline stage separation"
+  },
+  "scenarios": {
+    "microphone_only": {
+      "description": "Clear microphone recording with minimal background noise",
+      "complexity": "simple",
+      "primary_audio_source": "microphone",
+      "use_cases": ["basic transcription accuracy", "microphone-focused testing"],
+      "path": "scenarios/microphone_only/"
+    },
+    "noisy_microphone": {
+      "description": "Noisy microphone recording with background interference", 
+      "complexity": "challenging",
+      "primary_audio_source": "microphone",
+      "use_cases": ["transcription robustness", "noise handling"],
+      "path": "scenarios/noisy_microphone/"
+    },
+    "podcast_desktop": {
+      "description": "Desktop audio from podcast playback",
+      "complexity": "simple",
+      "primary_audio_source": "desktop",
+      "use_cases": ["desktop audio transcription", "clean content processing"],
+      "path": "scenarios/podcast_desktop/"
+    },
+    "youtube_desktop": {
+      "description": "Mixed desktop audio from YouTube (music + speech)",
+      "complexity": "complex",
+      "primary_audio_source": "desktop", 
+      "use_cases": ["mixed content handling", "challenging desktop audio"],
+      "path": "scenarios/youtube_desktop/"
+    }
+  },
+  "simple": {
+    "description": "Fast unit test fixtures (when created)",
+    "complexity": "minimal",
+    "use_cases": ["unit tests", "quick iteration", "edge case testing"],
+    "path": "simple/",
+    "status": "planned"
+  },
+  "pipeline_stages": {
+    "01_extracted": {
+      "description": "FFmpeg audio extraction outputs",
+      "files": ["audio_track_*.wav", "microphone_audio.wav", "desktop_audio.wav"]
+    },
+    "02_transcribed": {
+      "description": "Whisper transcription outputs", 
+      "files": ["*-whisper-*.json"]
+    },
+    "03_merged": {
+      "description": "Chronologically merged transcripts",
+      "files": ["merged_transcript.json"]
+    },
+    "04_summarized": {
+      "description": "AI-generated summaries",
+      "files": ["*summary.md"]
+    }
+  },
+  "migration_info": {
+    "migrated_from": "+outputs/",
+    "migration_date": "2025-10-18T00:00:00Z",
+    "preserved_artifacts": "All complete pipeline outputs moved to scenario-based structure",
+    "changes": [
+      "Renamed source videos to input.mkv for consistency",
+      "Organized outputs by pipeline stage within each scenario",
+      "Added metadata.json for each scenario",
+      "Created master fixture registry"
+    ]
+  }
+}
