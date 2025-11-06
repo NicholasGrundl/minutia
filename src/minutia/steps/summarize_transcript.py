@@ -18,7 +18,7 @@ anthropic_models = {
         "price_per_1k_output_tokens": 0.015,
     },
     "claude-3-5-sonnet": {
-        "name": "claude-3-5-sonnet-20240620",
+        "name": "claude-3-7-sonnet-20250219",
         "price_per_1k_input_tokens": 0.003,
         "price_per_1k_output_tokens": 0.015,
     },
