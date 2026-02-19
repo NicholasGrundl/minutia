@@ -21,6 +21,17 @@ class ChaosConfig:
             # del self.failures[mock_name]
             raise exc
 
+    from contextlib import contextmanager
+    @contextmanager
+    def set_error(self, mock_name: str, exception: Exception):
+        """Context manager to set a failure and clear it after."""
+        self.set_failure(mock_name, exception)
+        try:
+            yield
+        finally:
+            if mock_name in self.failures:
+                del self.failures[mock_name]
+
 @pytest.fixture
 def chaos_config():
     """Fixture to manage error injection across mocks."""

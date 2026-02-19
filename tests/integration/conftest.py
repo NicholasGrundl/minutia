@@ -14,6 +14,21 @@ def sample_video_file(tmp_path):
 
 
 @pytest.fixture
+def sample_run_paths(sample_video_file, tmp_path):
+    """Create a standard RunPaths structure for testing.
+
+    Uses the sample_video_file fixture and creates RunPaths with standard
+    output directory structure. This is the most commonly needed fixture
+    across multiple test modules.
+    """
+    from minutia.paths import RunPaths
+    return RunPaths.from_video_input(
+        sample_video_file,
+        base_output_dir=tmp_path / "runs"
+    )
+
+
+@pytest.fixture
 def sample_transcript_json(tmp_path):
     """Create sample transcript JSON files for testing transcript merging.
 
