@@ -59,31 +59,6 @@ def scenario_loader(test_scenarios, mock_whisper, mock_llm, mock_ffmpeg):
     return _load
 
 
-@pytest.fixture(scope="session")
-def golden_samples(test_fixtures_dir):
-    """Load golden sample outputs for regression testing."""
-    golden_dir = test_fixtures_dir / "golden_samples"
-    samples = {}
-    if golden_dir.exists():
-        for sample_dir in golden_dir.iterdir():
-            if sample_dir.is_dir():
-                samples[sample_dir.name] = sample_dir
-    return samples
-
-
-@pytest.fixture
-def isolated_tmp_dir(tmp_path):
-    """Create isolated temporary directory for each test."""
-    return tmp_path
-
-
-@pytest.fixture
-def mock_anthropic():
-    """Mock Anthropic API for unit/integration tests."""
-    # TODO: Implement proper Anthropic API mocking
-    pass
-
-
 @pytest.fixture
 def sample_video_file(tmp_path):
     """Create a sample video file for testing.
