@@ -23,6 +23,23 @@ This repository uses the `uv` Python toolchain and a Makefile-driven workflow. U
 - `make test` or `uv run pytest`: run tests (add tests under `tests/` as pytest modules).
 - `uv run minutia <command>`: execute CLI entry points defined in the project.
 
+## Testing Standards & Best Practices
+- **Framework**: `pytest` is the standard. Use `pytest-mock` for mocking.
+- **Organization**:
+  - Tests reside in `tests/` (outside `src/`).
+  - Structure: `tests/unit/`, `tests/integration/`, `tests/fixtures/`, `tests/mocks/`.
+- **Fixtures**:
+  - Place shared fixtures in `tests/conftest.py`.
+  - Use **Factory Fixtures** (fixtures returning functions) for creating complex objects with variable config.
+  - Use `scope="session"` for expensive resources (e.g., loading models).
+- **Mocking**:
+  - Prefer the `mocker` fixture (from `pytest-mock`) over `unittest.mock.patch`.
+  - Use `monkeypatch` only for simple environment variable or attribute overrides.
+  - See `tests/mocks/` for complex mock implementations (e.g., LLM mocks).
+- **Configuration**:
+  - All config is in `pyproject.toml`.
+  - Use markers: `@pytest.mark.unit`, `@pytest.mark.integration`, `@pytest.mark.slow`.
+
 ## Code Contributions
 - Keep changes aligned with the architecture in `design/design.md`; update design docs if plans change.
 - Favor small, composable modules inside `src/minutia/`. Maintain clear boundaries between pipeline stages (extraction, transcription, merging, summarization).

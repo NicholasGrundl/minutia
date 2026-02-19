@@ -113,12 +113,14 @@ python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = [
+    "--import-mode=importlib",
     "--strict-markers",
     "--strict-config",
     "--cov=src/minutia",
     "--cov-report=term-missing",
     "--cov-report=html",
 ]
+xfail_strict = true
 markers = [
     "unit: Unit tests (fast, < 1s each)",
     "integration: Integration tests (medium, < 30s)",

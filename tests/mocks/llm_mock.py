@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import MagicMock
 
 class LLMMock:
     """Simulates Anthropic Claude API behavior for testing."""
@@ -19,25 +20,39 @@ class LLMMock:
         else:
             text = self.responses.pop(0)
             
-        # Mock the Anthropic response structure: response.content[0].text
-        class Content:
-            def __init__(self, text):
-                self.text = text
-        
-        class Response:
-            def __init__(self, text):
-                self.content = [Content(text)]
-                
-        return Response(text)
+        # Mimic the Anthropic SDK response structure: response.content[0].text
+        # Using MagicMock to simulate the Pydantic models in the real SDK.
+        mock_response = MagicMock()
+        mock_content = MagicMock()
+        mock_content.text = text
+        mock_content.type = "text"
+        mock_response.content = [mock_content]
+        mock_response.usage = MagicMock(input_tokens=10, output_tokens=20)
+        mock_response.model = kwargs.get("model", "claude-3-5-sonnet-20240620")
+        mock_response.id = "msg_mock_123"
+        return mock_response
 
 from tests.mocks.chaos_config import chaos_config
 
 @pytest.fixture
 def mock_llm(mocker, chaos_config):
     """
-    Mock the Anthropic client in summarize_transcript.
+    Mock the Anthropic client and configuration globally.
     """
-    from minutia.steps import summarize_transcript
+    # We patch load_config in multiple places where it might be imported
+    # to ensure all components see the same mock configuration.
+    mock_app_config = MagicMock()
+    mock_app_config.anthropic_api_key = "fake-api-key"
+    mock_app_config.base_output_dir = "runs"
+    mock_app_config.log_level = "INFO"
+    mock_app_config.mic_track = 3
+    mock_app_config.desktop_track = 2
+    mock_app_config.whisper_model = "base"
+    mock_app_config.summary_model = "claude-3-5-sonnet"
+
+    mocker.patch("minutia.config.load_config", return_value=mock_app_config)
+    mocker.patch("minutia.baseline_pipeline.load_config", return_value=mock_app_config)
+    mocker.patch("minutia.cli.load_config", return_value=mock_app_config)
     
     mock_inst = LLMMock()
     
@@ -45,16 +60,18 @@ def mock_llm(mocker, chaos_config):
         chaos_config.trigger_if_set("anthropic.messages.create")
         return mock_inst.create_message(**kwargs)
 
-    # We need to mock the Anthropic CLASS so when it's instantiated it returns our mock client
-    def mock_anthropic_init(api_key=None):
+    # Mock Anthropic client instantiation
+    def mock_anthropic_init(api_key=None, **kwargs):
         chaos_config.trigger_if_set("anthropic.init")
-        mock_client = mocker.Mock()
+        mock_client = MagicMock()
         mock_client.messages.create.side_effect = mock_create_message
         return mock_client
     
-    mocker.patch.object(summarize_transcript, "Anthropic", side_effect=mock_anthropic_init)
+    # Patch Anthropic class where it is used
+    mocker.patch("minutia.steps.summarize_transcript.Anthropic", side_effect=mock_anthropic_init)
     
-    # Also mock API key resolution to avoid needing a real key in tests
-    mocker.patch.object(summarize_transcript, "resolve_anthropic_api_key", return_value="fake-api-key")
+    # Also mock API key resolution helper
+    mocker.patch("minutia.steps.summarize_transcript.resolve_anthropic_api_key", return_value="fake-api-key")
+    mocker.patch("minutia.config.resolve_anthropic_api_key", return_value="fake-api-key")
     
     return mock_inst

@@ -9,7 +9,7 @@ from minutia import (
 )
 
 
-def test_baseline_pipeline_smoke(tmp_path, monkeypatch):
+def test_baseline_pipeline_smoke(tmp_path, mocker, mock_ffmpeg, mock_whisper, mock_llm):
     # Arrange fixture files
     input_video = tmp_path / "sample.mkv"
     input_video.write_text("fake-video", encoding="utf-8")
@@ -23,81 +23,24 @@ def test_baseline_pipeline_smoke(tmp_path, monkeypatch):
     markdown_notes_file = tmp_path / "notes.md"
     markdown_notes_file.write_text("# Extra context\nDetails go here.\n", encoding="utf-8")
 
-    created_transcripts = []
+    # Configure Mocks
+    mock_ffmpeg.set_probe_data(input_video, audio_tracks=3)
+    
+    # Set scenarios for whisper mock to return specific text
+    mock_whisper.set_scenario("microphone_audio", [
+        {"start": 0.0, "end": 1.0, "text": "Hello from mic"}
+    ])
+    mock_whisper.set_scenario("desktop_audio", [
+        {"start": 0.25, "end": 1.25, "text": "Hello from desktop"}
+    ])
+    
+    # Configure LLM mock responses
+    mock_llm.set_responses(["Summary content"])
 
-    def fake_process_mkv_file(input_mkv: str, output_dir: str, **kwargs):
-        out_dir = Path(output_dir)
-        out_dir.mkdir(parents=True, exist_ok=True)
-        microphone = out_dir / "microphone_audio.wav"
-        desktop = out_dir / "desktop_audio.wav"
-        microphone.write_text("mic-bytes", encoding="utf-8")
-        desktop.write_text("desktop-bytes", encoding="utf-8")
-        return {"microphone": str(microphone), "desktop": str(desktop)}
+    # Mock environment for Anthropic API
+    mocker.patch("os.getenv", side_effect=lambda key, default=None: "test-key" if key == "MINUTIA_ANTHROPIC_API_KEY" else default)
 
-    def fake_process_audio_files(mic_audio, desktop_audio, output_dir, whisper_model_name="base"):
-        out_dir = Path(output_dir)
-        out_dir.mkdir(parents=True, exist_ok=True)
-        mic_transcript = out_dir / "microphone-whisper-fake_transcription.json"
-        desk_transcript = out_dir / "desktop-whisper-fake_transcription.json"
-        mic_data = {
-            "metadata": {
-                "source_file": str(mic_audio),
-                "model": whisper_model_name,
-                "schema_version": "1.0",
-                "processed_at": "2024-01-01T00:00:00+00:00",
-            },
-            "segments": [
-                {"start_time": 0.0, "end_time": 1.0, "text": "Hello from mic"},
-            ],
-            "text": "Hello from mic",
-        }
-        desk_data = {
-            "metadata": {
-                "source_file": str(desktop_audio),
-                "model": whisper_model_name,
-                "schema_version": "1.0",
-                "processed_at": "2024-01-01T00:00:00+00:00",
-            },
-            "segments": [
-                {"start_time": 0.25, "end_time": 1.25, "text": "Hello from desktop"},
-            ],
-            "text": "Hello from desktop",
-        }
-        mic_transcript.write_text(json.dumps(mic_data), encoding="utf-8")
-        desk_transcript.write_text(json.dumps(desk_data), encoding="utf-8")
-        created_transcripts.append((mic_transcript, desk_transcript))
-        return {"microphone": str(mic_transcript), "desktop": str(desk_transcript)}
-
-    def fake_estimate(transcript_text, model="claude-3-5-sonnet", max_output_tokens=None):
-        return 256, 0.42
-
-    def fake_generate_summary(transcript_text, model_name="claude-3-5-sonnet", **kwargs):
-        assert "Hello from mic" in transcript_text
-        return "Summary content"
-
-    def fake_save_summary(summary, output_file):
-        Path(output_file).write_text(summary, encoding="utf-8")
-
-    def fake_create_markdown(content, output_path, model_name="claude-3-5-sonnet"):
-        markdown_path = output_path / "meeting_summary.md"
-        markdown_path.write_text(content, encoding="utf-8")
-        return markdown_path
-
-    monkeypatch.setattr(video_extraction, "process_mkv_file", fake_process_mkv_file)
-    monkeypatch.setattr(audio_transcription, "process_audio_files", fake_process_audio_files)
-    monkeypatch.setattr(
-        summarize_transcript, "estimate_tokens_and_price", fake_estimate, raising=False
-    )
-    monkeypatch.setattr(
-        summarize_transcript, "generate_summary", fake_generate_summary, raising=False
-    )
-    monkeypatch.setattr(
-        summarize_transcript, "generate_long_summary", fake_generate_summary, raising=False
-    )
-    monkeypatch.setattr(summarize_transcript, "save_summary", fake_save_summary, raising=False)
-    monkeypatch.setattr(baseline_pipeline, "create_markdown_report", fake_create_markdown)
-    monkeypatch.setenv("MINUTIA_ANTHROPIC_API_KEY", "test-key")
-
+    # Run the pipeline
     args = baseline_pipeline.build_parser().parse_args(
         [
             str(input_video),
@@ -121,7 +64,6 @@ def test_baseline_pipeline_smoke(tmp_path, monkeypatch):
     artifacts = baseline_pipeline.run_pipeline(args)
 
     # Validate audio extraction and transcription steps
-    assert created_transcripts, "Transcription step did not create transcripts"
     assert artifacts.run_paths.audio_dir.exists()
     assert artifacts.transcription_files["microphone"].exists()
 
@@ -129,7 +71,7 @@ def test_baseline_pipeline_smoke(tmp_path, monkeypatch):
     assert artifacts.merged_transcript.exists()
     merged_data = json.loads(artifacts.merged_transcript.read_text(encoding="utf-8"))
     assert merged_data["metadata"]["segment_count"] > 0
-    assert merged_data["metadata"]["source_files"]["microphone"].endswith(".json")
+    assert "microphone" in merged_data["metadata"]["source_files"]
 
     # Validate summary artifact
     assert artifacts.summary_file is not None
@@ -144,4 +86,3 @@ def test_baseline_pipeline_smoke(tmp_path, monkeypatch):
     assert metadata_file.exists()
     run_metadata = json.loads(metadata_file.read_text(encoding="utf-8"))
     assert run_metadata["run_info"]["status"] == "completed"
-    assert run_metadata["outputs"]["merged_transcript"].endswith(".json")

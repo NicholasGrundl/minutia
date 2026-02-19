@@ -74,16 +74,14 @@ remember ONLY return the filename as a string and follow the <filenamerules>
 
 
 def get_filename_from_content(
-    content: str, model_name: str = "claude-3-5-sonnet"
+    content: str, model_name: str = "claude-3-5-sonnet", api_key: str | None = None
 ) -> str:
     """Use Anthropic to generate a descriptive filename for markdown exports."""
     anthropic_models = summarize_transcript.anthropic_models
     if model_name not in anthropic_models:
         raise KeyError(f"model must be one of [{list(anthropic_models.keys())}]")
     model = anthropic_models[model_name]["name"]
-    client = summarize_transcript.Anthropic(
-        api_key=summarize_transcript.ANTHROPIC_API_KEY
-    )
+    client = summarize_transcript.Anthropic(api_key=api_key)
     prompt = get_filename_prompt(content)
     response = client.messages.create(
         model=model,
@@ -98,11 +96,14 @@ def create_markdown_report(
     content: str,
     output_path: Path,
     model_name: str = "claude-3-5-sonnet",
+    api_key: str | None = None,
 ) -> Path:
     """
     Persist a markdown report alongside the summary using an Anthropic generated name.
     """
-    filename = get_filename_from_content(content, model_name=model_name)
+    filename = get_filename_from_content(
+        content, model_name=model_name, api_key=api_key
+    )
     filepath = output_path / f"{filename}.md"
     logger.info("Writing markdown report to {}", filepath)
     filepath.write_text(content, encoding="utf-8")
@@ -477,6 +478,7 @@ def run_pipeline(args: argparse.Namespace) -> PipelineArtifacts:
                         summary_text,
                         run_paths.run_root,
                         model_name=summary_model,
+                        api_key=app_config.anthropic_api_key,
                     )
                     outputs["markdown"] = str(markdown_path)
 

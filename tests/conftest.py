@@ -12,6 +12,12 @@ import pytest
 from minutia.paths import RunPaths
 from minutia.pipeline.orchestrator import PipelineConfig
 
+# Import mocks to register them as fixtures
+from tests.mocks.ffmpeg_mock import mock_ffmpeg, dummy_wav
+from tests.mocks.whisper_mock import mock_whisper
+from tests.mocks.llm_mock import mock_llm
+from tests.mocks.chaos_config import chaos_config
+
 # Session-scoped fixtures for expensive resources
 
 @pytest.fixture(scope="session")
