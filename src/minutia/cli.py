@@ -21,7 +21,7 @@ from .steps.video_extraction import process_mkv_file
 
 @click.group()
 @click.pass_context
-def cli(ctx: click.Context):
+def main(ctx: click.Context):
     """OBS Video Processing CLI"""
     try:
         config = load_config()
@@ -39,7 +39,7 @@ def cli(ctx: click.Context):
     )
 
 
-@cli.command()
+@main.command()
 @click.pass_context
 @click.argument("input_video", type=click.Path(exists=True))
 @click.argument("output_dir", type=click.Path(), required=False)
@@ -74,7 +74,7 @@ def extract_audio(ctx, input_video, output_dir, mic_track, desktop_track):
         raise click.ClickException(str(e)) from e
 
 
-@cli.command()
+@main.command()
 @click.pass_context
 @click.argument("mic_audio", type=click.Path(exists=True))
 @click.argument("desktop_audio", type=click.Path(exists=True))
@@ -91,7 +91,7 @@ def transcribe(ctx, mic_audio, desktop_audio, output_dir):
         raise click.ClickException(str(e)) from e
 
 
-@cli.command()
+@main.command()
 @click.pass_context
 @click.argument("mic_transcript", type=click.Path(exists=True))
 @click.argument("desktop_transcript", type=click.Path(exists=True))
@@ -106,7 +106,7 @@ def merge_transcripts(ctx, mic_transcript, desktop_transcript, output_file):
         raise click.ClickException(str(e)) from e
 
 
-@cli.command()
+@main.command()
 @click.pass_context
 @click.argument("merged_transcript", type=click.Path(exists=True))
 @click.argument("output_file", type=click.Path())
@@ -156,7 +156,7 @@ def summarize(ctx, merged_transcript, output_file, model, dry_run):
         raise click.ClickException(str(e)) from e
 
 
-@cli.command()
+@main.command()
 @click.pass_context
 @click.argument("input_video", type=click.Path(exists=True))
 @click.argument("output_dir", type=click.Path(), required=False)
@@ -285,4 +285,4 @@ def _format_failure_message(result: PipelineResult) -> str:
 
 
 if __name__ == "__main__":
-    cli()
+    main()

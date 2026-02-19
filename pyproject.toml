@@ -64,7 +64,7 @@ media = [
 ]
 
 [project.scripts]
-minutia = "minutia.cli:cli"
+minutia = "minutia.cli:main"
 
 # Note: UV does not support tool.uv.scripts for task running.
 # Use the Makefile for development tasks (make lint, make test, etc.)
@@ -132,3 +132,8 @@ log_cli_date_format = "%Y-%m-%d %H:%M:%S"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest-mock>=3.15.1",
+]
