@@ -64,7 +64,7 @@ media = [
 ]
 
 [project.scripts]
-minutia = "minutia:main"
+minutia = "minutia.cli:cli"
 
 # Note: UV does not support tool.uv.scripts for task running.
 # Use the Makefile for development tasks (make lint, make test, etc.)

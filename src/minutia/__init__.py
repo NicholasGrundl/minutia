@@ -2,6 +2,6 @@
 
 __version__ = "0.1.0"
 
-from .cli import cli as main
+from .cli import cli
 
-__all__ = ["main"]
+__all__ = ["cli"]
