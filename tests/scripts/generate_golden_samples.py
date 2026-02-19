@@ -94,7 +94,7 @@ def run_pipeline_for_scenario(scenario_dir: Path, force: bool = False):
     try:
         summary = summarize_transcript.generate_long_summary(
             transcript_text, 
-            model_name='claude-3-5-sonnet-20240620', 
+            model_name='claude-4-5-sonnet', 
             system_prompt=system_prompt
         )
         
