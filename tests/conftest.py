@@ -27,27 +27,36 @@ def test_fixtures_dir():
 
 
 @pytest.fixture(scope="session")
-def whisper_tiny_model():
-    """Load tiny Whisper model once per test session."""
-    try:
-        import whisper
-        model = whisper.load_model("tiny")
-        yield model
-        del model
-    except ImportError:
-        pytest.skip("Whisper not available for integration tests")
+def test_scenarios(test_fixtures_dir):
+    """Load test scenarios from the scenarios directory."""
+    scenarios_dir = test_fixtures_dir / "scenarios"
+    scenarios = {}
+    if scenarios_dir.exists():
+        for scenario_dir in scenarios_dir.iterdir():
+            if scenario_dir.is_dir():
+                scenarios[scenario_dir.name] = scenario_dir
+    return scenarios
 
 
-@pytest.fixture(scope="session")
-def test_video_files(test_fixtures_dir):
-    """Load test video files created by fixture generation scripts."""
-    video_dir = test_fixtures_dir / "video"
-    return {
-        "short": video_dir / "sample_short.mkv",
-        "overlap": video_dir / "sample_overlap.mkv",
-        "quiet": video_dir / "sample_quiet.mkv",
-        "noisy": video_dir / "sample_noisy.mkv"
-    }
+@pytest.fixture
+def scenario_loader(test_scenarios, mock_whisper, mock_llm, mock_ffmpeg):
+    """
+    Helper to load a specific scenario and configure mocks accordingly.
+    """
+    def _load(name: str):
+        scenario_path = test_scenarios.get(name)
+        if not scenario_path:
+            pytest.fail(f"Scenario '{name}' not found in {test_scenarios.keys()}")
+        
+        metadata_path = scenario_path / "metadata.json"
+        if metadata_path.exists():
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            # Configure mocks based on metadata if needed
+            # For now, we'll just return the path and metadata
+            return {"path": scenario_path, "metadata": metadata}
+        return {"path": scenario_path, "metadata": {}}
+
+    return _load
 
 
 @pytest.fixture(scope="session")
