@@ -11,13 +11,39 @@ MAX_TOKENS_OUTPUT = (
 )
 
 # Model information
+# Pricing source: Anthropic API docs, verified April 29, 2026.
+# Convention: per-1k tokens (Anthropic publishes per-MTok; divide by 1000).
+# Output is 5x input across the entire current lineup — handy for budgeting.
 anthropic_models = {
-    "claude-4-5-sonnet": {
+    # ---- Current generation (Claude 4.x, recommended for new work) ----
+    "claude-opus-4-7": {
+        "name": "claude-opus-4-7",  # released 2026-04-16, current flagship
+        "price_per_1k_input_tokens": 0.005,
+        "price_per_1k_output_tokens": 0.025,
+    },
+    "claude-opus-4-6": {
+        "name": "claude-opus-4-6",  # previous flagship, same price as 4.7
+        "price_per_1k_input_tokens": 0.005,
+        "price_per_1k_output_tokens": 0.025,
+    },
+    "claude-sonnet-4-6": {
+        "name": "claude-sonnet-4-6",  # best price/perf, 1M context at flat rate
+        "price_per_1k_input_tokens": 0.003,
+        "price_per_1k_output_tokens": 0.015,
+    },
+    "claude-haiku-4-5": {
+        "name": "claude-haiku-4-5-20251001",  # fast/cheap current-gen
+        "price_per_1k_input_tokens": 0.001,
+        "price_per_1k_output_tokens": 0.005,
+    },
+
+    # ---- Legacy (still callable, kept for backward compatibility) ----
+    "claude-sonnet-4-5": {
         "name": "claude-sonnet-4-5-20250929",
         "price_per_1k_input_tokens": 0.003,
         "price_per_1k_output_tokens": 0.015,
     },
-    "claude-3-5-sonnet": {
+    "claude-3-7-sonnet": {
         "name": "claude-3-7-sonnet-20250219",
         "price_per_1k_input_tokens": 0.003,
         "price_per_1k_output_tokens": 0.015,
@@ -106,7 +132,7 @@ def estimate_price(
 
 
 def estimate_tokens_and_price(
-    transcript_text, model="claude-3-5-sonnet", max_output_tokens=None
+    transcript_text, model="claude-sonnet-4-6", max_output_tokens=None
 ):
     """Estimate tokens and price for summarizing the transcript."""
     if max_output_tokens is None:
@@ -140,7 +166,7 @@ def estimate_tokens_and_price(
 
 def generate_long_summary(
     transcript_text,
-    model_name="claude-3-5-sonnet",
+    model_name="claude-sonnet-4-6",
     max_output_tokens=None,
     system_prompt=None,
     api_key=None,
@@ -200,7 +226,7 @@ def generate_long_summary(
 
 def generate_summary(
     transcript_text,
-    model_name="claude-3-5-sonnet",
+    model_name="claude-sonnet-4-6",
     max_output_tokens=None,
     system_prompt=None,
     api_key=None,
