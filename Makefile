@@ -11,20 +11,21 @@ PYTHON_VENV := .venv/bin/python
 PYTEST_ARGS ?=
 
 # Installation commands (UV native, not scripts)
+# Note: `uv sync` installs the `dev` group by default (PEP 735).
 .PHONY: install
 install:
-	@echo "Installing project and dependencies with uv..."
+	@echo "Installing project + dev group (default)..."
 	uv sync
 
-.PHONY: install-dev
-install-dev:
-	@echo "Installing project with development dependencies..."
-	uv sync --extra dev
+.PHONY: install-jupyter
+install-jupyter:
+	@echo "Installing project + dev + jupyter groups..."
+	uv sync --group jupyter
 
 .PHONY: install-all
 install-all:
-	@echo "Installing project with all optional dependencies..."
-	uv sync --extra dev --extra jupyter --extra media
+	@echo "Installing project with all dependency groups..."
+	uv sync --all-groups
 
 .PHONY: create-env-file
 create-env-file:
