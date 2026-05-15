@@ -1,8 +1,6 @@
 # UV-based project management for Minutia
 #
 # This Makefile is the primary task runner for development commands.
-# Note: UV does not support tool.uv.scripts, so we use Make for task running.
-#
 # You can use either:
 #   - make <target>           (recommended, convenient)
 #   - uv run <command> <args> (direct command execution)
