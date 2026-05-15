@@ -7,71 +7,83 @@ license = { text = "MIT" }
 authors = [
     { name = "Nicholas Grundl", email = "nicholasgrundl@gmail.com" }
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 keywords = ["meeting", "transcription", "audio", "summarization", "whisper"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Multimedia :: Sound/Audio :: Speech",
     "Topic :: Office/Business",
 ]
 dependencies = [
-    "loguru",
-    "tiktoken",
-    "ffmpeg-python",
-    "openai-whisper",
-    "pandas",
-    "numpy<2",
-    "transformers",
-    "torch<2.3.0",
-    "openai",
-    "anthropic",
-    "pydantic",
-    "instructor",
-    "python-dotenv",
+    # Core CLI / orchestration
     "click",
-    "sounddevice",
-    "scipy",
-    "pyaudio",
-    "matplotlib",
     "isodate",
-    "nanoid",
     "loguru>=0.7.3",
-    "gputil>=1.4.0",
-    "psutil>=7.1.0",
+    "nanoid",
+    "python-dotenv",
+    # Data / validation
+    "numpy",
+    "pydantic",
+    "scipy",
+    # Audio IO
+    "ffmpeg-python",
+    "sounddevice",
+    # Models / inference
+    "openai-whisper",
+    "tiktoken",
+    "torch>=2.4,<2.6",
+    "transformers",
+    # LLM clients
+    "anthropic",
+    "instructor",
+    "openai",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
+# Installed by default on `uv sync`
 dev = [
-    "ruff",
     "pytest",
     "pytest-cov",
+    "pytest-mock>=3.15.1",
+    "ruff",
 ]
+# Notebook environment + plotting (`uv sync --group jupyter`)
 jupyter = [
-    "jupyterlab",
     "ipywidgets",
+    "jupyterlab",
+    "matplotlib",
+    "pandas",
     "panel",
 ]
+# System probing for notebooks (`uv sync --group diagnostics`)
+diagnostics = [
+    "gputil>=1.4.0",
+    "psutil>=7.1.0",
+    "pyaudio",
+]
+# Heavy ASR experiments — opt-in only (`uv sync --group experiments`)
+experiments = [
+    "faster-whisper",
+    "nemo_toolkit[asr]",
+    "pyannote.audio",
+    "whisperx",
+]
+# Alternative audio backends (`uv sync --group media`)
 media = [
-    "pydub",
-    "moviepy",
     "librosa",
+    "moviepy",
+    "pydub",
 ]
 
 [project.scripts]
 minutia = "minutia.cli:main"
 
-# Note: UV does not support tool.uv.scripts for task running.
-# Use the Makefile for development tasks (make lint, make test, etc.)
-# or run commands directly with: uv run <command>
-
 [tool.ruff]
-target-version = "py310"
+target-version = "py312"
 line-length = 88
 exclude = [
     ".git",
@@ -134,8 +146,3 @@ log_cli_date_format = "%Y-%m-%d %H:%M:%S"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
-
-[dependency-groups]
-dev = [
-    "pytest-mock>=3.15.1",
-]
