@@ -1,3 +1,3 @@
-# Session — TUI heatmap: live-populate + real summaries in detail
+# Session
 
-*The present — an ephemeral working scratchpad.*
+*The present — an ephemeral working scratchpad. Wiped at flush; nothing durable belongs here.*
