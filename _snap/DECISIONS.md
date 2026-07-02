@@ -8,6 +8,49 @@ close.
 
 ---
 
+## 2026-07-02 — refactor_to_cli / Phase 2: notebook re-pointed at `minutia.prompts`
+
+- **Set out to:** Make `SummaryPromptVariations.ipynb` (the daily driver) consume the package
+  prompt registry instead of its inline builder cells.
+- **Why:** Proves registry parity in real use before the CLI takes over; single source of
+  truth for prompt flavors.
+- **How it ended:** Done — 6 builder-def cells deleted (27→21 cells);
+  `generate_meeting_summary_prompt` + `get_filename_prompt` now imported from
+  `minutia.prompts` (plus a `list_prompt_kinds()` echo). `extract_transcript_text`,
+  `get_filename_from_content`, `create_markdown_report` deliberately remain notebook-local —
+  their move into `steps/` is the next checklist task. nbformat validates; headless smoke
+  test of the import + prompt-render path passes. NOTE: the notebook itself wasn't executed
+  end-to-end (needs whisper/API) — first real run is the true verification.
+- **Also:** BACKLOG entry added: "Dev-env modernization: Makefile → justfile, direnv" (user
+  is migrating tooling; noted as backlog rather than draft spec, per user).
+- **Next:** Phase 2 — move `get_filename_from_content`/`create_markdown_report` from
+  `baseline_pipeline.py` into `steps/summarize_transcript.py`; verify merger step against
+  `03_merged/` golden fixtures.
+
+## 2026-07-02 — refactor_to_cli / Phase 2: prompt-registry consolidation
+
+- **Set out to:** Make `src/minutia/prompts.py` the single prompt registry: port the three
+  builders that existed only in `SummaryPromptVariations.ipynb` (`slide-review`,
+  `interview-debrief`, `discovery-summary`), add `get_prompt_builder(kind)` /
+  `list_prompt_kinds()`, TDD unit tests.
+- **Why:** First task of the re-planned refactor (see the 2026-07-02 PLAN changelog entries in
+  the spec): the CLI's `--prompt-kind` will derive its choices from the registry, and prompt
+  variants must be enumerable for the future evals harness.
+- **How it ended:** Done — all 6 kinds registered; the 3 builders shared with the notebook were
+  verified semantically identical (style-only diffs), so no content reconciliation was needed.
+  Unknown kinds now raise `ValueError` naming valid kinds (replaces the old silent
+  fallback-to-baseline; the notebook's own dispatcher had a latent `.get(kind, 'default')`
+  crash bug — not copied). 18 unit tests GREEN in `tests/unit/test_prompts.py`
+  (`pytestmark = pytest.mark.unit`); lint + format clean.
+- **Gotchas logged:** (1) `pytest -m unit` collected *zero* tests before this session — nothing
+  in `tests/unit/` carries the `unit` marker, so `make test-unit` was a no-op; new test module
+  is marked, existing ones still aren't. (2) 6 pre-existing integration failures
+  (`test_e2e_permutations.py` ×5, `test_baseline_pipeline_smoke`) from stale mock targets /
+  `PipelineConfig` signature drift — present before and after this change.
+- **Next:** Phase 2 continues — point `SummaryPromptVariations.ipynb` at `minutia.prompts`
+  (delete its inline builder cells), then move
+  `get_filename_from_content`/`create_markdown_report` into `steps/`.
+
 ## 2026-07-01: Unify `_blueprint` and `_snap` into a single AI-workspace system
 
 - **What**: Migrated relevant content from the older `_blueprint/` workspace into `_snap/`

@@ -14,6 +14,34 @@ and add it to [`ROADMAP.md`](../ROADMAP.md).
 
 ---
 
+### Dev-env modernization: Makefile → justfile, direnv (.envrc)
+
+- **Context**: 2026-07-02 — user is migrating their dev tooling: task running moves from
+  `make` to `just` (justfile), env management to `direnv` (`.envrc`), plus other recent
+  tooling changes. Repo currently has a `Makefile` (with one already-broken target,
+  `make commit` — see `opensource_polishing.md`) and CWD `.env` loading. Reference material
+  already cached: `_snap/context/just/`, `_snap/context/direnv/`.
+- **When**: after (or alongside) the `refactor_to_cli` config work lands — the Phase 3
+  config-precedence design (flag > env > `.env` > user config) should be direnv-friendly
+  either way. Also touches AGENTS.md's "Development Commands" section and CI docs.
+- **Options**: straight port of Makefile targets to a justfile; or prune to the targets
+  actually used (install/lint/format/test/jupyter) while porting.
+- **Effort**: Small.
+- **Decision**: 2026-07-02 — noted here rather than a draft spec, per user ("you decide").
+
+### Guided TUI mode for the pipeline
+
+- **Context**: 2026-07-02 PLAN (refactor_to_cli) — the CLI gets two entry styles: power-user
+  (explicit paths / latest-MKV discovery) and a *light* interactive mode (rich/typer prompts:
+  pick MKV newest-first, choose prompt kind, confirm cost) built inside `refactor_to_cli`.
+  A full guided TUI — persistent screens, navigation, progress views (e.g. `textual`) — was
+  explicitly deferred to keep the refactor surface small.
+- **When**: after `refactor_to_cli` lands and the light interactive mode's rough edges are
+  known; or when onboarding a non-power-user.
+- **Options**: `textual` app; or grow the rich-prompt flow incrementally.
+- **Effort**: Medium-Large.
+- **Decision**: 2026-07-02 — light interactive now, full TUI deferred here.
+
 ### LanceDB retrieval backend — PROMOTED 2026-06-13
 
 Promoted to a `[draft]` spec: **`features/[draft]lancedb_retrieval_backend.md`**.

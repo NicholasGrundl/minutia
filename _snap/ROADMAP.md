@@ -5,16 +5,20 @@ summarization tool. The order *is* the plan; "phases" are just grouping labels. 
 feature lives in its `features/<name>.md` spec; history lives in
 [`DECISIONS.md`](./DECISIONS.md).
 
-*Last updated: 2026-07-01 (unified `_blueprint`/`_snap` into a single workspace; `_snap`'s core
-memory files reset for this project after being seeded from another project's content).*
+*Last updated: 2026-07-02 (re-planned `refactor_to_cli` against the real daily workflow,
+`SummaryPromptVariations.ipynb`; previously 2026-07-01: unified `_blueprint`/`_snap` into a
+single workspace).*
 
 ---
 
 1. **`[active]`** [`refactor_to_cli`](./features/%5Bactive%5Drefactor_to_cli.md) — finish
-   migrating from the notebook/`baseline_pipeline.py` workflow to the
-   `src/minutia/{pipeline,steps}/` package structure, validated against golden-sample fixtures.
-   Currently mid-Phase 2 (logic unification): `baseline_pipeline.py` is still active and
-   tested, not yet deletable.
+   migrating the notebook workflow into the `src/minutia/{pipeline,steps}/` package + CLI,
+   validated against golden-sample fixtures. Re-planned 2026-07-02: parity target is now
+   `SummaryPromptVariations.ipynb` (the actual daily driver, which already runs on
+   `minutia.steps.*`); includes low-surface eval seams (`SummaryClient` protocol,
+   run-metadata sidecar). Currently mid-Phase 2 (registry + notebook re-point done
+   2026-07-02; next: move the report helpers into `steps/`, verify merger vs golden
+   fixtures); `baseline_pipeline.py` is still active and tested, not deletable until Phase 6.
 2. **`[draft]`** [`refactor_for_opensource_portfolio`](./features/%5Bdraft%5Drefactor_for_opensource_portfolio.md) —
    broader post-refactor vision: filestore for videos, SQL-backed job/transcript tracking,
    background-process CLI, local-LLM summarization support, and an evals harness for comparing
