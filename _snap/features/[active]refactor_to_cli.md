@@ -47,7 +47,7 @@ see [`[draft]refactor_for_opensource_portfolio.md`](./%5Bdraft%5Drefactor_for_op
       (`ui_jupyter.py`, `claude_audio_widget.py`, `gpt_audio_widget.py`)
 - [x] Reorganize tests into `tests/{unit,integration,slow,fixtures,mocks,scripts}/`
 
-### Phase 2: Logic Unification — IN PROGRESS
+### Phase 2: Logic Unification — DONE (2026-07-02)
 - [x] Port `generate_long_summary` (token-continuation loop) into
       `src/minutia/steps/summarize_transcript.py`
 - [x] Consolidate `prompts.py` as the single prompt registry: add the three builders that
@@ -61,10 +61,15 @@ see [`[draft]refactor_for_opensource_portfolio.md`](./%5Bdraft%5Drefactor_for_op
       *(2026-07-02: done; 6 builder cells deleted, dispatcher + filename prompt now imported;
       `extract_transcript_text`/`get_filename_from_content`/`create_markdown_report` stay
       notebook-local until the next task moves them into `steps/`)*
-- [ ] Move `get_filename_from_content` + `create_markdown_report` from
+- [x] Move `get_filename_from_content` + `create_markdown_report` from
       `baseline_pipeline.py` into `steps/summarize_transcript.py` (move, not rewrite; the
       notebook's third copy dies when the CLI replaces it)
-- [ ] Verify merger step (`transcript_merger.py`) against `03_merged/` golden fixtures
+      *(2026-07-02: done; baseline re-exports from the step; notebook imports from the step
+      too — its local copies removed early; stale default model fixed to claude-sonnet-4-6;
+      4 unit tests in `tests/unit/steps/test_summarize_transcript.py`)*
+- [x] Verify merger step (`transcript_merger.py`) against `03_merged/` golden fixtures
+      *(2026-07-02: verified — all 4 scenarios reproduce their goldens exactly; frozen as
+      `test_merger_reproduces_golden_fixture` in `tests/integration/test_transcript_merger.py`)*
 
 ### Phase 3: CLI Foundations (typer + paths/config defaults) — NOT STARTED
 - [ ] Port the five existing commands from Click to **typer** 1:1 — no behavior change

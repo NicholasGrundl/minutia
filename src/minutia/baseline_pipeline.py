@@ -39,75 +39,20 @@ from .run_metadata import build_run_metadata, write_run_metadata
 
 def get_isodatetime() -> str:
     """Return the current UTC time encoded as an ISO 8601 datetime string."""
-    current = datetime.datetime.now(tz=datetime.timezone.utc)
+    current = datetime.datetime.now(tz=datetime.UTC)
     return isodate.datetime_isoformat(current)
 
 
 def get_isodate() -> str:
     """Return the current UTC date encoded as an ISO 8601 date string."""
-    current = datetime.datetime.now(tz=datetime.timezone.utc)
+    current = datetime.datetime.now(tz=datetime.UTC)
     return isodate.date_isoformat(current)
 
 
-def get_filename_prompt(content: str) -> str:
-    """Construct the Anthropic prompt used to derive markdown filenames."""
-    current_date = get_isodate()
-    return f"""Please read the <content> completely and provide a filename that can be used to write the file to disk as a markdown. The filename should be concise but also descriptive so its clear what the content contains.
-
-<filenamerules>
-- only use lowercase letters, numbers, and underscores or dashes
-- prefer underscores where possible as they are operating system independent
-- make the filename convenient for all operating systems (windows, macOS, linux)
-- include the current date in the filename as YYYMMDD (e.g. July 4th , 2024 would be 20240704)
-- include a concise but descriptive name related to the <content>
-- keep the filename as short as possible while containing a useful name and date
-- DONOT include the suffix of the filename and make sure their are no period characters in the filename
-- the current date is {current_date}
-</filenamerules>
-
-<content>
-{content}
-</content>
-
-remember ONLY return the filename as a string and follow the <filenamerules>
-"""
-
-
-def get_filename_from_content(
-    content: str, model_name: str = "claude-3-5-sonnet", api_key: str | None = None
-) -> str:
-    """Use Anthropic to generate a descriptive filename for markdown exports."""
-    anthropic_models = summarize_transcript.anthropic_models
-    if model_name not in anthropic_models:
-        raise KeyError(f"model must be one of [{list(anthropic_models.keys())}]")
-    model = anthropic_models[model_name]["name"]
-    client = summarize_transcript.Anthropic(api_key=api_key)
-    prompt = get_filename_prompt(content)
-    response = client.messages.create(
-        model=model,
-        max_tokens=100,
-        temperature=0.7,
-        messages=[{"role": "user", "content": prompt}],
-    )
-    return response.content[0].text
-
-
-def create_markdown_report(
-    content: str,
-    output_path: Path,
-    model_name: str = "claude-3-5-sonnet",
-    api_key: str | None = None,
-) -> Path:
-    """
-    Persist a markdown report alongside the summary using an Anthropic generated name.
-    """
-    filename = get_filename_from_content(
-        content, model_name=model_name, api_key=api_key
-    )
-    filepath = output_path / f"{filename}.md"
-    logger.info("Writing markdown report to {}", filepath)
-    filepath.write_text(content, encoding="utf-8")
-    return filepath
+# Report helpers moved to steps/summarize_transcript.py (refactor_to_cli Phase 2);
+# re-exported here because this module is still the documented entry point.
+create_markdown_report = summarize_transcript.create_markdown_report
+get_filename_from_content = summarize_transcript.get_filename_from_content
 
 
 def format_personal_notes(notes: Iterable[Mapping[str, Any]]) -> str:
@@ -251,7 +196,9 @@ def read_personal_notes(path: Path | None) -> list[MutableMapping[str, Any]]:
 
 def read_personal_info(info: str | None, path: Path | None) -> str:
     if info and path:
-        raise ValueError("Specify personal info via --personal-info or --personal-info-file, not both.")
+        raise ValueError(
+            "Specify personal info via --personal-info or --personal-info-file, not both."
+        )
     if path:
         return path.read_text(encoding="utf-8")
     return info or ""
@@ -390,7 +337,7 @@ def run_pipeline(args: argparse.Namespace) -> PipelineArtifacts:
     setup_logging(level=app_config.log_level, logs_file=run_paths.logs_file)
     run_paths.ensure_directories()
 
-    started_at = datetime.datetime.now(datetime.timezone.utc)
+    started_at = datetime.datetime.now(datetime.UTC)
     status = "failed"
     error: Exception | None = None
     merged_metadata: Mapping[str, Any] | None = None
@@ -402,9 +349,13 @@ def run_pipeline(args: argparse.Namespace) -> PipelineArtifacts:
         ):
             logger.info("Writing run artifacts to {}", run_paths.run_root)
 
-            mic_track = args.mic_track if args.mic_track is not None else app_config.mic_track
+            mic_track = (
+                args.mic_track if args.mic_track is not None else app_config.mic_track
+            )
             desktop_track = (
-                args.desktop_track if args.desktop_track is not None else app_config.desktop_track
+                args.desktop_track
+                if args.desktop_track is not None
+                else app_config.desktop_track
             )
             whisper_model = args.whisper_model or app_config.whisper_model
             summary_model = args.summary_model or app_config.summary_model
@@ -427,7 +378,9 @@ def run_pipeline(args: argparse.Namespace) -> PipelineArtifacts:
             merged_metadata = transcript_data.get("metadata")
 
             personal_notes = read_personal_notes(args.personal_notes)
-            personal_info = read_personal_info(args.personal_info, args.personal_info_file)
+            personal_info = read_personal_info(
+                args.personal_info, args.personal_info_file
+            )
             markdown_notes = read_markdown_notes(args.markdown_notes)
 
             if personal_notes or personal_info or markdown_notes:
@@ -439,8 +392,8 @@ def run_pipeline(args: argparse.Namespace) -> PipelineArtifacts:
                 transcript_text_for_summary = extract_transcript_text(transcript_data)
             else:
                 system_prompt = None
-                transcript_text_for_summary = summarize_transcript.prepare_transcript_for_summary(
-                    transcript_data
+                transcript_text_for_summary = (
+                    summarize_transcript.prepare_transcript_for_summary(transcript_data)
                 )
 
             estimate_summary_cost(transcript_text_for_summary, summary_model)
@@ -494,7 +447,7 @@ def run_pipeline(args: argparse.Namespace) -> PipelineArtifacts:
         error = exc
         raise
     finally:
-        completed_at = datetime.datetime.now(datetime.timezone.utc)
+        completed_at = datetime.datetime.now(datetime.UTC)
         outputs.setdefault("logs", str(run_paths.logs_file))
         run_metadata_payload = build_run_metadata(
             run_root=run_paths.run_root,

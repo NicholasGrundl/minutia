@@ -1,10 +1,12 @@
 import json
+from pathlib import Path
 
 import tiktoken
 from anthropic import Anthropic
 
 from ..config import resolve_anthropic_api_key
 from ..logging import logger
+from ..prompts import get_filename_prompt
 
 MAX_TOKENS_OUTPUT = (
     8192  # Max model output. Around 3.1K words (6-7 single spaced pages)
@@ -36,7 +38,6 @@ anthropic_models = {
         "price_per_1k_input_tokens": 0.001,
         "price_per_1k_output_tokens": 0.005,
     },
-
     # ---- Legacy (still callable, kept for backward compatibility) ----
     "claude-sonnet-4-5": {
         "name": "claude-sonnet-4-5-20250929",
@@ -267,6 +268,49 @@ def generate_summary(
     except Exception as e:
         logger.exception("Error generating summary: {}", e)
         raise
+
+
+def get_filename_from_content(
+    content, model_name="claude-sonnet-4-6", api_key=None
+) -> str:
+    """Use Anthropic to generate a descriptive filename for markdown exports."""
+    if model_name not in anthropic_models:
+        raise KeyError(f"model must be one of [{list(anthropic_models.keys())}]")
+    model = anthropic_models[model_name]["name"]
+
+    api_key = api_key or resolve_anthropic_api_key()
+    if not api_key:
+        raise RuntimeError("Anthropic API key not configured")
+    client = Anthropic(api_key=api_key)
+
+    prompt = get_filename_prompt(content)
+    try:
+        response = client.messages.create(
+            model=model,
+            max_tokens=100,
+            temperature=0.7,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return response.content[0].text
+    except Exception as e:
+        logger.exception("Error generating filename: {}", e)
+        raise
+
+
+def create_markdown_report(
+    content,
+    output_path,
+    model_name="claude-sonnet-4-6",
+    api_key=None,
+) -> Path:
+    """Persist a markdown report using an Anthropic-generated filename."""
+    filename = get_filename_from_content(
+        content, model_name=model_name, api_key=api_key
+    )
+    filepath = Path(output_path) / f"{filename}.md"
+    logger.info("Writing markdown report to {}", filepath)
+    filepath.write_text(content, encoding="utf-8")
+    return filepath
 
 
 def save_summary(summary, output_file):
