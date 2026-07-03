@@ -12,23 +12,19 @@ from __future__ import annotations
 import time
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any
 
 from ..logging import configure_logging, logger, logging_context
+from ..model_registry import DEFAULT_SUMMARY_MODEL, anthropic_models
 from ..paths import CleanupPolicy, RunPaths
 from ..run_metadata import build_run_metadata, write_run_metadata
 
-# Anthropic model choices sourced from Claude model overview:
-# https://docs.claude.com/en/docs/about-claude/models/overview
-SUMMARY_MODEL_CHOICES: Sequence[str] = (
-    "claude-4-5-sonnet",
-    "claude-3-5-sonnet",
-    "claude-3-haiku",
-)
+# Single source of truth for valid summarization models: the shared registry.
+SUMMARY_MODEL_CHOICES: Sequence[str] = tuple(anthropic_models)
 
 
 class StepStatus(Enum):
@@ -153,7 +149,7 @@ class PipelineConfig:
         'base', 'small', 'medium', 'large').
     skip_summary : bool, default=False
         If True, the final summarization step will be skipped.
-    summary_model : str, default='claude-4-5-sonnet'
+    summary_model : str, default='claude-sonnet-4-6'
         The Anthropic model identifier to use for summarization.
     mic_track : int, default=3
         The audio track number for the microphone in the source video.
@@ -174,7 +170,7 @@ class PipelineConfig:
     run_id: str
     whisper_model: str = "base"
     skip_summary: bool = False
-    summary_model: str = "claude-4-5-sonnet"
+    summary_model: str = DEFAULT_SUMMARY_MODEL
     mic_track: int = 3
     desktop_track: int = 2
     base_output_dir: Path = Path("./runs")
@@ -281,7 +277,9 @@ class PipelineOrchestrator:
         dependencies during module import (e.g., Whisper, ffmpeg).
         """
 
-        def extract_audio(config: PipelineConfig, _: Mapping[str, Any]) -> dict[str, Any]:
+        def extract_audio(
+            config: PipelineConfig, _: Mapping[str, Any]
+        ) -> dict[str, Any]:
             from ..steps import video_extraction
 
             config.run_paths.ensure_directories()
@@ -297,11 +295,17 @@ class PipelineOrchestrator:
                 "extract_audio": {key: Path(value) for key, value in outputs.items()},
             }
 
-        def transcribe(config: PipelineConfig, artifacts: Mapping[str, Any]) -> dict[str, Any]:
+        def transcribe(
+            config: PipelineConfig, artifacts: Mapping[str, Any]
+        ) -> dict[str, Any]:
             from ..steps import audio_transcription
 
-            mic_audio = artifacts.get("microphone_audio") or config.run_paths.microphone_audio
-            desk_audio = artifacts.get("desktop_audio") or config.run_paths.desktop_audio
+            mic_audio = (
+                artifacts.get("microphone_audio") or config.run_paths.microphone_audio
+            )
+            desk_audio = (
+                artifacts.get("desktop_audio") or config.run_paths.desktop_audio
+            )
             outputs = audio_transcription.process_audio_files(
                 str(mic_audio),
                 str(desk_audio),
@@ -314,7 +318,9 @@ class PipelineOrchestrator:
                 "transcribe": {key: Path(value) for key, value in outputs.items()},
             }
 
-        def merge(config: PipelineConfig, artifacts: Mapping[str, Any]) -> dict[str, Any]:
+        def merge(
+            config: PipelineConfig, artifacts: Mapping[str, Any]
+        ) -> dict[str, Any]:
             from ..steps import transcript_merger
 
             microphone = artifacts.get("microphone_transcript")
@@ -331,18 +337,26 @@ class PipelineOrchestrator:
                 "merged_transcript_metadata": merged_data.get("metadata"),
             }
 
-        def summarize(config: PipelineConfig, artifacts: Mapping[str, Any]) -> dict[str, Any]:
+        def summarize(
+            config: PipelineConfig, artifacts: Mapping[str, Any]
+        ) -> dict[str, Any]:
             from ..steps import summarize_transcript
 
-            merged_path = artifacts.get("merged_transcript") or config.run_paths.merged_transcript
+            merged_path = (
+                artifacts.get("merged_transcript") or config.run_paths.merged_transcript
+            )
             transcript_data = summarize_transcript.load_transcript(str(merged_path))
-            transcript_text = summarize_transcript.prepare_transcript_for_summary(transcript_data)
+            transcript_text = summarize_transcript.prepare_transcript_for_summary(
+                transcript_data
+            )
             summary_text = summarize_transcript.generate_summary(
                 transcript_text,
                 model_name=config.summary_model,
                 api_key=config.anthropic_api_key,
             )
-            summarize_transcript.save_summary(summary_text, str(config.run_paths.summary_file))
+            summarize_transcript.save_summary(
+                summary_text, str(config.run_paths.summary_file)
+            )
             return {
                 "summary": config.run_paths.summary_file,
                 "summary_text": summary_text,
@@ -375,11 +389,23 @@ class PipelineOrchestrator:
     @property
     def steps(self) -> list[PipelineStepDefinition]:
         """Return the active step sequence."""
-        return list(self._custom_steps if self._custom_steps is not None else self._build_default_steps())
+        return list(
+            self._custom_steps
+            if self._custom_steps is not None
+            else self._build_default_steps()
+        )
 
-    def _report_progress(self, step_name: str, status: StepStatus, message: str = "", error: Exception | None = None) -> None:
+    def _report_progress(
+        self,
+        step_name: str,
+        status: StepStatus,
+        message: str = "",
+        error: Exception | None = None,
+    ) -> None:
         """Emit a progress update to the registered callback."""
-        progress = StepProgress(step_name=step_name, status=status, message=message, error=error)
+        progress = StepProgress(
+            step_name=step_name, status=status, message=message, error=error
+        )
         self._progress_callback(progress)
 
     def execute(self, config: PipelineConfig) -> PipelineResult:
@@ -395,7 +421,7 @@ class PipelineOrchestrator:
         artifacts: dict[str, Any] = {}
         completed_steps: list[str] = []
         start_time = time.perf_counter()
-        started_at = datetime.now(timezone.utc)
+        started_at = datetime.now(UTC)
         self.state = PipelineExecutionState()
         self.state.success = None
 
@@ -407,12 +433,16 @@ class PipelineOrchestrator:
                 if not step.is_enabled(config):
                     with logging_context(step=step.name):
                         logger.info("Skipping disabled step")
-                        self._report_progress(step.name, StepStatus.COMPLETED, "Skipped")
+                        self._report_progress(
+                            step.name, StepStatus.COMPLETED, "Skipped"
+                        )
                     continue
 
                 self.state.current_step = step.name
                 with logging_context(step=step.name):
-                    self._report_progress(step.name, StepStatus.RUNNING, step.description)
+                    self._report_progress(
+                        step.name, StepStatus.RUNNING, step.description
+                    )
                     logger.info("Running step")
 
                     try:
@@ -422,7 +452,9 @@ class PipelineOrchestrator:
                         completed_steps.append(step.name)
                         self.state.completed_steps = list(completed_steps)
                         self.state.artifacts = dict(artifacts)
-                        self._report_progress(step.name, StepStatus.COMPLETED, "Completed")
+                        self._report_progress(
+                            step.name, StepStatus.COMPLETED, "Completed"
+                        )
                         logger.info("Step completed")
                     except Exception as exc:  # noqa: BLE001 - propagate structured failure state
                         self.state.failed_step = step.name
@@ -433,7 +465,7 @@ class PipelineOrchestrator:
                         )
                         logger.exception("Step failed with error: {}", exc)
                         outputs = _prepare_outputs(config, artifacts)
-                        completed_at = datetime.now(timezone.utc)
+                        completed_at = datetime.now(UTC)
                         run_metadata = build_run_metadata(
                             run_root=config.run_paths.run_root,
                             input_path=config.input_path,
@@ -445,12 +477,15 @@ class PipelineOrchestrator:
                             error=exc,
                         )
                         write_run_metadata(config.run_paths.metadata_file, run_metadata)
-                        
+
                         # Apply cleanup policy on error
                         if config.cleanup_policy == CleanupPolicy.CLEANUP_ON_ERROR:
-                            logger.info("Applying cleanup policy: {}", config.cleanup_policy.value)
+                            logger.info(
+                                "Applying cleanup policy: {}",
+                                config.cleanup_policy.value,
+                            )
                             config.run_paths.cleanup(config.cleanup_policy)
-                        
+
                         return PipelineResult(
                             success=False,
                             run_paths=config.run_paths,
@@ -465,7 +500,7 @@ class PipelineOrchestrator:
         self.state.current_step = None
         self.state.success = True
         outputs = _prepare_outputs(config, artifacts)
-        completed_at = datetime.now(timezone.utc)
+        completed_at = datetime.now(UTC)
         run_metadata = build_run_metadata(
             run_root=config.run_paths.run_root,
             input_path=config.input_path,
@@ -491,7 +526,9 @@ class PipelineOrchestrator:
         )
 
 
-def _prepare_outputs(config: PipelineConfig, artifacts: Mapping[str, Any]) -> dict[str, Any]:
+def _prepare_outputs(
+    config: PipelineConfig, artifacts: Mapping[str, Any]
+) -> dict[str, Any]:
     """Construct a serialisable view of pipeline outputs for run metadata."""
 
     def _serialise(value: Any) -> str | None:

@@ -49,7 +49,7 @@ def test_baseline_pipeline_smoke(tmp_path, mocker, mock_ffmpeg, mock_whisper, mo
             "--summary-filename",
             "summary.txt",
             "--summary-model",
-            "claude-3-5-sonnet",
+            "claude-sonnet-4-6",
             "--generate-markdown",
             "--personal-notes",
             str(personal_notes_file),

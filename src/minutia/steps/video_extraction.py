@@ -27,7 +27,9 @@ def extract_audio_track(input_file: Path, output_file: Path, track_index: int) -
     ffmpeg.run(output, capture_stdout=False, capture_stderr=True)
 
 
-def extract_all_audio_tracks(input_file: Path, output_directory: Path) -> Iterable[Path]:
+def extract_all_audio_tracks(
+    input_file: Path, output_directory: Path
+) -> Iterable[Path]:
     """Extract every audio stream to numbered WAV files."""
     output_directory.mkdir(parents=True, exist_ok=True)
     audio_streams = get_video_info(input_file)["audio_streams"]
@@ -71,7 +73,9 @@ def identify_audio_tracks(
     return {"microphone": microphone, "desktop": desktop}
 
 
-def copy_and_rename_audio_files(identified_tracks: dict[str, Path], output_directory: Path) -> dict[str, Path]:
+def copy_and_rename_audio_files(
+    identified_tracks: dict[str, Path], output_directory: Path
+) -> dict[str, Path]:
     """Copy identified audio files with stable filenames for downstream steps."""
     output_directory.mkdir(parents=True, exist_ok=True)
     renamed_tracks = {}

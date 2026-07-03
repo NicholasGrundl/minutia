@@ -8,9 +8,7 @@ from ..logging import logger
 
 SCHEMA_VERSION = "1.0"
 
-LEGACY_SEGMENT_PATTERN = re.compile(
-    r"\[(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\]\s*(.+)"
-)
+LEGACY_SEGMENT_PATTERN = re.compile(r"\[(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\]\s*(.+)")
 
 
 def _normalise_segment(segment: Mapping[str, Any]) -> dict[str, Any]:
@@ -86,7 +84,9 @@ def parse_transcript(file_path: str | Path) -> dict[str, Any]:
         logger.warning("Detected legacy transcript format at {}", path)
         return _parse_legacy_transcript(path)
 
-    raw_segments: Iterable[Mapping[str, Any]] = data.get("segments") or data.get("transcript") or []
+    raw_segments: Iterable[Mapping[str, Any]] = (
+        data.get("segments") or data.get("transcript") or []
+    )
     segments: list[dict[str, Any]] = []
     for raw_segment in raw_segments:
         try:
@@ -94,7 +94,11 @@ def parse_transcript(file_path: str | Path) -> dict[str, Any]:
         except ValueError as exc:
             logger.warning("Skipping malformed segment in {}: {}", path, exc)
 
-    metadata = {key: value for key, value in (data.get("metadata") or {}).items() if value is not None}
+    metadata = {
+        key: value
+        for key, value in (data.get("metadata") or {}).items()
+        if value is not None
+    }
     metadata.setdefault("format", "json")
     metadata.setdefault("source_file", str(path))
     metadata.setdefault("segment_count", len(segments))
@@ -104,7 +108,9 @@ def parse_transcript(file_path: str | Path) -> dict[str, Any]:
     return {"metadata": metadata, "segments": segments}
 
 
-def _attach_source(segments: Iterable[Mapping[str, Any]], source: str) -> list[dict[str, Any]]:
+def _attach_source(
+    segments: Iterable[Mapping[str, Any]], source: str
+) -> list[dict[str, Any]]:
     """Copy segments and label them with the originating source."""
     labelled = []
     for segment in segments:
@@ -136,7 +142,10 @@ def merge_transcripts(
         merged_segments: list[dict[str, Any]] = []
         for segment in combined_segments:
             current = dict(segment)
-            if not merged_segments or current["start_time"] >= merged_segments[-1]["end_time"]:
+            if (
+                not merged_segments
+                or current["start_time"] >= merged_segments[-1]["end_time"]
+            ):
                 merged_segments.append(current)
                 continue
 
@@ -187,17 +196,22 @@ def merge_transcripts(
             "desktop": desktop_transcript.get("metadata", {}).get("source_file"),
         }
     metadata["source_files"] = {
-        key: str(Path(value)) if value is not None else None for key, value in dict(source_files).items()
+        key: str(Path(value)) if value is not None else None
+        for key, value in dict(source_files).items()
     }
     metadata["source_files"] = {
-        key: value for key, value in metadata["source_files"].items() if value is not None
+        key: value
+        for key, value in metadata["source_files"].items()
+        if value is not None
     }
 
     logger.info("Merged transcript contains {} segments", len(merged_segments))
     return {"metadata": metadata, "transcript": merged_segments}
 
 
-def save_merged_transcript(merged_data: Mapping[str, Any], output_file: str | Path) -> None:
+def save_merged_transcript(
+    merged_data: Mapping[str, Any], output_file: str | Path
+) -> None:
     logger.info("Saving merged transcript to {}", output_file)
     with Path(output_file).open("w", encoding="utf-8") as handle:
         json.dump(merged_data, handle, indent=2, ensure_ascii=False)

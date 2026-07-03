@@ -1,5 +1,7 @@
-import pytest
 from unittest.mock import MagicMock
+
+import pytest
+
 
 class LLMMock:
     """Simulates Anthropic Claude API behavior for testing."""
@@ -32,7 +34,6 @@ class LLMMock:
         mock_response.id = "msg_mock_123"
         return mock_response
 
-from tests.mocks.chaos_config import chaos_config
 
 @pytest.fixture
 def mock_llm(mocker, chaos_config):
@@ -48,7 +49,9 @@ def mock_llm(mocker, chaos_config):
     mock_app_config.mic_track = 3
     mock_app_config.desktop_track = 2
     mock_app_config.whisper_model = "base"
-    mock_app_config.summary_model = "claude-3-5-sonnet"
+    mock_app_config.summary_model = "claude-sonnet-4-6"
+    mock_app_config.recordings_dir = None
+    mock_app_config.personal_info_path = None
 
     mocker.patch("minutia.config.load_config", return_value=mock_app_config)
     mocker.patch("minutia.baseline_pipeline.load_config", return_value=mock_app_config)

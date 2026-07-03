@@ -41,8 +41,10 @@ cached per-topic under `_snap/context/`.
 
 ### Core Dependencies
 
-- **click** - CLI framework with advanced context/group features
-  - 📚 Docs: https://click.palletsprojects.com/en/stable/api/
+- **typer** - CLI framework (built on click; type-hint-driven commands)
+  - 📚 Docs: https://typer.tiangolo.com/
+  - Note: `click` remains available as typer's dependency (used for
+    `ClickException` and `click.testing.CliRunner`)
 - **pydantic** - Data validation and models
   - 📚 Docs: https://ai.pydantic.dev/llms.txt
 - **pydantic-settings** - Configuration management (env vars, .env files, CLI args)
@@ -122,20 +124,30 @@ target is broken until it's either restored or repointed at the `_snap` git work
 ### CLI Commands
 
 ```bash
-# Extract audio from MKV
-minutia extract-audio INPUT.mkv OUTPUT_DIR [--mic-track 3] [--desktop-track 2]
+# Guided interactive run: pick a recording, choose a prompt kind, confirm cost
+minutia go              # browses MINUTIA_RECORDINGS_DIR
+minutia go .            # browse .mkv files in a specific directory instead
 
-# Transcribe audio files
-minutia transcribe MIC_AUDIO.wav DESKTOP_AUDIO.wav OUTPUT_DIR
+# Show resolved configuration and where each value came from
+minutia config
+
+# Extract audio from MKV (INPUT optional when MINUTIA_RECORDINGS_DIR is set —
+# picks the newest recording; skips if outputs exist, --force to redo)
+minutia extract-audio [INPUT.mkv] [OUTPUT_DIR] [--mic-track 3] [--desktop-track 2] [--force]
+
+# Transcribe audio files (skips if outputs exist)
+minutia transcribe MIC_AUDIO.wav DESKTOP_AUDIO.wav [OUTPUT_DIR] [--whisper-model medium.en] [--gpu/--no-gpu] [--force]
 
 # Merge transcripts
-minutia merge-transcripts MIC_TRANSCRIPT.txt DESKTOP_TRANSCRIPT.txt OUTPUT.json
+minutia merge-transcripts MIC_TRANSCRIPT.json DESKTOP_TRANSCRIPT.json OUTPUT.json
 
-# Generate summary
-minutia summarize MERGED_TRANSCRIPT.json OUTPUT.txt [--model claude-3-5-sonnet] [--dry-run]
+# Generate an AI-named markdown meeting report (cost estimate + confirm first)
+minutia summarize MERGED_TRANSCRIPT.json [OUTPUT_DIR] \
+    [--prompt-kind minutia|baseline|realtor|slide-review|interview-debrief|discovery-summary] \
+    [--notes NOTES.md] [--personal-info ME.md] [--model claude-sonnet-4-6] [--dry-run] [--yes]
 
-# Complete pipeline (all steps)
-minutia process-all INPUT.mkv OUTPUT_DIR [--mic-track 3] [--desktop-track 2] [--model claude-3-5-sonnet]
+# Complete pipeline via the orchestrator (INPUT optional as above)
+minutia process-all [INPUT.mkv] [OUTPUT_DIR] [--mic-track 3] [--desktop-track 2] [--model claude-sonnet-4-6]
 ```
 
 **Default track numbers**: OBS recordings typically use track 3 for microphone and track 2 for
@@ -147,7 +159,7 @@ desktop audio (1-indexed).
 
 ```
 src/minutia/
-├── cli.py                      # Click-based CLI entry point
+├── cli.py                      # Typer-based CLI entry point
 ├── config.py                   # Configuration loading
 ├── logging.py                  # Loguru setup
 ├── paths.py                    # RunPaths — path/output management
@@ -216,22 +228,29 @@ for the current schema).
 
 Required for full pipeline:
 ```bash
-ANTHROPIC_API_KEY=sk-ant-...     # Required for summarization
+ANTHROPIC_API_KEY=sk-ant-...      # Required for summarization
 ```
 
-Optional (for future features):
+Optional (all `MINUTIA_`-prefixed):
 ```bash
-OPENAI_API_KEY=sk-...            # Not currently used in CLI
+MINUTIA_RECORDINGS_DIR=~/Videos   # Where OBS drops MKVs; enables bare `minutia process-all`
+                                  # (picks the newest .mkv and says so)
+MINUTIA_OUTPUT_DIR=...            # Artifact home; defaults to ~/Documents/minutia (platformdirs)
+MINUTIA_WHISPER_MODEL=medium.en   # Whisper model (default: base)
+MINUTIA_SUMMARY_MODEL=...         # Summarization model
+MINUTIA_PERSONAL_INFO=...         # Path to a personal-info file for prompts (Phase 4)
+MINUTIA_LOG_LEVEL=INFO
 ```
 
-### Configuration Precedence (Future)
+### Configuration Precedence
 
 ```
-CLI flags > Environment variables > Config file > Hard-coded defaults
+CLI flags > Environment variables > ./.env, ./.minutia > user config > platformdirs defaults
 ```
 
-Config file locations (searched in order): `.minutia` (project-specific), `.env` (standard env
-file), `~/.minutia` (user global).
+The user-global config is an env-format file at `platformdirs.user_config_path("minutia")/config.env`
+(e.g. `~/.config/minutia/config.env` on Linux). Run **`minutia config`** to print every resolved
+value and which layer supplied it.
 
 **Never commit `.env` or real API keys.** `.gitignore` already excludes `.env*`.
 

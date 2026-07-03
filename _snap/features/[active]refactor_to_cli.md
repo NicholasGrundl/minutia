@@ -71,45 +71,58 @@ see [`[draft]refactor_for_opensource_portfolio.md`](./%5Bdraft%5Drefactor_for_op
       *(2026-07-02: verified — all 4 scenarios reproduce their goldens exactly; frozen as
       `test_merger_reproduces_golden_fixture` in `tests/integration/test_transcript_merger.py`)*
 
-### Phase 3: CLI Foundations (typer + paths/config defaults) — NOT STARTED
-- [ ] Port the five existing commands from Click to **typer** 1:1 — no behavior change
+### Phase 3: CLI Foundations (typer + paths/config defaults) — DONE (2026-07-02)
+- [x] Port the five existing commands from Click to **typer** 1:1 — no behavior change
       (typed params, enum choices, `typer.Context` for the shared config object); swap
       `click` → `typer` in `pyproject.toml`; existing CLI tests keep passing
-- [ ] Add **platformdirs** dependency; `config.py` gains:
+      *(2026-07-02: done; `main = typer.main.get_command(app)` keeps entry point + click
+      CliRunner working unchanged; `--model` Enum now derived from `SUMMARY_MODEL_CHOICES`)*
+- [x] Add **platformdirs** dependency; `config.py` gains:
       `recordings_dir` (`MINUTIA_RECORDINGS_DIR`; where OBS drops MKVs, no default),
       `base_output_dir` default changes `./runs` → `platformdirs.user_documents_path()/
       "minutia"`, and a `personal_info_path` default
-- [ ] User-global config file at `platformdirs.user_config_path("minutia")/config.env`,
+      *(2026-07-02: done; layered resolution with per-key source tracking)*
+- [x] User-global config file at `platformdirs.user_config_path("minutia")/config.env`,
       loaded *after* CWD `.env`/`.minutia` (which keep winning for project-local dev);
       full precedence: CLI flag > env var > CWD `.env` > user config > platformdirs default
-- [ ] Input-resolution helper (`paths.py` or `cli.py`): explicit MKV path wins; else the
+      *(2026-07-02: done)*
+- [x] Input-resolution helper (`paths.py` or `cli.py`): explicit MKV path wins; else the
       **newest `.mkv` in `recordings_dir`** (always echo which file was picked); actionable
       error if `recordings_dir` is unset or empty (TDD — unit tests over the precedence
       chain with tmp dirs)
-- [ ] `minutia config` command: print resolved config values and their sources (which file/
+      *(2026-07-02: done — `paths.resolve_input_video`; `input_video` now optional on
+      `extract-audio` + `process-all`)*
+- [x] `minutia config` command: print resolved config values and their sources (which file/
       env/default each came from) — cheap, and de-mystifies the precedence chain
+      *(2026-07-02: done; also prints the user-config path + precedence line)*
 
-### Phase 4: CLI Parity with `SummaryPromptVariations.ipynb` — NOT STARTED
-- [ ] `summarize` command upgrade (`cli.py`): `--prompt-kind` (choices from
+### Phase 4: CLI Parity with `SummaryPromptVariations.ipynb` — code DONE (2026-07-02), milestone pending
+- [x] `summarize` command upgrade (`cli.py`): `--prompt-kind` (choices from
       `list_prompt_kinds()`), `--notes FILE`, `--personal-info FILE` (both optional, both
       defaultable from config), route through `generate_long_summary(system_prompt=...)`,
-      write markdown report via `create_markdown_report` (Tracer-Bullet, then unit tests
-      with mocked Anthropic)
-- [ ] Cost preview + confirm: always print token/price estimate before the API call;
-      `--yes` to skip the confirmation; keep `--dry-run` as estimate-only
-- [ ] `transcribe` command: `--whisper-model` (default from config; notebook uses
-      `medium.en`) and `--gpu/--no-gpu` passthrough
-- [ ] Idempotent re-runs: `extract-audio` and `transcribe` skip work when outputs already
-      exist (`--force` to override) — mirrors the notebook's skip-if-exists guard and gives
-      cheap resume (integration test: second invocation is a no-op)
-- [ ] Fix the `--model` choice lists in `cli.py` (currently stale, e.g. `claude-3-5-sonnet`;
-      derive from `summarize_transcript.anthropic_models` instead of hardcoding)
-- [ ] Light interactive mode (`minutia go` or `--interactive` on `process-all`): rich/typer
-      prompts — pick MKV from a newest-first list out of `recordings_dir`, choose prompt
-      kind, confirm cost, then run the normal pipeline path (a *full* guided TUI is
-      deferred — see BACKLOG "Guided TUI mode")
+      write markdown report via `create_markdown_report`
+      *(2026-07-02: done; output arg is now a directory — the report filename is
+      AI-generated; `extract_transcript_text` moved into the step for timestamped parity)*
+- [x] Cost preview + confirm: always print token/price estimate before the API call;
+      `--yes` to skip the confirmation; keep `--dry-run` as estimate-only *(2026-07-02)*
+- [x] `transcribe` command: `--whisper-model` (default from config; notebook uses
+      `medium.en`) and `--gpu/--no-gpu` passthrough *(2026-07-02)*
+- [x] Idempotent re-runs: `extract-audio` and `transcribe` skip work when outputs already
+      exist (`--force` to override) *(2026-07-02: unit tests assert the underlying step is
+      not called on second invocation)*
+- [x] Fix the `--model` choice lists in `cli.py` *(2026-07-02: `anthropic_models` moved to
+      new cycle-free `model_registry.py`; `SUMMARY_MODEL_CHOICES = tuple(anthropic_models)`;
+      config default is now `claude-sonnet-4-6` — this also fixed the previously-broken
+      default summarize path AND the long-failing `test_baseline_pipeline_smoke`)*
+- [x] Light interactive mode: **`minutia go [PATH]`** — newest-first MKV pick (from an
+      optional directory argument, e.g. `minutia go .`, else the configured recordings
+      dir), prompt-kind choice, optional notes file, cost confirm, then
+      extract→transcribe→merge→summarize with skip-if-exists; artifacts land in
+      `base_output_dir/<recording-stem>/`
+      *(2026-07-02; full guided TUI remains deferred — see BACKLOG)*
 - [ ] **Milestone check**: run one real meeting end-to-end with only CLI commands; retire
-      the notebook for daily use
+      the notebook for daily use *(user's next real meeting — everything short of a live
+      Whisper+API run is verified)*
 
 ### Phase 5: Eval Seams — NOT STARTED
 - [ ] `clients/summary_client.py`: `SummaryClient` protocol —

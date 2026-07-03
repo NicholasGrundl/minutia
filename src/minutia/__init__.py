@@ -2,8 +2,8 @@
 
 __version__ = "0.1.0"
 
+from . import clients, config, logging, paths, pipeline, run_metadata, steps
 from .cli import main
-from . import steps, pipeline, clients, config, logging, paths, run_metadata
 from .steps import (
     audio_transcription,
     summarize_transcript,

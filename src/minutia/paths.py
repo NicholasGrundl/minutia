@@ -73,10 +73,52 @@ def _slugify(value: str) -> str:
 
 def _current_iso_date() -> str:
     """Return current date in ISO format (YYYY-MM-DD) in UTC."""
-    return datetime.datetime.now(tz=datetime.timezone.utc).date().isoformat()
+    return datetime.datetime.now(tz=datetime.UTC).date().isoformat()
 
 
-def resolve_run_directory(base_name: str, base_dir: Path, max_attempts: int = 100) -> Path:
+def resolve_input_video(
+    explicit_path: Path | None, recordings_dir: Path | None
+) -> Path:
+    """
+    Resolve the input MKV: an explicit path always wins; otherwise pick the
+    newest ``.mkv`` (by mtime) in the configured recordings directory.
+
+    Raises
+    ------
+    ConfigurationError
+        If no explicit path is given and the recordings directory is unset,
+        missing, or contains no ``.mkv`` files.
+    """
+    # Imported here: config.py imports this module at import time, so a
+    # module-level import would be circular.
+    from .config import ConfigurationError
+
+    if explicit_path is not None:
+        return Path(explicit_path)
+
+    if recordings_dir is None:
+        raise ConfigurationError(
+            "No input video given and no recordings directory configured. "
+            "Pass an MKV path or set MINUTIA_RECORDINGS_DIR."
+        )
+    recordings_dir = Path(recordings_dir).expanduser()
+    if not recordings_dir.is_dir():
+        raise ConfigurationError(
+            f"Recordings directory does not exist: {recordings_dir}"
+        )
+    candidates = sorted(
+        recordings_dir.glob("*.mkv"),
+        key=lambda p: p.stat().st_mtime,
+        reverse=True,
+    )
+    if not candidates:
+        raise ConfigurationError(f"No .mkv files found in {recordings_dir}")
+    return candidates[0]
+
+
+def resolve_run_directory(
+    base_name: str, base_dir: Path, max_attempts: int = 100
+) -> Path:
     """
     Resolve a unique run directory under ``base_dir`` using collision handling.
 
@@ -352,20 +394,20 @@ class RunPaths:
     def _safe_cleanup_on_error(self) -> None:
         """
         Safely remove run directory and contents with defensive checks.
-        
+
         This method explicitly removes known files/directories rather than
         using shutil.rmtree() to avoid potential security issues with
         corrupted paths, symlinks, or race conditions.
         """
         if not self.run_root.exists():
             return
-            
+
         # Safety check: ensure run_root looks like a minutia directory
         if not self._is_minutia_directory():
             raise RuntimeError(
                 f"Refusing to cleanup directory that doesn't appear to be a minutia run: {self.run_root}"
             )
-        
+
         # Explicitly remove known files first
         known_files = [
             self.microphone_audio,
@@ -375,11 +417,11 @@ class RunPaths:
             self.metadata_file,
             self.logs_file,
         ]
-        
+
         for file_path in known_files:
             if file_path.exists() and file_path.is_file():
                 file_path.unlink()
-        
+
         # Remove known directories if empty
         known_dirs = [self.transcripts_dir, self.audio_dir]
         for dir_path in known_dirs:
@@ -389,7 +431,7 @@ class RunPaths:
                 except OSError:
                     # Directory not empty - leave it for manual inspection
                     pass
-        
+
         # Finally, attempt to remove run_root if it's empty
         if self.run_root.exists() and self.run_root.is_dir():
             try:
@@ -401,7 +443,7 @@ class RunPaths:
     def _is_minutia_directory(self) -> bool:
         """
         Check if run_root appears to be a valid minutia run directory.
-        
+
         Returns
         -------
         bool
@@ -410,33 +452,34 @@ class RunPaths:
         # Basic safety checks
         if not self.run_root.is_dir():
             return False
-            
+
         # Check if it's too high in the filesystem hierarchy (dangerous)
         try:
             # Resolve to absolute path and count parts
             abs_path = self.run_root.resolve()
             path_parts = abs_path.parts
-            
+
             # Refuse to clean anything with fewer than 3 path components
             # (e.g., "/", "/home", "/usr" would be rejected)
             if len(path_parts) < 3:
                 return False
-                
+
             # Check if it looks like a minutia run directory name
             # Should be in format YYYY-MM-DD_something or similar
             dir_name = abs_path.name
-            
+
             # Basic pattern check - should start with date-like pattern
             import re
-            if not re.match(r'^\d{4}-\d{2}-\d{2}_', dir_name):
+
+            if not re.match(r"^\d{4}-\d{2}-\d{2}_", dir_name):
                 return False
-                
+
             # Additional check: should be under a "runs" directory or similar
             parent_name = abs_path.parent.name.lower()
-            if parent_name not in ('runs', 'output', 'outputs', 'minutia'):
+            if parent_name not in ("runs", "output", "outputs", "minutia"):
                 return False
-                
+
             return True
-            
+
         except (OSError, ValueError):
             return False

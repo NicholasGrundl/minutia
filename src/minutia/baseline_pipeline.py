@@ -165,19 +165,9 @@ If the summary exceeds the token limit, please end your response with '[CONTINUE
 """
 
 
-def extract_transcript_text(transcript_data: Mapping[str, Any]) -> str:
-    """
-    Convert the merged transcript JSON into the meeting-note format used by the notebook.
-    """
-    transcript_entries = transcript_data["transcript"]
-    sorted_entries = sorted(transcript_entries, key=lambda x: x["start_time"])
-    formatted_lines = []
-    for entry in sorted_entries:
-        speaker = entry["source"].capitalize()
-        start_time = f"{entry['start_time']:.2f}"
-        text = entry["text"].strip()
-        formatted_lines.append(f"[{speaker} {start_time}] {text}")
-    return "\n".join(formatted_lines)
+# Moved to steps/summarize_transcript.py (refactor_to_cli Phase 4); re-exported
+# like the report helpers above.
+extract_transcript_text = summarize_transcript.extract_transcript_text
 
 
 # ---------------------------------------------------------------------------

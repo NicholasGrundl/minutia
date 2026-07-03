@@ -17,7 +17,7 @@ def test_pipeline_config_defaults(sample_run_paths):
     )
 
     assert config.whisper_model == "base"
-    assert config.summary_model == "claude-4-5-sonnet"
+    assert config.summary_model == "claude-sonnet-4-6"
     assert config.mic_track == 3
     assert config.desktop_track == 2
     assert config.base_output_dir == Path("./runs")

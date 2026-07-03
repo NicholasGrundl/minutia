@@ -123,4 +123,3 @@ def logging_context(
 
 # Expose the configured logger for callers to import directly.
 logger = _logger
-

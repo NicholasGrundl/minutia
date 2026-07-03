@@ -67,7 +67,7 @@ def test_process_all_runs_pipeline_orchestrator(sample_video_file, tmp_path, mon
 
     assert result.exit_code == 0, result.output
     config = captured_config["config"]
-    assert config.summary_model == "claude-4-5-sonnet"
+    assert config.summary_model == "claude-sonnet-4-6"
     assert config.run_paths.run_root.exists()
 
     output = result.output

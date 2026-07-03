@@ -6,55 +6,15 @@ from anthropic import Anthropic
 
 from ..config import resolve_anthropic_api_key
 from ..logging import logger
+
+# Model registry re-exported for backwards compatibility — notebooks and
+# baseline_pipeline reference `summarize_transcript.anthropic_models`.
+from ..model_registry import anthropic_models
 from ..prompts import get_filename_prompt
 
 MAX_TOKENS_OUTPUT = (
     8192  # Max model output. Around 3.1K words (6-7 single spaced pages)
 )
-
-# Model information
-# Pricing source: Anthropic API docs, verified April 29, 2026.
-# Convention: per-1k tokens (Anthropic publishes per-MTok; divide by 1000).
-# Output is 5x input across the entire current lineup — handy for budgeting.
-anthropic_models = {
-    # ---- Current generation (Claude 4.x, recommended for new work) ----
-    "claude-opus-4-7": {
-        "name": "claude-opus-4-7",  # released 2026-04-16, current flagship
-        "price_per_1k_input_tokens": 0.005,
-        "price_per_1k_output_tokens": 0.025,
-    },
-    "claude-opus-4-6": {
-        "name": "claude-opus-4-6",  # previous flagship, same price as 4.7
-        "price_per_1k_input_tokens": 0.005,
-        "price_per_1k_output_tokens": 0.025,
-    },
-    "claude-sonnet-4-6": {
-        "name": "claude-sonnet-4-6",  # best price/perf, 1M context at flat rate
-        "price_per_1k_input_tokens": 0.003,
-        "price_per_1k_output_tokens": 0.015,
-    },
-    "claude-haiku-4-5": {
-        "name": "claude-haiku-4-5-20251001",  # fast/cheap current-gen
-        "price_per_1k_input_tokens": 0.001,
-        "price_per_1k_output_tokens": 0.005,
-    },
-    # ---- Legacy (still callable, kept for backward compatibility) ----
-    "claude-sonnet-4-5": {
-        "name": "claude-sonnet-4-5-20250929",
-        "price_per_1k_input_tokens": 0.003,
-        "price_per_1k_output_tokens": 0.015,
-    },
-    "claude-3-7-sonnet": {
-        "name": "claude-3-7-sonnet-20250219",
-        "price_per_1k_input_tokens": 0.003,
-        "price_per_1k_output_tokens": 0.015,
-    },
-    "claude-3-haiku": {
-        "name": "claude-3-haiku-20240307",
-        "price_per_1k_input_tokens": 0.00025,
-        "price_per_1k_output_tokens": 0.00125,
-    },
-}
 
 
 def load_transcript(file_path):
@@ -76,6 +36,23 @@ def prepare_transcript_for_summary(transcript_data):
         text = segment["text"]
         transcript_text += f"[{source.capitalize()}] {text}\n"
     return transcript_text
+
+
+def extract_transcript_text(transcript_data):
+    """
+    Convert the merged transcript JSON into speaker+timestamp lines
+    (``[Speaker 12.34] text``), sorted chronologically — the format the
+    prompt-kind system prompts expect.
+    """
+    transcript_entries = transcript_data["transcript"]
+    sorted_entries = sorted(transcript_entries, key=lambda x: x["start_time"])
+    formatted_lines = []
+    for entry in sorted_entries:
+        speaker = entry["source"].capitalize()
+        start_time = f"{entry['start_time']:.2f}"
+        text = entry["text"].strip()
+        formatted_lines.append(f"[{speaker} {start_time}] {text}")
+    return "\n".join(formatted_lines)
 
 
 def create_summary_prompt(transcript_text):
