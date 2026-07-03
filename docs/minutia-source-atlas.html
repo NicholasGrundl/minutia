@@ -1,0 +1,1105 @@
+<title>Minutia Source Atlas</title>
+<style>
+:root {
+  --ink: #1c2430;
+  --ink-soft: #4b5563;
+  --ink-faint: #8b94a3;
+  --ground: #f7f8f6;
+  --panel: #ffffff;
+  --panel-edge: #dfe3dd;
+  --accent: #0f766e;
+  --accent-soft: #0f766e22;
+  --accent-ink: #0b5d57;
+  --warn: #b45309;
+  --warn-soft: #b4530918;
+  --code-bg: #eef1ee;
+  --code-ink: #22303c;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Charter, Georgia, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #e2e7ea;
+    --ink-soft: #a8b2bd;
+    --ink-faint: #6b7683;
+    --ground: #14181c;
+    --panel: #1c2228;
+    --panel-edge: #2c353d;
+    --accent: #37b8ab;
+    --accent-soft: #37b8ab1f;
+    --accent-ink: #55cabe;
+    --warn: #e39a4a;
+    --warn-soft: #e39a4a1a;
+    --code-bg: #232b32;
+    --code-ink: #d3dae0;
+  }
+}
+:root[data-theme="dark"] {
+  --ink: #e2e7ea; --ink-soft: #a8b2bd; --ink-faint: #6b7683;
+  --ground: #14181c; --panel: #1c2228; --panel-edge: #2c353d;
+  --accent: #37b8ab; --accent-soft: #37b8ab1f; --accent-ink: #55cabe;
+  --warn: #e39a4a; --warn-soft: #e39a4a1a;
+  --code-bg: #232b32; --code-ink: #d3dae0;
+}
+:root[data-theme="light"] {
+  --ink: #1c2430; --ink-soft: #4b5563; --ink-faint: #8b94a3;
+  --ground: #f7f8f6; --panel: #ffffff; --panel-edge: #dfe3dd;
+  --accent: #0f766e; --accent-soft: #0f766e22; --accent-ink: #0b5d57;
+  --warn: #b45309; --warn-soft: #b4530918;
+  --code-bg: #eef1ee; --code-ink: #22303c;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.65;
+}
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 28px 120px; }
+.prose { max-width: 74ch; }
+
+h1, h2, h3, h4 { font-family: var(--serif); line-height: 1.2; text-wrap: balance; color: var(--ink); }
+h1 { font-size: 2.6rem; margin: 0 0 8px; font-weight: 600; }
+h2 { font-size: 1.85rem; margin: 0 0 14px; font-weight: 600; }
+h3 { font-size: 1.3rem; margin: 34px 0 10px; font-weight: 600; }
+h4 { font-size: 1.05rem; margin: 24px 0 8px; }
+p { margin: 0 0 14px; color: var(--ink); }
+p.lead { font-size: 1.12rem; color: var(--ink-soft); }
+a { color: var(--accent-ink); text-decoration-color: var(--accent-soft); text-underline-offset: 3px; }
+a:hover { text-decoration-color: var(--accent); }
+a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+
+code { font-family: var(--mono); font-size: 0.86em; background: var(--code-bg); color: var(--code-ink); padding: 1px 5px; border-radius: 4px; }
+pre { background: var(--code-bg); color: var(--code-ink); border: 1px solid var(--panel-edge); border-radius: 8px; padding: 14px 16px; overflow-x: auto; font-family: var(--mono); font-size: 0.82rem; line-height: 1.55; margin: 14px 0; }
+pre code { background: none; padding: 0; font-size: inherit; }
+pre .c { color: var(--ink-faint); }
+pre .k { color: var(--accent-ink); font-weight: 600; }
+pre .s { color: var(--warn); }
+
+.eyebrow { font-family: var(--sans); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-ink); margin: 0 0 6px; }
+section { margin-top: 72px; scroll-margin-top: 24px; }
+.secno { color: var(--ink-faint); font-weight: 400; margin-right: 10px; }
+
+header.masthead { padding: 64px 0 18px; border-bottom: 3px double var(--panel-edge); margin-bottom: 8px; }
+.masthead .sub { color: var(--ink-soft); font-size: 1.05rem; max-width: 70ch; }
+.meta-row { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 18px; font-family: var(--mono); font-size: 0.78rem; color: var(--ink-faint); }
+.meta-row b { color: var(--ink-soft); font-weight: 600; }
+
+nav.toc { margin: 34px 0 8px; background: var(--panel); border: 1px solid var(--panel-edge); border-radius: 10px; padding: 20px 24px; }
+nav.toc h2 { font-size: 1rem; font-family: var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 12px; }
+nav.toc ol { columns: 2; gap: 40px; margin: 0; padding-left: 22px; }
+nav.toc li { margin: 4px 0; padding-left: 4px; }
+nav.toc a { text-decoration: none; }
+nav.toc a:hover { text-decoration: underline; }
+nav.toc .hint { color: var(--ink-faint); font-size: 0.82rem; }
+@media (max-width: 700px) { nav.toc ol { columns: 1; } }
+
+.callout { border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 0 8px 8px 0; padding: 12px 18px; margin: 18px 0; max-width: 78ch; }
+.callout.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.callout .tag { display: block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-ink); margin-bottom: 4px; }
+.callout.warn .tag { color: var(--warn); }
+.callout p { margin: 0 0 8px; } .callout p:last-child { margin: 0; }
+
+figure { margin: 26px 0; }
+figure .diagram { background: var(--panel); border: 1px solid var(--panel-edge); border-radius: 10px; padding: 18px; overflow-x: auto; }
+figcaption { font-size: 0.85rem; color: var(--ink-faint); margin-top: 8px; max-width: 78ch; }
+svg text { font-family: var(--sans); fill: var(--ink); }
+svg .mono { font-family: var(--mono); }
+svg .soft { fill: var(--ink-soft); }
+svg .faint { fill: var(--ink-faint); }
+svg .accent { fill: var(--accent-ink); }
+svg .box { fill: var(--panel); stroke: var(--panel-edge); stroke-width: 1.5; }
+svg .box-accent { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+svg .box-warn { fill: var(--warn-soft); stroke: var(--warn); stroke-width: 1.5; }
+svg .arrow { stroke: var(--ink-soft); stroke-width: 1.6; fill: none; }
+svg .arrow-accent { stroke: var(--accent); stroke-width: 1.8; fill: none; }
+svg .arrow-warn { stroke: var(--warn); stroke-width: 1.6; fill: none; stroke-dasharray: 5 4; }
+svg .head { fill: var(--ink-soft); }
+svg .head-accent { fill: var(--accent); }
+svg .head-warn { fill: var(--warn); }
+svg .lane { stroke: var(--panel-edge); stroke-width: 1; stroke-dasharray: 2 4; }
+
+table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 0.92rem; }
+.tablewrap { overflow-x: auto; }
+th { text-align: left; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); border-bottom: 2px solid var(--panel-edge); padding: 8px 14px 8px 0; }
+td { border-bottom: 1px solid var(--panel-edge); padding: 9px 14px 9px 0; vertical-align: top; }
+td code, th code { white-space: nowrap; }
+td:first-child { white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+
+.card { background: var(--panel); border: 1px solid var(--panel-edge); border-radius: 10px; padding: 22px 26px; margin: 22px 0; }
+.card h3, .card h4 { margin-top: 0; }
+.card .filemeta { font-family: var(--mono); font-size: 0.75rem; color: var(--ink-faint); margin-bottom: 12px; }
+.sig { font-family: var(--mono); font-size: 0.84rem; background: var(--code-bg); color: var(--code-ink); border-radius: 6px; padding: 8px 12px; margin: 8px 0; overflow-x: auto; white-space: pre; }
+.sig b { color: var(--accent-ink); font-weight: 600; }
+
+.pill { display: inline-block; font-family: var(--mono); font-size: 0.7rem; font-weight: 600; border-radius: 999px; padding: 2px 10px; vertical-align: 2px; margin-left: 6px; }
+.pill.done { background: var(--accent-soft); color: var(--accent-ink); }
+.pill.gap { background: var(--warn-soft); color: var(--warn); }
+
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 4px 18px; font-size: 0.92rem; margin: 12px 0; }
+.kv dt { font-family: var(--mono); font-size: 0.8rem; color: var(--ink-faint); }
+.kv dd { margin: 0; }
+
+.ladder { counter-reset: rung; margin: 18px 0; max-width: 620px; }
+.ladder .rung { counter-increment: rung; display: flex; align-items: baseline; gap: 14px; padding: 10px 16px; background: var(--panel); border: 1px solid var(--panel-edge); border-radius: 8px; margin-bottom: 6px; }
+.ladder .rung::before { content: counter(rung); font-family: var(--mono); font-weight: 700; color: var(--accent-ink); }
+.ladder .rung .who { font-family: var(--mono); font-size: 0.85rem; font-weight: 600; min-width: 210px; }
+.ladder .rung .what { color: var(--ink-soft); font-size: 0.88rem; }
+.ladder .rung.top { border-color: var(--accent); background: var(--accent-soft); }
+
+.treelist { font-family: var(--mono); font-size: 0.83rem; line-height: 1.8; }
+.treelist .note { color: var(--ink-faint); }
+
+hr.section-rule { border: none; border-top: 1px solid var(--panel-edge); margin: 60px 0 0; }
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">Minutia · src/minutia · branch uv_refactor · 2026-07-02</p>
+  <h1>The Minutia Source Atlas</h1>
+  <p class="sub">A guided walk through the package after the <code>refactor_to_cli</code> sprint —
+  every module, its interfaces, how they interlink, and the order things happen in.
+  Written to rebuild your mental map after a fast-moving week: read it top-to-bottom once,
+  then use it as a reference.</p>
+  <div class="meta-row">
+    <span><b>16</b> modules · ~2,700 lines</span>
+    <span><b>7</b> CLI commands</span>
+    <span><b>4</b> pipeline stages</span>
+    <span><b>74</b> tests passing · 5 known-stale</span>
+    <span>Phases <b>0–4</b> done · <b>5–6</b> pending</span>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#view">The 10,000-foot view</a> <span class="hint">— what runs, in what order</span></li>
+    <li><a href="#map">The module map</a> <span class="hint">— layers &amp; import rules</span></li>
+    <li><a href="#foundations">Foundations</a> <span class="hint">— registry, logging, paths, metadata</span></li>
+    <li><a href="#config">config.py</a> <span class="hint">— layered resolution with provenance</span></li>
+    <li><a href="#prompts">prompts.py</a> <span class="hint">— the prompt registry</span></li>
+    <li><a href="#steps">steps/</a> <span class="hint">— the four pipeline stages</span></li>
+    <li><a href="#orchestrator">pipeline/orchestrator.py</a> <span class="hint">— the sequential engine</span></li>
+    <li><a href="#cli">cli.py</a> <span class="hint">— typer app &amp; the go flow</span></li>
+    <li><a href="#contracts">Data contracts on disk</a> <span class="hint">— every artifact, annotated</span></li>
+    <li><a href="#threads">Cross-cutting threads</a> <span class="hint">— model, key, config, output layouts</span></li>
+    <li><a href="#testing">The testing map</a> <span class="hint">— tiers, mocks, goldens</span></li>
+    <li><a href="#transition">Transitional state</a> <span class="hint">— shims &amp; what remains</span></li>
+  </ol>
+</nav>
+
+<!-- ================================================================ -->
+<section id="view">
+  <p class="eyebrow">Section 1</p>
+  <h2><span class="secno">1</span>The 10,000-foot view</h2>
+  <div class="prose">
+    <p>Minutia turns an OBS screen recording into a meeting report. The whole system is one
+    linear data pipeline with four stages, and every piece of the package exists to run,
+    configure, or wrap some slice of it:</p>
+  </div>
+
+  <figure>
+    <div class="diagram">
+      <svg viewBox="0 0 980 250" width="100%" role="img" aria-label="Pipeline: MKV to WAVs to transcripts to merged JSON to markdown report">
+        <defs>
+          <marker id="ah" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L9,4 L0,8 z" class="head"/></marker>
+          <marker id="ahA" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L9,4 L0,8 z" class="head-accent"/></marker>
+        </defs>
+        <!-- input -->
+        <rect x="10" y="70" width="130" height="64" rx="8" class="box"/>
+        <text x="75" y="97" text-anchor="middle" font-size="13" font-weight="600">OBS recording</text>
+        <text x="75" y="117" text-anchor="middle" font-size="11" class="mono faint">meeting.mkv</text>
+
+        <!-- stage 1 -->
+        <path d="M140,102 H186" class="arrow-accent" marker-end="url(#ahA)"/>
+        <rect x="190" y="58" width="160" height="88" rx="8" class="box-accent"/>
+        <text x="270" y="82" text-anchor="middle" font-size="12" font-weight="700">1 · extract</text>
+        <text x="270" y="100" text-anchor="middle" font-size="11" class="mono">video_extraction</text>
+        <text x="270" y="118" text-anchor="middle" font-size="10.5" class="soft">ffmpeg: probe, split,</text>
+        <text x="270" y="132" text-anchor="middle" font-size="10.5" class="soft">identify tracks 3 &amp; 2</text>
+
+        <!-- stage 2 -->
+        <path d="M350,102 H396" class="arrow-accent" marker-end="url(#ahA)"/>
+        <rect x="400" y="58" width="160" height="88" rx="8" class="box-accent"/>
+        <text x="480" y="82" text-anchor="middle" font-size="12" font-weight="700">2 · transcribe</text>
+        <text x="480" y="100" text-anchor="middle" font-size="11" class="mono">audio_transcription</text>
+        <text x="480" y="118" text-anchor="middle" font-size="10.5" class="soft">Whisper (GPU-aware),</text>
+        <text x="480" y="132" text-anchor="middle" font-size="10.5" class="soft">per-track JSON</text>
+
+        <!-- stage 3 -->
+        <path d="M560,102 H606" class="arrow-accent" marker-end="url(#ahA)"/>
+        <rect x="610" y="58" width="160" height="88" rx="8" class="box-accent"/>
+        <text x="690" y="82" text-anchor="middle" font-size="12" font-weight="700">3 · merge</text>
+        <text x="690" y="100" text-anchor="middle" font-size="11" class="mono">transcript_merger</text>
+        <text x="690" y="118" text-anchor="middle" font-size="10.5" class="soft">label sources, sort</text>
+        <text x="690" y="132" text-anchor="middle" font-size="10.5" class="soft">chronologically</text>
+
+        <!-- stage 4 -->
+        <path d="M770,102 H816" class="arrow-accent" marker-end="url(#ahA)"/>
+        <rect x="820" y="58" width="150" height="88" rx="8" class="box-accent"/>
+        <text x="895" y="82" text-anchor="middle" font-size="12" font-weight="700">4 · summarize</text>
+        <text x="895" y="100" text-anchor="middle" font-size="11" class="mono">summarize_transcript</text>
+        <text x="895" y="118" text-anchor="middle" font-size="10.5" class="soft">Claude + prompt kind,</text>
+        <text x="895" y="132" text-anchor="middle" font-size="10.5" class="soft">AI-named report</text>
+
+        <!-- artifacts row -->
+        <path d="M270,146 V176" class="arrow" marker-end="url(#ah)"/>
+        <path d="M480,146 V176" class="arrow" marker-end="url(#ah)"/>
+        <path d="M690,146 V176" class="arrow" marker-end="url(#ah)"/>
+        <path d="M895,146 V176" class="arrow" marker-end="url(#ah)"/>
+        <text x="270" y="196" text-anchor="middle" font-size="10.5" class="mono soft">microphone_audio.wav</text>
+        <text x="270" y="211" text-anchor="middle" font-size="10.5" class="mono soft">desktop_audio.wav</text>
+        <text x="480" y="196" text-anchor="middle" font-size="10.5" class="mono soft">{track}-whisper-{model}</text>
+        <text x="480" y="211" text-anchor="middle" font-size="10.5" class="mono soft">_transcription.json ×2</text>
+        <text x="690" y="196" text-anchor="middle" font-size="10.5" class="mono soft">merged_transcript.json</text>
+        <text x="895" y="196" text-anchor="middle" font-size="10.5" class="mono soft">20260702_topic.md</text>
+        <text x="895" y="211" text-anchor="middle" font-size="10.5" class="mono soft">(filename by Claude)</text>
+      </svg>
+    </div>
+    <figcaption>The pipeline. Each stage is one module in <code>steps/</code> with a single
+    public entry function, file paths in, file paths out. Stages 1–3 are local and free;
+    stage 4 costs money — which is why the CLI puts a price gate in front of it.</figcaption>
+  </figure>
+
+  <div class="prose">
+    <h3>Three ways to run it</h3>
+    <p>The same four stages are reachable through three surfaces, and knowing which one you're
+    in explains almost every "why is this file here?" question:</p>
+  </div>
+
+  <div class="tablewrap"><table>
+    <tr><th>Surface</th><th>What it is</th><th>Output layout</th><th>Summarize path</th></tr>
+    <tr>
+      <td><code>minutia go</code> / step commands</td>
+      <td>Your daily driver: guided or piecemeal, skip-if-exists, prompt kinds, cost confirm</td>
+      <td>Flat dir (<code>go</code>: <code>&lt;output&gt;/&lt;recording-stem&gt;/</code>)</td>
+      <td><b>New</b>: prompt registry → <code>generate_long_summary</code> → AI-named .md</td>
+    </tr>
+    <tr>
+      <td><code>minutia process-all</code></td>
+      <td>The orchestrator: sequential engine with progress events, run metadata, cleanup policies</td>
+      <td><code>RunPaths</code> tree (<code>runs/&lt;date&gt;_&lt;slug&gt;/</code>)</td>
+      <td><b>Old</b>: generic prompt → <code>summary.txt</code> <span class="pill gap">Phase 6 gap</span></td>
+    </tr>
+    <tr>
+      <td><code>baseline_pipeline.py</code></td>
+      <td>Frozen argparse script from the notebook era; still README-documented</td>
+      <td><code>RunPaths</code> tree</td>
+      <td>Own copy of the long-summary flow; re-exports from <code>steps/</code></td>
+    </tr>
+  </table></div>
+
+  <div class="callout warn">
+    <span class="tag">Hold this thought</span>
+    <p>The <b>step commands + <code>go</code></b> path is the one that reached notebook parity in
+    Phase 4 — it is current-best. The <b>orchestrator</b> still summarizes the pre-Phase-4 way
+    (no prompt kinds, no markdown report), and <b>baseline_pipeline</b> is a shim awaiting
+    deletion. Phase 6 exists precisely to collapse the second and third rows into the first.</p>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<section id="map">
+  <p class="eyebrow">Section 2</p>
+  <h2><span class="secno">2</span>The module map</h2>
+  <div class="prose">
+    <p>The package is a strict layer cake: <b>every arrow points downward</b>. A module may import
+    anything below its layer and nothing above it. When you're deciding where new code goes,
+    find the lowest layer where all its imports are satisfied — that's its home.</p>
+  </div>
+
+  <figure>
+    <div class="diagram">
+      <svg viewBox="0 0 980 560" width="100%" role="img" aria-label="Layered module diagram with imports flowing downward">
+        <defs>
+          <marker id="ah2" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L9,4 L0,8 z" class="head"/></marker>
+          <marker id="ahW" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L9,4 L0,8 z" class="head-warn"/></marker>
+        </defs>
+
+        <!-- L5 CLI -->
+        <text x="16" y="40" font-size="11" class="mono faint">L5 · surface</text>
+        <rect x="120" y="16" width="740" height="52" rx="8" class="box-accent"/>
+        <text x="490" y="38" text-anchor="middle" font-size="13" font-weight="700" class="mono">cli.py</text>
+        <text x="490" y="56" text-anchor="middle" font-size="11" class="soft">typer app · 7 commands · skip-aware step helpers · enums derived from registries</text>
+
+        <!-- L4 pipeline -->
+        <text x="16" y="126" font-size="11" class="mono faint">L4 · engine</text>
+        <rect x="120" y="100" width="360" height="52" rx="8" class="box"/>
+        <text x="300" y="122" text-anchor="middle" font-size="13" font-weight="700" class="mono">pipeline/orchestrator.py</text>
+        <text x="300" y="140" text-anchor="middle" font-size="11" class="soft">PipelineConfig · step defs · execute()</text>
+        <rect x="520" y="100" width="340" height="52" rx="8" class="box"/>
+        <text x="690" y="122" text-anchor="middle" font-size="13" font-weight="700" class="mono">baseline_pipeline.py</text>
+        <text x="690" y="140" text-anchor="middle" font-size="11" class="soft">legacy argparse script · re-export shim</text>
+
+        <!-- L3 steps -->
+        <text x="16" y="216" font-size="11" class="mono faint">L3 · stages</text>
+        <rect x="120" y="184" width="740" height="76" rx="8" class="box"/>
+        <text x="150" y="206" font-size="12" font-weight="700" class="mono">steps/</text>
+        <rect x="140" y="216" width="165" height="34" rx="6" class="box-accent"/>
+        <text x="222" y="238" text-anchor="middle" font-size="11" class="mono">video_extraction</text>
+        <rect x="315" y="216" width="175" height="34" rx="6" class="box-accent"/>
+        <text x="402" y="238" text-anchor="middle" font-size="11" class="mono">audio_transcription</text>
+        <rect x="500" y="216" width="165" height="34" rx="6" class="box-accent"/>
+        <text x="582" y="238" text-anchor="middle" font-size="11" class="mono">transcript_merger</text>
+        <rect x="675" y="216" width="170" height="34" rx="6" class="box-accent"/>
+        <text x="760" y="238" text-anchor="middle" font-size="11" class="mono">summarize_transcript</text>
+
+        <!-- L2 config/prompts -->
+        <text x="16" y="322" font-size="11" class="mono faint">L2 · policy</text>
+        <rect x="120" y="292" width="360" height="52" rx="8" class="box"/>
+        <text x="300" y="314" text-anchor="middle" font-size="13" font-weight="700" class="mono">config.py</text>
+        <text x="300" y="332" text-anchor="middle" font-size="11" class="soft">layered resolution · MinutiaConfig · provenance</text>
+        <rect x="520" y="292" width="340" height="52" rx="8" class="box"/>
+        <text x="690" y="314" text-anchor="middle" font-size="13" font-weight="700" class="mono">prompts.py</text>
+        <text x="690" y="332" text-anchor="middle" font-size="11" class="soft">6 builders · PROMPT_BUILDERS registry</text>
+
+        <!-- L1 -->
+        <text x="16" y="416" font-size="11" class="mono faint">L1 · plumbing</text>
+        <rect x="120" y="384" width="360" height="52" rx="8" class="box"/>
+        <text x="300" y="406" text-anchor="middle" font-size="13" font-weight="700" class="mono">paths.py</text>
+        <text x="300" y="424" text-anchor="middle" font-size="11" class="soft">RunPaths · resolve_input_video · CleanupPolicy</text>
+        <rect x="520" y="384" width="340" height="52" rx="8" class="box"/>
+        <text x="690" y="406" text-anchor="middle" font-size="13" font-weight="700" class="mono">run_metadata.py</text>
+        <text x="690" y="424" text-anchor="middle" font-size="11" class="soft">build / write metadata.json</text>
+
+        <!-- L0 -->
+        <text x="16" y="508" font-size="11" class="mono faint">L0 · bedrock</text>
+        <rect x="120" y="476" width="360" height="52" rx="8" class="box"/>
+        <text x="300" y="498" text-anchor="middle" font-size="13" font-weight="700" class="mono">model_registry.py</text>
+        <text x="300" y="516" text-anchor="middle" font-size="11" class="soft">anthropic_models · pricing · zero imports</text>
+        <rect x="520" y="476" width="340" height="52" rx="8" class="box"/>
+        <text x="690" y="498" text-anchor="middle" font-size="13" font-weight="700" class="mono">logging.py</text>
+        <text x="690" y="516" text-anchor="middle" font-size="11" class="soft">loguru sinks · logging_context()</text>
+
+        <!-- downward arrows -->
+        <path d="M300,68 V96" class="arrow" marker-end="url(#ah2)"/>
+        <path d="M690,68 V96" class="arrow" marker-end="url(#ah2)"/>
+        <path d="M490,152 V180" class="arrow" marker-end="url(#ah2)"/>
+        <path d="M300,260 V288" class="arrow" marker-end="url(#ah2)"/>
+        <path d="M690,260 V288" class="arrow" marker-end="url(#ah2)"/>
+        <path d="M300,344 V380" class="arrow" marker-end="url(#ah2)"/>
+        <path d="M690,344 V380" class="arrow" marker-end="url(#ah2)"/>
+        <path d="M300,436 V472" class="arrow" marker-end="url(#ah2)"/>
+        <path d="M690,436 V472" class="arrow" marker-end="url(#ah2)"/>
+      </svg>
+    </div>
+    <figcaption>The layer cake. Solid layer membership matters more than the individual arrows:
+    <code>cli</code> may touch everything; <code>steps/</code> may touch config, prompts, and bedrock;
+    bedrock touches nothing. <code>baseline_pipeline</code> sits beside the orchestrator only because
+    it wraps the same stages — it is scheduled for deletion (Phase 6).</figcaption>
+  </figure>
+
+  <div class="prose">
+    <h3>The two forbidden-cycle stories</h3>
+    <p>Two design decisions this week exist purely to keep the arrows pointing down. They're worth
+    internalizing because they tell you where shared data must live:</p>
+  </div>
+
+  <div class="card">
+    <h4>Story one: why <code>model_registry.py</code> exists</h4>
+    <p>The model table (<code>anthropic_models</code>) used to live inside
+    <code>steps/summarize_transcript.py</code>. But three <em>other</em> places need it: the
+    orchestrator validates <code>summary_model</code> against it, <code>config.py</code> needs a default
+    model name, and <code>cli.py</code> builds its <code>--model</code> choices from it. The import chain
+    <code>summarize_transcript → config → orchestrator</code> already exists, so
+    <code>orchestrator → summarize_transcript</code> would have closed a cycle:</p>
+    <div class="sig">steps/summarize_transcript ──▶ config ──▶ pipeline/orchestrator ──▶ <span style="color:var(--warn)">✗ steps/summarize_transcript</span></div>
+    <p>The fix is the classic one: push the shared data <em>down</em>. <code>model_registry.py</code>
+    imports nothing, so anyone may import it. <code>summarize_transcript</code> re-exports
+    <code>anthropic_models</code> for backwards compatibility (the notebook and tests reference it there).</p>
+    <p><b>Bonus discovery:</b> unifying on the registry exposed that the old config default
+    (<code>claude-4-5-sonnet</code>) was never a valid key — the default summarize path had been raising
+    <code>KeyError</code>, and a long-red test (<code>test_baseline_pipeline_smoke</code>) was this bug in disguise.</p>
+  </div>
+
+  <div class="card">
+    <h4>Story two: the lazy import inside <code>paths.py</code></h4>
+    <p><code>resolve_input_video()</code> raises <code>ConfigurationError</code>, which is defined in
+    <code>config.py</code> — but <code>config.py</code> imports <code>paths.py</code> at module load
+    (for <code>CleanupPolicy</code>). A top-of-file import would cycle, so the import happens
+    <em>inside the function body</em>, at call time:</p>
+    <pre><code><span class="k">def</span> resolve_input_video(explicit_path, recordings_dir):
+    <span class="c"># Imported here: config.py imports this module at import time,</span>
+    <span class="c"># so a module-level import would be circular.</span>
+    <span class="k">from</span> .config <span class="k">import</span> ConfigurationError
+    ...</code></pre>
+    <p>Function-level imports are the pragmatic escape hatch when only an <em>exception type</em>
+    crosses a layer boundary. If more than that ever needs to cross, the type should move down
+    a layer instead (the <code>model_registry</code> treatment).</p>
+  </div>
+
+  <div class="prose">
+    <h3>Module inventory</h3>
+  </div>
+  <div class="tablewrap"><table>
+    <tr><th>Module</th><th>Lines</th><th>One-line role</th><th>Key exports</th></tr>
+    <tr><td><code>model_registry.py</code></td><td>~55</td><td>Model names + pricing, zero deps</td><td><code>anthropic_models</code>, <code>DEFAULT_SUMMARY_MODEL</code></td></tr>
+    <tr><td><code>logging.py</code></td><td>126</td><td>Loguru sinks + contextual fields</td><td><code>logger</code>, <code>configure_logging</code>, <code>logging_context</code></td></tr>
+    <tr><td><code>paths.py</code></td><td>~480</td><td>Run-directory layout, input discovery, cleanup</td><td><code>RunPaths</code>, <code>resolve_input_video</code>, <code>CleanupPolicy</code></td></tr>
+    <tr><td><code>run_metadata.py</code></td><td>81</td><td>Build + persist <code>metadata.json</code></td><td><code>build_run_metadata</code>, <code>write_run_metadata</code></td></tr>
+    <tr><td><code>config.py</code></td><td>~290</td><td>Layered settings with provenance</td><td><code>MinutiaConfig</code>, <code>load_config</code>, <code>ConfigurationError</code></td></tr>
+    <tr><td><code>prompts.py</code></td><td>~790</td><td>Prompt registry (mostly prompt text)</td><td><code>PROMPT_BUILDERS</code>, <code>get_prompt_builder</code>, <code>list_prompt_kinds</code></td></tr>
+    <tr><td><code>steps/video_extraction.py</code></td><td>115</td><td>ffmpeg: MKV → labeled WAVs</td><td><code>process_mkv_file</code></td></tr>
+    <tr><td><code>steps/audio_transcription.py</code></td><td>~190</td><td>Whisper: WAV → transcript JSON</td><td><code>process_audio_files</code></td></tr>
+    <tr><td><code>steps/transcript_merger.py</code></td><td>244</td><td>Two transcripts → one chronological JSON</td><td><code>process_transcripts</code></td></tr>
+    <tr><td><code>steps/summarize_transcript.py</code></td><td>~300</td><td>Claude: transcript → summary + report</td><td><code>generate_long_summary</code>, <code>create_markdown_report</code>, …</td></tr>
+    <tr><td><code>pipeline/orchestrator.py</code></td><td>~520</td><td>Sequential engine w/ progress + metadata</td><td><code>PipelineOrchestrator</code>, <code>PipelineConfig</code></td></tr>
+    <tr><td><code>cli.py</code></td><td>~560</td><td>typer surface; owns UX policy</td><td><code>app</code>, <code>main</code></td></tr>
+    <tr><td><code>baseline_pipeline.py</code></td><td>~580</td><td>Legacy script (shim; Phase 6 deletes)</td><td><code>run_pipeline</code>, re-exports</td></tr>
+    <tr><td><code>legacy/</code></td><td>—</td><td>Jupyter-widget era, unused by CLI</td><td>—</td></tr>
+  </table></div>
+</section>
+
+<!-- ================================================================ -->
+<section id="foundations">
+  <p class="eyebrow">Section 3</p>
+  <h2><span class="secno">3</span>Foundations: bedrock and plumbing</h2>
+
+  <div class="card">
+    <h3>model_registry.py — the shared vocabulary</h3>
+    <p class="filemeta">src/minutia/model_registry.py · new this week · imports: nothing</p>
+    <p>A single dict mapping <em>friendly keys</em> to API model IDs and per-1k-token prices, plus
+    the project default. Everything model-related derives from it:</p>
+    <pre><code>anthropic_models = {
+    <span class="s">"claude-sonnet-4-6"</span>:  {<span class="s">"name"</span>: <span class="s">"claude-sonnet-4-6"</span>,           <span class="c"># API id</span>
+                            <span class="s">"price_per_1k_input_tokens"</span>: 0.003,
+                            <span class="s">"price_per_1k_output_tokens"</span>: 0.015},
+    <span class="s">"claude-haiku-4-5"</span>:   {<span class="s">"name"</span>: <span class="s">"claude-haiku-4-5-20251001"</span>, ...},
+    ...  <span class="c"># opus-4-7, opus-4-6, sonnet-4-5, 3-7-sonnet, 3-haiku</span>
+}
+DEFAULT_SUMMARY_MODEL = <span class="s">"claude-sonnet-4-6"</span></code></pre>
+    <dl class="kv">
+      <dt>consumed by</dt><dd><code>orchestrator.SUMMARY_MODEL_CHOICES = tuple(anthropic_models)</code> → config validation; <code>cli.SummaryModel</code> enum → <code>--model</code> choices; the summarize step's price math.</dd>
+      <dt>note the split</dt><dd>Key ≠ API name (<code>claude-haiku-4-5</code> → dated ID). Users always speak the friendly key; only the API call itself uses <code>["name"]</code>.</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <h3>logging.py — one logger, contextual columns</h3>
+    <p class="filemeta">src/minutia/logging.py · wraps loguru</p>
+    <p>Every module does <code>from ..logging import logger</code> and never touches loguru directly.
+    Two ideas matter:</p>
+    <p><b>1. Sinks are (re)configured, not accumulated.</b> <code>configure_logging(level, logs_file=None)</code>
+    calls <code>logger.remove()</code> then adds a colored stderr sink; the orchestrator calls it again
+    per run with <code>logs_file=run_root/minutia.log</code> to add a DEBUG file sink inside the run directory.</p>
+    <p><b>2. Context rides on every record.</b> The format string prints three extra columns —
+    <code>step | input_file | run_root</code> — defaulting to <code>-</code>. The orchestrator wraps work in:</p>
+    <pre><code><span class="k">with</span> logging_context(input_file=..., run_root=...):
+    <span class="k">with</span> logging_context(step=<span class="s">"extract_audio"</span>):
+        logger.info(<span class="s">"Running step"</span>)   <span class="c"># columns fill themselves</span></code></pre>
+    <p>So a single grep on a run log gives you a per-step timeline with no extra plumbing in the steps.</p>
+  </div>
+
+  <div class="card">
+    <h3>paths.py — where files live, decided once</h3>
+    <p class="filemeta">src/minutia/paths.py · frozen dataclass + two helpers</p>
+    <h4>RunPaths — the orchestrator's filesystem contract</h4>
+    <p>An immutable snapshot of <em>every</em> path a run will touch. Built once by a factory, then
+    passed around; no step ever invents a path string. The factory names the run directory
+    <code>{ISO-date}_{slugified-input-stem}</code> and dodges collisions with <code>_2</code>, <code>_3</code>… suffixes
+    (<code>resolve_run_directory</code>).</p>
+    <div class="sig"><b>RunPaths.from_video_input</b>(input_path, base_output_dir) → RunPaths
+<b>RunPaths.from_audio_inputs</b>(mic, desktop, base_output_dir) → RunPaths   <span class="c"># names run from parent dir</span>
+<b>.ensure_directories</b>()    <b>.cleanup</b>(policy)</div>
+    <pre class="treelist"><code>runs/2026-07-02_client-sync/          <span class="note">← run_root</span>
+├── audio/
+│   ├── microphone_audio.wav          <span class="note">← .microphone_audio</span>
+│   └── desktop_audio.wav             <span class="note">← .desktop_audio</span>
+├── transcripts/                      <span class="note">← .transcripts_dir</span>
+├── merged_transcript.json            <span class="note">← .merged_transcript</span>
+├── summary.txt                       <span class="note">← .summary_file</span>
+├── metadata.json                     <span class="note">← .metadata_file</span>
+└── minutia.log                       <span class="note">← .logs_file</span></code></pre>
+    <h4>CleanupPolicy — three post-run behaviors</h4>
+    <p><code>KEEP_ALL</code> (default) · <code>KEEP_FINAL</code> (drop intermediate audio, keep transcript/summary) ·
+    <code>CLEANUP_ON_ERROR</code> (delete the whole run dir on failure). Applied by the orchestrator after
+    <code>execute()</code>; <code>cleanup()</code> refuses to delete a directory that doesn't look like a minutia run.</p>
+    <h4>resolve_input_video — the discovery rule</h4>
+    <div class="sig"><b>resolve_input_video</b>(explicit_path, recordings_dir) → Path</div>
+    <p>Explicit path always wins. Otherwise: newest <code>*.mkv</code> by mtime in <code>recordings_dir</code>,
+    with actionable <code>ConfigurationError</code>s for unset / missing / empty. This one function is why
+    bare <code>minutia process-all</code> and <code>minutia extract-audio</code> now work.</p>
+  </div>
+
+  <div class="card">
+    <h3>run_metadata.py — the run's receipt</h3>
+    <p class="filemeta">src/minutia/run_metadata.py · pure functions</p>
+    <p><code>build_run_metadata(...)</code> assembles a JSON-able dict — status, start/end timestamps,
+    input info (duration + segment count when the merge metadata is available), output paths, and
+    the error string on failure — and <code>write_run_metadata</code> persists it as
+    <code>metadata.json</code>. The orchestrator writes it on <em>both</em> success and failure paths, so
+    every run directory self-describes. <span class="pill gap">Phase 5</span> extends this idea into a
+    per-report sidecar (prompt kind, model, params, token counts) — the eval substrate.</p>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<section id="config">
+  <p class="eyebrow">Section 4</p>
+  <h2><span class="secno">4</span>config.py — layered resolution with provenance</h2>
+  <div class="prose">
+    <p>Configuration went from "read some env vars" to a small resolution engine this week.
+    The core idea: build an ordered list of <b>layers</b>, walk them per key, and remember
+    <em>which layer answered</em>. That memory is what powers <code>minutia config</code>.</p>
+  </div>
+
+  <div class="ladder" role="list" aria-label="Configuration precedence, highest first">
+    <div class="rung top" role="listitem"><span class="who">CLI flags</span><span class="what">handled in cli.py — a flag simply overrides the config value after loading</span></div>
+    <div class="rung" role="listitem"><span class="who">process environment</span><span class="what">MINUTIA_* vars — layer name "environment"</span></div>
+    <div class="rung" role="listitem"><span class="who">./.env then ./.minutia</span><span class="what">CWD files, project-local dev overrides</span></div>
+    <div class="rung" role="listitem"><span class="who">~/.config/minutia/config.env</span><span class="what">user-global set-once home (platformdirs.user_config_path)</span></div>
+    <div class="rung" role="listitem"><span class="who">built-in defaults</span><span class="what">e.g. output home = platformdirs user_documents_path()/minutia</span></div>
+  </div>
+
+  <div class="prose">
+    <h3>How resolution works</h3>
+    <p><code>_config_layers()</code> builds <code>[(source_name, mapping), …]</code> — the env mapping first,
+    then each file read via <code>dotenv_values()</code> (files are read <em>directly</em>, not through the
+    process environment, so provenance stays truthful). <code>_resolve(layers, key)</code> walks in order and
+    returns <code>(value, source_name)</code>; misses return <code>(None, "default")</code>.</p>
+    <p><code>load_config()</code> resolves each option, records the source under a friendly name in
+    <code>MinutiaConfig.sources</code>, coerces types (<code>_coerce_int</code>, <code>_coerce_path</code> with
+    <code>expanduser</code>), validates, and returns the frozen picture:</p>
+  </div>
+
+  <div class="tablewrap"><table>
+    <tr><th>Field</th><th>Env var</th><th>Default</th><th>Consumed by</th></tr>
+    <tr><td><code>whisper_model</code></td><td><code>MINUTIA_WHISPER_MODEL</code></td><td><code>base</code></td><td>transcribe step</td></tr>
+    <tr><td><code>summary_model</code></td><td><code>MINUTIA_SUMMARY_MODEL</code></td><td><code>claude-sonnet-4-6</code> (registry)</td><td>summarize step, orchestrator</td></tr>
+    <tr><td><code>mic_track</code> / <code>desktop_track</code></td><td><code>MINUTIA_MIC_TRACK</code> / <code>…DESKTOP_TRACK</code></td><td>3 / 2</td><td>extract step (OBS convention)</td></tr>
+    <tr><td><code>base_output_dir</code></td><td><code>MINUTIA_OUTPUT_DIR</code></td><td><code>~/Documents/minutia</code></td><td>every command's output fallback</td></tr>
+    <tr><td><code>recordings_dir</code></td><td><code>MINUTIA_RECORDINGS_DIR</code></td><td><em>unset</em></td><td>input discovery, <code>go</code> pick list</td></tr>
+    <tr><td><code>personal_info_path</code></td><td><code>MINUTIA_PERSONAL_INFO</code></td><td><em>unset</em></td><td>summarize prompt context</td></tr>
+    <tr><td><code>log_level</code></td><td><code>MINUTIA_LOG_LEVEL</code></td><td><code>INFO</code></td><td>logging sinks</td></tr>
+    <tr><td><code>cleanup_policy</code></td><td><code>MINUTIA_CLEANUP_POLICY</code></td><td><code>keep_all</code></td><td>orchestrator post-run</td></tr>
+    <tr><td><code>anthropic_api_key</code></td><td><code>ANTHROPIC_API_KEY</code> → <code>MINUTIA_ANTHROPIC_API_KEY</code> → <code>CLAUDE_API_KEY</code></td><td><em>unset</em></td><td>summarize + filename calls</td></tr>
+  </table></div>
+
+  <div class="callout">
+    <span class="tag">Why load_dotenv still runs</span>
+    <p>Resolution no longer <em>needs</em> the process environment mutated — but
+    <code>_load_env_files()</code> still calls <code>load_dotenv(override=False)</code> on all three files.
+    Reason: downstream code (<code>resolve_anthropic_api_key()</code> called with no args inside the
+    summarize step) reads <code>os.environ</code> directly. Removing the mutation would silently break
+    any path that doesn't thread the key explicitly. Belt <em>and</em> suspenders, on purpose.</p>
+  </div>
+
+  <div class="callout warn">
+    <span class="tag">Gotcha</span>
+    <p>The API key is special-cased: three variable <em>names</em> are tried in priority order, and each
+    name is resolved across <em>all</em> layers before falling to the next name. So
+    <code>ANTHROPIC_API_KEY</code> in your user config file beats <code>MINUTIA_ANTHROPIC_API_KEY</code>
+    in the environment. Name priority outranks layer priority for this one key.</p>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<section id="prompts">
+  <p class="eyebrow">Section 5</p>
+  <h2><span class="secno">5</span>prompts.py — the prompt registry</h2>
+  <div class="prose">
+    <p>Nearly 800 lines, but the <em>structure</em> is 30: six builder functions, one dict, three
+    accessors. Everything else is prompt text. The contract every builder satisfies:</p>
+  </div>
+  <div class="sig">PromptBuilder = Callable[[str, str], str]
+<b>builder</b>(markdown_notes: str = <span>""</span>, personal_info: str = <span>""</span>) → str   <span class="c"># the system prompt</span></div>
+
+  <div class="tablewrap"><table>
+    <tr><th>Kind</th><th>Builder</th><th>Tuned for</th></tr>
+    <tr><td><code>minutia</code> <span class="pill done">default</span></td><td><code>minutia_summary_prompt</code></td><td>Consultant meetings; dual-track noise handling, P0/P1/P2 priority split</td></tr>
+    <tr><td><code>baseline</code></td><td><code>baseline_summary_prompt</code></td><td>The original verbose, detail-heavy summarizer</td></tr>
+    <tr><td><code>realtor</code></td><td><code>realty_summary_prompt</code></td><td>Home-buying meetings; deadlines and money flags</td></tr>
+    <tr><td><code>slide-review</code></td><td><code>minutia_slide_review_prompt</code></td><td>Skeleton-deck walkthroughs; slide-pointer tracking, per-slide resolved intent</td></tr>
+    <tr><td><code>interview-debrief</code></td><td><code>interview_debrief_prompt</code></td><td>Candidate-side interviews; evidence discipline, coaching read</td></tr>
+    <tr><td><code>discovery-summary</code></td><td><code>discovery_summary_prompt</code></td><td>Client discovery calls; qualification + proposal ammunition</td></tr>
+  </table></div>
+
+  <div class="prose">
+    <p>The accessors, and the behavior change that matters:</p>
+  </div>
+  <div class="sig"><b>list_prompt_kinds</b>() → list[str]                <span class="c"># sorted; feeds CLI choices &amp; future evals</span>
+<b>get_prompt_builder</b>(kind: str | None) → PromptBuilder   <span class="c"># None → DEFAULT_PROMPT_KIND ("minutia")</span>
+<b>generate_meeting_summary_prompt</b>(notes, info, kind=None) → str   <span class="c"># convenience dispatch</span></div>
+
+  <div class="callout">
+    <span class="tag">Design decision</span>
+    <p>Unknown kinds now <b>raise <code>ValueError</code></b> naming the valid kinds. The notebook-era
+    dispatcher silently fell back (and actually had a latent crash:
+    <code>builders.get(kind, 'default')</code> returns the <em>string</em> <code>'default'</code>). Since the CLI
+    derives its <code>--prompt-kind</code> choices from <code>list_prompt_kinds()</code>, typer rejects bad
+    values before this code even runs — the ValueError protects programmatic callers.</p>
+  </div>
+
+  <div class="prose">
+    <p>One more resident: <code>get_filename_prompt(content, current_date=None)</code> — the prompt that
+    asks Claude to invent a filesystem-safe, date-prefixed filename for a report. It lives here (not in
+    the step) so <em>all</em> prompt text has one home. New flavors go in this file, get registered in
+    <code>PROMPT_BUILDERS</code>, and every surface — CLI choices, <code>go</code> menu, future eval matrix —
+    picks them up automatically.</p>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<section id="steps">
+  <p class="eyebrow">Section 6</p>
+  <h2><span class="secno">6</span>steps/ — the four pipeline stages</h2>
+  <div class="prose">
+    <p>Each step module is deliberately boring on the outside: one public entry function, strings-in,
+    file-paths-out, loguru inside. The <em>disk contract</em> — exact filenames — is the real interface,
+    because the CLI's skip-if-exists logic reconstructs these names to decide whether work is done.</p>
+  </div>
+
+  <div class="card">
+    <h3>video_extraction.py — MKV in, two labeled WAVs out</h3>
+    <p class="filemeta">deps: ffmpeg-python · no ML</p>
+    <div class="sig"><b>process_mkv_file</b>(input_mkv, output_dir, *, mic_track_number=3, desktop_track_number=2)
+    → {<span class="s">"microphone"</span>: path, <span class="s">"desktop"</span>: path}</div>
+    <p>Four internal moves: <code>ffmpeg.probe</code> the streams → extract <em>every</em> audio stream to
+    <code>audio_track_N.wav</code> (1-indexed, matching OBS) → pick mic/desktop by track number from the
+    filename suffix → <code>copy2</code> to stable names.</p>
+    <dl class="kv">
+      <dt>disk out</dt><dd><code>audio_track_1..N.wav</code> (all tracks, kept) + <code>microphone_audio.wav</code>, <code>desktop_audio.wav</code> (copies)</dd>
+      <dt>failure mode</dt><dd><code>ValueError</code> if either requested track number isn't among the extracted files</dd>
+      <dt>known issue</dt><dd>Re-running into a dir with existing outputs may hit ffmpeg's overwrite prompt — unverified against current code; the CLI's skip-if-exists mostly sidesteps it. (Spec: Known Issues.)</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <h3>audio_transcription.py — Whisper, GPU-aware</h3>
+    <p class="filemeta">deps: openai-whisper, torch</p>
+    <div class="sig"><b>process_audio_files</b>(mic_audio_path, desktop_audio_path, output_dir,
+    whisper_model_name=<span class="s">"base"</span>, use_gpu=True) → {<span class="s">"microphone"</span>: path, <span class="s">"desktop"</span>: path}</div>
+    <p>Loads the model once per file (CUDA if available and requested, FP16 on GPU), transcribes, and
+    saves a JSON per track. Logs speed ratio and peak GPU memory — useful when you start comparing
+    Whisper models later.</p>
+    <dl class="kv">
+      <dt>disk out</dt><dd><code>{track}-whisper-{model}_transcription.json</code> ×2 — <b>the model name is part of the filename</b>, so switching models never collides with old outputs (and the CLI skip-check is per-model for free)</dd>
+      <dt>JSON shape</dt><dd><code>{metadata: {source_file, model, language, duration, processed_at, schema_version}, segments: […], text}</code></dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <h3>transcript_merger.py — two tracks, one timeline</h3>
+    <p class="filemeta">deps: stdlib only · golden-verified ✓</p>
+    <div class="sig"><b>process_transcripts</b>(mic_file, desktop_file, output_file, parse_overlaps=True)
+    → merged dict (also written to output_file)</div>
+    <p>Pipeline inside: <code>parse_transcript</code> (accepts the JSON schema <em>and</em> the legacy
+    plaintext <code>[0.0 - 2.5] text</code> format; normalizes segment keys) → label every segment with
+    <code>source: microphone|desktop</code> → concatenate and sort by <code>start_time</code> →
+    optionally splice overlap markers → attach metadata (counts, duration, per-source metadata,
+    source files).</p>
+    <div class="callout warn">
+      <span class="tag">Practice vs. capability</span>
+      <p><code>parse_overlaps=True</code> is the signature default, but <b>the real workflow always passes
+      <code>False</code></b> — the golden fixtures were generated that way, and the prompt kinds handle
+      echo/overlap in-prompt instead. The overlap splicer exists and is tested, but treat
+      <code>parse_overlaps=False</code> as the de-facto contract.</p>
+    </div>
+    <dl class="kv">
+      <dt>verified</dt><dd>Reproduces all four golden <code>03_merged/</code> fixtures segment-for-segment (<code>test_merger_reproduces_golden_fixture</code>)</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <h3>summarize_transcript.py — the money step</h3>
+    <p class="filemeta">deps: anthropic, tiktoken · everything Claude-related lives here</p>
+    <p>This module accumulated the most change: it now hosts transcript prep, cost estimation, the
+    long-summary loop, and the report writer. Group its nine functions into four clusters:</p>
+    <h4>1 · Prep — transcript JSON → prompt text</h4>
+    <div class="sig"><b>load_transcript</b>(path) → dict
+<b>extract_transcript_text</b>(data) → <span class="s">"[Microphone 12.34] text"</span>   <span class="c"># timestamped, sorted — the Phase-4 path</span>
+<b>prepare_transcript_for_summary</b>(data) → <span class="s">"[Microphone] text"</span>     <span class="c"># older, no timestamps — orchestrator still uses</span></div>
+    <h4>2 · Economics — estimate before you spend</h4>
+    <div class="sig"><b>estimate_tokens_and_price</b>(text, model=<span class="s">"claude-sonnet-4-6"</span>) → (total_tokens, price_usd)</div>
+    <p>tiktoken count of the prompt + assumed max output (8192), priced from the registry. This feeds
+    the CLI's confirm gate.</p>
+    <h4>3 · Generation — the [CONTINUE] loop</h4>
+    <div class="sig"><b>generate_long_summary</b>(text, model_name=…, system_prompt=None, api_key=None, **kw) → str</div>
+    <p>The workhorse. With a <code>system_prompt</code> (the prompt-kind path) the transcript rides as the
+    user message; without one it falls back to the generic built-in prompt. Every prompt kind
+    instructs the model to end with <code>[CONTINUE]</code> if truncated — the loop detects that sentinel,
+    strips it, appends the partial as an assistant turn plus a "please continue" user turn, and calls
+    again until the summary completes. <code>generate_summary</code> is the single-shot sibling
+    (no loop; the orchestrator's current path).</p>
+    <h4>4 · Reporting — AI-named markdown</h4>
+    <div class="sig"><b>get_filename_from_content</b>(content, model_name=…, api_key=None) → str
+<b>create_markdown_report</b>(content, output_path, model_name=…, api_key=None) → Path</div>
+    <p>A <em>second, tiny</em> Claude call (max 100 tokens) reads the finished summary and proposes a
+    <code>YYYYMMDD_topic_slug</code> filename; the report is written as
+    <code>&lt;that&gt;.md</code>. So every summarize run = two API calls: one big, one cent-sized.</p>
+    <div class="callout">
+      <span class="tag">Interface habit worth copying</span>
+      <p>Every Claude-touching function takes <code>api_key=None</code> and falls back to
+      <code>resolve_anthropic_api_key()</code>, and validates <code>model_name</code> against the registry
+      <em>before</em> constructing a client. Uniform seams → trivial mocking (one patch point:
+      <code>summarize_transcript.Anthropic</code>) and a clean slot for the Phase-5
+      <code>SummaryClient</code> protocol.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<section id="orchestrator">
+  <p class="eyebrow">Section 7</p>
+  <h2><span class="secno">7</span>pipeline/orchestrator.py — the sequential engine</h2>
+  <div class="prose">
+    <p>The orchestrator is a small, generic step-runner plus four step definitions. Its vocabulary
+    is a family of dataclasses; learn these five and the module reads itself:</p>
+  </div>
+
+  <div class="tablewrap"><table>
+    <tr><th>Type</th><th>Mutability</th><th>Role</th></tr>
+    <tr><td><code>PipelineConfig</code></td><td>frozen</td><td>Everything a run needs: input path, <code>RunPaths</code>, models, tracks, key, cleanup policy. Validates <code>summary_model</code> against the registry in <code>__post_init__</code>.</td></tr>
+    <tr><td><code>PipelineStepDefinition</code></td><td>mutable</td><td><code>name</code> + <code>runner(config, artifacts) → dict</code> + optional <code>is_enabled(config)</code> predicate (how <code>skip_summary</code> works).</td></tr>
+    <tr><td><code>StepProgress</code></td><td>frozen</td><td>Event emitted to the callback: step name, <code>StepStatus</code> (PENDING/RUNNING/COMPLETED/FAILED), message, error.</td></tr>
+    <tr><td><code>PipelineExecutionState</code></td><td>mutable</td><td>Live view (<code>orchestrator.state</code>): current step, artifacts so far — inspectable mid-run.</td></tr>
+    <tr><td><code>PipelineResult</code></td><td>mutable</td><td>The outcome: success flag, completed steps, failed step + error, artifacts, duration. <code>.is_partial</code> = some steps done but overall failure.</td></tr>
+  </table></div>
+
+  <div class="prose">
+    <h3>The execute() loop, in prose</h3>
+    <p>For each enabled step: emit <code>RUNNING</code> → call the runner with the config and a
+    <b>read-only view of the artifacts dict</b> (<code>MappingProxyType</code>) → merge the runner's
+    returned dict into the artifacts → emit <code>COMPLETED</code>. The artifacts dict is the only
+    channel between steps: extract publishes <code>microphone_audio</code>, transcribe reads it and
+    publishes <code>microphone_transcript</code>, merge reads those, and so on. On any exception the
+    loop stops, emits <code>FAILED</code>, writes <code>metadata.json</code> with
+    <code>status: failed</code>, applies <code>CLEANUP_ON_ERROR</code> if configured, and returns a
+    partial result — <b>it never raises</b>. Success also writes metadata and applies
+    <code>KEEP_FINAL</code>.</p>
+    <p>Two idioms worth noting: the four default runners <b>import their step modules lazily inside
+    the closure</b>, so importing the orchestrator doesn't drag in torch/whisper/ffmpeg; and every
+    step body runs inside <code>logging_context(step=…)</code>, which is what makes run logs greppable
+    per step.</p>
+  </div>
+
+  <div class="callout warn">
+    <span class="tag">The Phase 6 gap — read before touching process-all</span>
+    <p>The orchestrator's <code>summarize</code> runner is still pre-Phase-4: it uses
+    <code>prepare_transcript_for_summary</code> (no timestamps), the single-shot
+    <code>generate_summary</code> with the <em>generic</em> prompt (no prompt kinds, no notes, no
+    personal info), and writes plain <code>summary.txt</code> (no markdown report, no AI filename).
+    Phase 6's job is to add <code>prompt_kind</code> / <code>notes_path</code> / <code>personal_info_path</code>
+    / <code>generate_markdown</code> to <code>PipelineConfig</code> and route this runner through the same
+    code path the CLI's <code>_summarize_step</code> uses. Until then, <code>process-all</code> produces a
+    noticeably weaker summary than <code>go</code>.</p>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<section id="cli">
+  <p class="eyebrow">Section 8</p>
+  <h2><span class="secno">8</span>cli.py — the typer surface</h2>
+  <div class="prose">
+    <p>The CLI owns all UX policy — discovery, idempotency, cost gates, interactivity — and delegates
+    every unit of real work to <code>steps/</code>. Three structural ideas explain the whole file:</p>
+
+    <h3>1 · The click-compat bridge</h3>
+    <pre><code>app = typer.Typer(name=<span class="s">"minutia"</span>, add_completion=False)
+<span class="c"># ... @app.callback + 7 @app.command functions ...</span>
+main = typer.main.get_command(app)   <span class="c"># ← a genuine click.Command</span></code></pre>
+    <p>That last line is why the migration was invisible to everything else: the console-script entry
+    point (<code>minutia = "minutia.cli:main"</code>), the package re-export, and
+    <code>click.testing.CliRunner</code> all still receive a Click object. Typer is an implementation
+    detail behind it.</p>
+
+    <h3>2 · Enums derived from registries</h3>
+    <pre><code>SummaryModel = Enum(<span class="s">"SummaryModel"</span>, {c: c <span class="k">for</span> c <span class="k">in</span> anthropic_models}, type=str)
+PromptKind   = Enum(<span class="s">"PromptKind"</span>,   {k: k <span class="k">for</span> k <span class="k">in</span> list_prompt_kinds()}, type=str)</code></pre>
+    <p>Typer renders enum members as CLI choices, so <code>--model</code> and <code>--prompt-kind</code>
+    can never drift from the registries that validate them. Add a model or a prompt flavor at the
+    source, and the CLI updates itself.</p>
+
+    <h3>3 · Shared step helpers</h3>
+    <p>The commands are thin wrappers over three private helpers that hold the actual policy —
+    and <code>go</code> chains the same three, which is why guided and piecemeal runs behave
+    identically:</p>
+  </div>
+
+  <div class="sig"><b>_extract_audio_step</b>(config, video, out_dir, mic, desk, force)   <span class="c"># skip if both wavs exist</span>
+<b>_transcribe_step</b>(config, mic, desk, out_dir, model, gpu, force)  <span class="c"># skip if both {track}-whisper-{model}…json exist</span>
+<b>_summarize_step</b>(config, merged, out_dir, kind, notes, info, model, dry_run, yes)
+    <span class="c"># read context files → estimate → confirm → long summary → AI-named report</span></div>
+
+  <div class="tablewrap"><table>
+    <tr><th>Command</th><th>Calls</th><th>Notable behavior</th></tr>
+    <tr><td><code>extract-audio</code></td><td><code>_extract_audio_step</code></td><td>Input optional → newest recording via <code>resolve_input_video</code>; echoes the pick</td></tr>
+    <tr><td><code>transcribe</code></td><td><code>_transcribe_step</code></td><td><code>--whisper-model</code>, <code>--gpu/--no-gpu</code>, skip-aware</td></tr>
+    <tr><td><code>merge-transcripts</code></td><td><code>process_transcripts</code> directly</td><td>cheap → always regenerates</td></tr>
+    <tr><td><code>summarize</code></td><td><code>_summarize_step</code></td><td>Output arg is a <b>directory</b> (default: beside the transcript); cost gate unless <code>--yes</code>/<code>--dry-run</code></td></tr>
+    <tr><td><code>process-all</code></td><td><code>PipelineOrchestrator.execute</code></td><td>The other universe — RunPaths tree, progress rendering, old summarize path</td></tr>
+    <tr><td><code>go</code></td><td>all three helpers + <code>process_transcripts</code></td><td>Interactive; optional dir argument (<code>minutia go .</code>) overrides recordings dir</td></tr>
+    <tr><td><code>config</code></td><td>—</td><td>Prints every resolved value with its source layer</td></tr>
+  </table></div>
+
+  <div class="prose"><h3>The <code>minutia go</code> sequence</h3></div>
+  <figure>
+    <div class="diagram">
+      <svg viewBox="0 0 960 620" width="100%" role="img" aria-label="Sequence diagram of minutia go">
+        <defs>
+          <marker id="ah3" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L9,4 L0,8 z" class="head"/></marker>
+          <marker id="ah3A" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L9,4 L0,8 z" class="head-accent"/></marker>
+        </defs>
+        <!-- lifeline headers -->
+        <rect x="20" y="12" width="120" height="36" rx="7" class="box"/><text x="80" y="35" text-anchor="middle" font-size="12" font-weight="600">You</text>
+        <rect x="220" y="12" width="130" height="36" rx="7" class="box-accent"/><text x="285" y="35" text-anchor="middle" font-size="12" font-weight="600" class="mono">cli.go</text>
+        <rect x="430" y="12" width="150" height="36" rx="7" class="box"/><text x="505" y="35" text-anchor="middle" font-size="12" font-weight="600" class="mono">step helpers</text>
+        <rect x="650" y="12" width="130" height="36" rx="7" class="box"/><text x="715" y="35" text-anchor="middle" font-size="12" font-weight="600" class="mono">steps/*</text>
+        <rect x="830" y="12" width="115" height="36" rx="7" class="box"/><text x="887" y="35" text-anchor="middle" font-size="12" font-weight="600">Claude API</text>
+        <!-- lifelines -->
+        <line x1="80" y1="48" x2="80" y2="600" class="lane"/>
+        <line x1="285" y1="48" x2="285" y2="600" class="lane"/>
+        <line x1="505" y1="48" x2="505" y2="600" class="lane"/>
+        <line x1="715" y1="48" x2="715" y2="600" class="lane"/>
+        <line x1="887" y1="48" x2="887" y2="600" class="lane"/>
+
+        <!-- messages -->
+        <path d="M80,80 H281" class="arrow" marker-end="url(#ah3)"/>
+        <text x="180" y="72" text-anchor="middle" font-size="11" class="mono">minutia go [PATH]</text>
+
+        <path d="M285,112 H84" class="arrow-accent" marker-end="url(#ah3A)"/>
+        <text x="184" y="104" text-anchor="middle" font-size="11" class="soft">recordings, newest first (1..10)</text>
+        <path d="M80,140 H281" class="arrow" marker-end="url(#ah3)"/>
+        <text x="180" y="132" text-anchor="middle" font-size="11" class="mono">pick #, prompt kind, notes?</text>
+
+        <path d="M285,180 H501" class="arrow" marker-end="url(#ah3)"/>
+        <text x="393" y="172" text-anchor="middle" font-size="11" class="mono">_extract_audio_step</text>
+        <text x="393" y="196" text-anchor="middle" font-size="10" class="faint">skip if both wavs exist</text>
+        <path d="M505,212 H711" class="arrow" marker-end="url(#ah3)"/>
+        <text x="608" y="204" text-anchor="middle" font-size="11" class="mono">process_mkv_file (ffmpeg)</text>
+
+        <path d="M285,252 H501" class="arrow" marker-end="url(#ah3)"/>
+        <text x="393" y="244" text-anchor="middle" font-size="11" class="mono">_transcribe_step</text>
+        <text x="393" y="268" text-anchor="middle" font-size="10" class="faint">skip if both jsons exist</text>
+        <path d="M505,284 H711" class="arrow" marker-end="url(#ah3)"/>
+        <text x="608" y="276" text-anchor="middle" font-size="11" class="mono">process_audio_files (whisper)</text>
+
+        <path d="M285,324 H711" class="arrow" marker-end="url(#ah3)"/>
+        <text x="498" y="316" text-anchor="middle" font-size="11" class="mono">process_transcripts → merged_transcript.json</text>
+
+        <path d="M285,364 H501" class="arrow" marker-end="url(#ah3)"/>
+        <text x="393" y="356" text-anchor="middle" font-size="11" class="mono">_summarize_step(kind, notes)</text>
+        <path d="M505,396 H84" class="arrow-accent" marker-end="url(#ah3A)"/>
+        <text x="294" y="388" text-anchor="middle" font-size="11" class="soft">est. tokens + $ — proceed? [y/N]</text>
+        <path d="M80,424 H501" class="arrow" marker-end="url(#ah3)"/>
+        <text x="290" y="416" text-anchor="middle" font-size="11" class="mono">y</text>
+
+        <path d="M505,456 H883" class="arrow" marker-end="url(#ah3)"/>
+        <text x="694" y="448" text-anchor="middle" font-size="11" class="mono">generate_long_summary (system=prompt kind)</text>
+        <path d="M887,486 H509" class="arrow-accent" marker-end="url(#ah3A)"/>
+        <text x="698" y="478" text-anchor="middle" font-size="11" class="soft">summary … [CONTINUE]? loop until done</text>
+
+        <path d="M505,518 H883" class="arrow" marker-end="url(#ah3)"/>
+        <text x="694" y="510" text-anchor="middle" font-size="11" class="mono">get_filename_from_content (≤100 tok)</text>
+        <path d="M887,548 H509" class="arrow-accent" marker-end="url(#ah3A)"/>
+        <text x="698" y="540" text-anchor="middle" font-size="11" class="soft">20260702_client_sync_kickoff</text>
+
+        <path d="M505,582 H84" class="arrow-accent" marker-end="url(#ah3A)"/>
+        <text x="294" y="574" text-anchor="middle" font-size="11" class="soft">report saved: &lt;out&gt;/&lt;stem&gt;/20260702_….md</text>
+      </svg>
+    </div>
+    <figcaption>One guided run. Interactive moments hug the left edge; API spend hugs the right.
+    Because the skip checks come first, re-running <code>go</code> after a crash (or to try a different
+    prompt kind) costs only the summarize stage — extraction and transcription are free replays.</figcaption>
+  </figure>
+
+  <div class="callout">
+    <span class="tag">Error-handling convention</span>
+    <p>Every command body follows the same shape: helpers raise <code>click.ClickException</code> for
+    user-facing errors (typer sits on click, so these render as <code>Error: …</code> with exit 1);
+    generic exceptions are logged with traceback then re-wrapped; <code>click.exceptions.Abort</code>
+    (a declined confirm) passes through untouched. If you add a command, copy that
+    <code>try/except</code> ladder.</p>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<section id="contracts">
+  <p class="eyebrow">Section 9</p>
+  <h2><span class="secno">9</span>Data contracts on disk</h2>
+  <div class="prose">
+    <p>Files are the real interfaces between stages — each one is versioned
+    (<code>schema_version: "1.0"</code>) and self-describing. The three JSON shapes:</p>
+  </div>
+
+  <div class="card">
+    <h4>Per-track transcript — written by transcribe, read by merge</h4>
+    <pre><code>{
+  <span class="s">"metadata"</span>: {
+    <span class="s">"source_file"</span>: <span class="s">"…/microphone_audio.wav"</span>,
+    <span class="s">"model"</span>: <span class="s">"medium.en"</span>,           <span class="c">← which Whisper produced this</span>
+    <span class="s">"language"</span>: <span class="s">"en"</span>, <span class="s">"duration"</span>: 1834.2,
+    <span class="s">"processed_at"</span>: <span class="s">"2026-07-02T18:04:11+00:00"</span>,
+    <span class="s">"schema_version"</span>: <span class="s">"1.0"</span>
+  },
+  <span class="s">"segments"</span>: [ { <span class="s">"start_time"</span>: 0.0, <span class="s">"end_time"</span>: 2.76, <span class="s">"text"</span>: <span class="s">"…"</span>,
+                  <span class="s">"id"</span>, <span class="s">"tokens"</span>, <span class="s">"temperature"</span>, <span class="s">"avg_logprob"</span>,
+                  <span class="s">"compression_ratio"</span>, <span class="s">"no_speech_prob"</span> } , … ],
+  <span class="s">"text"</span>: <span class="s">"full transcript as one string"</span>
+}</code></pre>
+    <p>The merger's <code>_normalise_segment</code> also accepts <code>start</code>/<code>end</code> key
+    variants and a legacy plaintext format — the compatibility shim that let old notebook outputs
+    keep working during migration.</p>
+  </div>
+
+  <div class="card">
+    <h4>Merged transcript — written by merge, read by summarize</h4>
+    <pre><code>{
+  <span class="s">"metadata"</span>: {
+    <span class="s">"schema_version"</span>: <span class="s">"1.0"</span>, <span class="s">"parse_overlaps"</span>: false,
+    <span class="s">"segment_count"</span>: 23, <span class="s">"total_duration"</span>: 1834.2,
+    <span class="s">"sources"</span>: { <span class="s">"microphone"</span>: {…track metadata…}, <span class="s">"desktop"</span>: {…} },
+    <span class="s">"source_files"</span>: { <span class="s">"microphone"</span>: <span class="s">"…json"</span>, <span class="s">"desktop"</span>: <span class="s">"…json"</span> }
+  },
+  <span class="s">"transcript"</span>: [ { …segment fields…, <span class="s">"source"</span>: <span class="s">"microphone"</span> | <span class="s">"desktop"</span> }, … ]
+}</code></pre>
+    <p>Note the key rename: per-track files say <code>segments</code>, the merged file says
+    <code>transcript</code> — and each entry gains the <code>source</code> label the prompt kinds rely on
+    (<code>[Desktop]</code>/<code>[Microphone]</code> speaker mapping).</p>
+  </div>
+
+  <div class="card">
+    <h4>metadata.json — the orchestrator's receipt</h4>
+    <pre><code>{ <span class="s">"schema_version"</span>: <span class="s">"1.0"</span>,
+  <span class="s">"run_info"</span>: { <span class="s">"started_at"</span>, <span class="s">"completed_at"</span>, <span class="s">"status"</span>: <span class="s">"completed"</span>|<span class="s">"failed"</span>, <span class="s">"error"</span>? },
+  <span class="s">"input"</span>:    { <span class="s">"source_file"</span>, <span class="s">"duration"</span>?, <span class="s">"segment_count"</span>? },
+  <span class="s">"outputs"</span>:  { …paths that exist…, <span class="s">"logs"</span> } }</code></pre>
+    <p>Written on success <em>and</em> failure — a run directory always explains itself.
+    <span class="pill gap">Phase 5</span> adds the per-report sidecar next to each <code>.md</code>
+    (prompt kind + hash, model, params, token counts, cost) so every real run becomes an eval datapoint.</p>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<section id="threads">
+  <p class="eyebrow">Section 10</p>
+  <h2><span class="secno">10</span>Cross-cutting threads</h2>
+  <div class="prose">
+    <p>Four journeys that cross many modules — tracing them is the fastest way to feel fluent.</p>
+
+    <h3>Where a model name travels</h3>
+    <p><code>model_registry.anthropic_models</code> (friendly key) → <code>config.summary_model</code>
+    default / env / file → possibly overridden by <code>--model</code> (enum whose members <em>are</em> the
+    registry keys) → <code>_summarize_step(model_name)</code> → validated again inside
+    <code>generate_long_summary</code> → translated to the API ID via <code>["name"]</code> only at the
+    <code>client.messages.create</code> call. One vocabulary, one translation point.</p>
+
+    <h3>Where the API key travels</h3>
+    <p>Layered lookup in <code>load_config</code> (three names × all layers) →
+    <code>config.anthropic_api_key</code> → passed <em>explicitly</em> as <code>api_key=</code> by the CLI
+    and orchestrator → each step function falls back to <code>resolve_anthropic_api_key()</code>
+    (os.environ) only if not given. The dotenv mutation in <code>_load_env_files</code> keeps that
+    fallback working for notebook users who never touch config objects.</p>
+
+    <h3>Where "which file do I process?" is decided</h3>
+    <p>Explicit CLI argument → else <code>resolve_input_video</code> picks newest
+    <code>.mkv</code> in <code>recordings_dir</code> → in <code>go</code>, the same ordering feeds a pick
+    list instead (and an optional directory argument overrides the configured dir). All three
+    routes echo the chosen file — discovery is never silent.</p>
+
+    <h3>The two output layouts (the subtlety most worth remembering)</h3>
+  </div>
+  <div class="tablewrap"><table>
+    <tr><th></th><th>Step commands + go</th><th>process-all / baseline</th></tr>
+    <tr><td>Layout</td><td>Flat directory (<code>go</code>: <code>&lt;base&gt;/&lt;recording-stem&gt;/</code>)</td><td><code>RunPaths</code> tree: <code>&lt;base&gt;/&lt;date&gt;_&lt;slug&gt;/audio/…</code></td></tr>
+    <tr><td>Naming authority</td><td>The step functions' own conventions</td><td><code>RunPaths</code> dataclass</td></tr>
+    <tr><td>Collision policy</td><td>Skip-if-exists (idempotent re-entry)</td><td>New suffixed dir per run (<code>_2</code>, <code>_3</code>…)</td></tr>
+    <tr><td>Re-run cost</td><td>Only missing stages run</td><td>Everything runs again</td></tr>
+  </table></div>
+  <div class="callout">
+    <span class="tag">Why both exist</span>
+    <p>The flat layout mirrors the notebook's one-folder-per-meeting habit and makes skip-if-exists
+    trivial (stable names). RunPaths gives the orchestrator collision-proof, self-contained run
+    directories. Phase 6 will have to pick a reconciliation — most likely teaching the orchestrator
+    the skip-aware helpers rather than the other way around.</p>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<section id="testing">
+  <p class="eyebrow">Section 11</p>
+  <h2><span class="secno">11</span>The testing map</h2>
+  <div class="prose">
+    <p>Three tiers by marker (<code>unit</code> / <code>integration</code> / <code>slow</code>), with the
+    interesting machinery in fixtures and mocks:</p>
+  </div>
+
+  <div class="tablewrap"><table>
+    <tr><th>Piece</th><th>Where</th><th>What it gives you</th></tr>
+    <tr><td>Golden scenarios</td><td><code>tests/fixtures/scenarios/{4 scenarios}/</code></td><td>Real input MKV + known-good outputs of every stage (<code>01_extracted</code> … <code>04_summarized</code>), generated by the trusted notebook. The merger is verified against <code>03_merged</code> exactly.</td></tr>
+    <tr><td><code>LLMMock</code> + <code>mock_llm</code></td><td><code>tests/mocks/llm_mock.py</code></td><td>Patches <code>summarize_transcript.Anthropic</code>, <code>resolve_anthropic_api_key</code>, and <code>load_config</code> (in config/cli/baseline). <code>set_responses([…])</code> scripts successive completions — first the summary, then the filename.</td></tr>
+    <tr><td><code>mock_whisper</code> / <code>mock_ffmpeg</code></td><td><code>tests/mocks/</code></td><td>Fake the heavy stages for integration tests; <code>chaos_config</code> injects failures at named trigger points.</td></tr>
+    <tr><td>CLI tests</td><td><code>tests/unit/test_cli_*.py</code>, <code>tests/integration/test_cli_process_all.py</code></td><td><code>click.testing.CliRunner</code> against <code>minutia.cli.main</code> — works unchanged across the typer port thanks to the bridge.</td></tr>
+  </table></div>
+
+  <div class="callout warn">
+    <span class="tag">Two honest caveats</span>
+    <p><b>1.</b> Most pre-existing test files carry no tier marker, so <code>make test-unit</code>
+    (<code>pytest -m unit</code>) only collects the <em>new</em> marked modules. Plain
+    <code>uv run pytest</code> is the trustworthy gate right now.</p>
+    <p><b>2.</b> Five tests in <code>test_e2e_permutations.py</code> fail for pre-existing reasons
+    (stale mock attribute targets and a <code>PipelineConfig</code>-signature drift in old test code —
+    not product bugs). They failed identically before this week's work; treat "74 passed, 5 known"
+    as the current green.</p>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<section id="transition">
+  <p class="eyebrow">Section 12</p>
+  <h2><span class="secno">12</span>Transitional state — shims, and what's next</h2>
+
+  <div class="card">
+    <h3>What is a shim right now</h3>
+    <p><b><code>baseline_pipeline.py</code></b> — still the README-documented entry point and still
+    integration-tested, but its brains have moved out: <code>create_markdown_report</code>,
+    <code>get_filename_from_content</code>, and <code>extract_transcript_text</code> are now one-line
+    re-exports from the summarize step. Delete-able the moment Phase 6 lands and the README points
+    at the CLI.</p>
+    <p><b><code>SummaryPromptVariations.ipynb</code></b> — the former daily driver now <em>imports</em>
+    everything (prompt registry, report helpers) from the package; its remaining value is as the
+    fallback until the live milestone run. <b><code>summarize_transcript.anthropic_models</code></b>
+    and the baseline re-exports are compatibility aliases — new code should import from
+    <code>model_registry</code> and <code>steps/</code> directly.</p>
+  </div>
+
+  <div class="card">
+    <h3>Breaking changes to keep in muscle memory</h3>
+    <dl class="kv">
+      <dt>summarize output</dt><dd>Second argument is now a <b>directory</b>; the report names itself (<code>YYYYMMDD_topic.md</code>). No more <code>OUTPUT.txt</code>.</dd>
+      <dt>default output home</dt><dd><code>~/Documents/minutia</code>, not <code>./runs</code> — set <code>MINUTIA_OUTPUT_DIR</code> if you relied on CWD.</dd>
+      <dt>default model</dt><dd><code>claude-sonnet-4-6</code> everywhere; the old default name was invalid and crashed.</dd>
+      <dt>unknown prompt kind</dt><dd>Raises (CLI rejects earlier via enum choices) — no silent fallback.</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <h3>The remaining roadmap, in code terms</h3>
+    <p><b>Milestone check</b> (yours): one real meeting through <code>minutia go</code>, then the
+    notebook retires.</p>
+    <p><b>Phase 5 — eval seams:</b> a <code>SummaryClient</code> protocol in the (currently empty)
+    <code>clients/</code> package — <code>complete(system_prompt, text, *, model, …) → str</code> — with
+    an Anthropic implementation, so <code>generate_long_summary</code> takes a client instead of
+    constructing one; plus the run-metadata sidecar per report. Together they make
+    local-LLM summarization a drop-in and every run an eval datapoint.</p>
+    <p><b>Phase 6 — convergence:</b> extend <code>PipelineConfig</code> with prompt-kind/notes/report
+    fields, route the orchestrator's summarize runner through <code>_summarize_step</code>'s path,
+    update the README, then delete <code>baseline_pipeline.py</code> and its test. After that, the
+    table in Section 1 collapses to a single row — and this atlas gets one page shorter.</p>
+  </div>
+
+  <hr class="section-rule">
+  <p style="margin-top:22px; color:var(--ink-faint); font-size:0.85rem;">
+    Minutia Source Atlas · generated 2026-07-02 against branch <code>uv_refactor</code> (post Phase-4
+    checkpoint). Spine documents: <code>_snap/features/[active]refactor_to_cli.md</code> ·
+    <code>_snap/DECISIONS.md</code>. When Phases 5–6 land, regenerate sections 7, 10, and 12.
+  </p>
+</section>
+
+</div>
