@@ -176,10 +176,12 @@ def generate_long_summary(
     full_summary = ""
     while True:
         try:
+            # NOTE: sampling params (temperature/top_p/top_k) were removed from
+            # messages.create() in the anthropic 1.x SDK and are rejected on
+            # Claude 4.6+ models. Do not reintroduce `temperature` here.
             response = client.messages.create(
                 model=model,
                 max_tokens=max_output_tokens,
-                temperature=0.1,
                 system=system_prompt,
                 messages=messages,
                 **kwargs,
@@ -236,7 +238,6 @@ def generate_summary(
         response = client.messages.create(
             model=model,
             max_tokens=max_output_tokens,
-            temperature=0,
             system=system_prompt,
             messages=messages,
             **kwargs,
@@ -265,7 +266,6 @@ def get_filename_from_content(
         response = client.messages.create(
             model=model,
             max_tokens=100,
-            temperature=0.7,
             messages=[{"role": "user", "content": prompt}],
         )
         return response.content[0].text

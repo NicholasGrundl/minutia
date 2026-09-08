@@ -55,6 +55,9 @@ Split out of the former `refactor_for_opensource_portfolio` draft (kept as the v
 - **`[draft]`** [`local-llm-summarization`](./features/%5Bdraft%5Dlocal-llm-summarization.md)
   (depends on `eval-seams`)
 - **`[draft]`** [`evals-harness`](./features/%5Bdraft%5Devals-harness.md) (depends on `eval-seams`)
+- **`[draft]`** [`tests-refactor`](./features/%5Bdraft%5Dtests-refactor.md) — triage/group tests,
+  rework fixtures+mocks (incl. the anthropic-1.x mock-drift hang), fix the 5 e2e failures, bring
+  `tests/` into the ruff+ty gate. Collects the test debt deferred by `justfile-migration`.
 
 ## D. Open-source release prep
 

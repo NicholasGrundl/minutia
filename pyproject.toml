@@ -7,7 +7,10 @@ license = { text = "MIT" }
 authors = [
     { name = "Nicholas Grundl", email = "nicholasgrundl@gmail.com" }
 ]
-requires-python = ">=3.12"
+# Upper-capped at <3.14 because PyTorch has no cp314 wheels yet (uv tool install
+# otherwise defaults to the newest interpreter, 3.14, and fails to resolve torch).
+# Lift the cap once torch ships cp314 wheels.
+requires-python = ">=3.12,<3.14"
 keywords = ["meeting", "transcription", "audio", "summarization", "whisper"]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -36,7 +39,10 @@ dependencies = [
     "torch>=2.4,<2.6",
     "transformers",
     # LLM clients
-    "anthropic",
+    # Pin to the 1.x major: the 0.x -> 1.x jump removed sampling params
+    # (temperature/top_p/top_k) from messages.create(). Keep dev and tool
+    # installs on the same major so this drift can't recur.
+    "anthropic>=1.4",
     "instructor",
     "openai",
     "typer>=0.25.1",
