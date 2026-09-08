@@ -8,6 +8,32 @@ close.
 
 ---
 
+## 2026-09-08 — justfile-migration / justfile + `ty` adopted (code complete)
+
+- **Set out to:** Replace the `Makefile` with a `justfile` task runner and adopt Astral's `ty`
+  as the type checker, on the base (`uv_refactor`) so it rides along at `main` promotion.
+- **Why:** Dev-facing half of the tooling modernization (`EXECUTIVE_SUMMARY.md`); matches the
+  sibling project's `just`+`ty` loop. CI/release half is the separate `ci-release-pipelines`.
+- **How it ended:** Code done.
+  - **`justfile`** authored (repo root): `sync`/`sync-all`, `lint`, `format`, `ruff` (mutating),
+    `ty`, `check-all` (= ruff + ty + test), `test *args` + tiers, `create-env-file`, `jupyter`,
+    `clean`. Dropped `commit`/`test-codex`/`lint-codex`/`install-jupyter`.
+  - **`ty==0.0.79`** added to the `dev` group; `[tool.ty]` config pins `python-version=3.12`.
+  - **Gate scoped to `src`** (not `src`+`tests`) — user decision: `tests/` has ~28 lint + 13
+    format items of pre-existing debt and will churn in the coming test refactor, so cleaning +
+    gating tests is deferred to a future **tests-refactor** feature. `tests/` left untouched.
+  - **`ty` triage:** 48 → 26 (scoping) → 9 real src errors. Large count → **baselined** via a
+    narrow per-file `[[tool.ty.overrides]]` (4 rules, 4 files); `just ty` exits 0. Found a latent
+    bug (None-subscript on unknown model in `summarize_transcript.py`) — logged, not fixed.
+  - **`just check-all`:** ruff + ty GREEN on `src`; `test` step surfaces the 5 pre-existing e2e
+    failures (`test_e2e_permutations.py`) — deferred, unchanged from baseline (74 passed / 5 fail).
+  - **Gotcha:** `ruff check --fix` deletes conftest fixture re-imports (F401) — a reason tests
+    stay out of the mutating recipe until fixtures are registered idiomatically.
+- **Why we stopped:** Code complete. Two `_snap`-etiquette git ops handed to the user:
+  `git mv` the spec `[ready]→[active]` (then `→[done]`) and `git rm Makefile` (each its own commit).
+- **Next:** User runs the two git ops + a `[MACRO]` commit; then `justfile-migration` → `[done]`.
+  Follow-ups tracked under ROADMAP "Known issues" (ty baseline debt; tests-refactor feature).
+
 ## 2026-07-02 — refactor_to_cli / Phase 4 code COMPLETE: notebook-parity CLI + minutia go
 
 - **Set out to:** All Phase 4 tasks in one session: summarize upgrade, cost confirm,

@@ -14,20 +14,19 @@ and add it to [`ROADMAP.md`](../ROADMAP.md).
 
 ---
 
-### Dev-env modernization: Makefile → justfile, direnv (.envrc)
+### Dev-env modernization: direnv (.envrc)
 
-- **Context**: 2026-07-02 — user is migrating their dev tooling: task running moves from
-  `make` to `just` (justfile), env management to `direnv` (`.envrc`), plus other recent
-  tooling changes. Repo currently has a `Makefile` (with one already-broken target,
-  `make commit` — see `opensource_polishing.md`) and CWD `.env` loading. Reference material
-  already cached: `_snap/context/just/`, `_snap/context/direnv/`.
-- **When**: after (or alongside) the `refactor_to_cli` config work lands — the Phase 3
-  config-precedence design (flag > env > `.env` > user config) should be direnv-friendly
-  either way. Also touches AGENTS.md's "Development Commands" section and CI docs.
-- **Options**: straight port of Makefile targets to a justfile; or prune to the targets
-  actually used (install/lint/format/test/jupyter) while porting.
-- **Effort**: Small.
-- **Decision**: 2026-07-02 — noted here rather than a draft spec, per user ("you decide").
+- **Context**: 2026-07-02 — user is migrating dev tooling. The **justfile** half was PROMOTED
+  2026-09-08 to `features/[ready]justfile-migration.md` (also folds in `ty` adoption). What
+  remains here is only the **direnv** piece: env management via `.envrc` (auto-activate the uv
+  env), replacing CWD `.env` loading. Reference cached: `_snap/context/direnv/`.
+- **When**: after the `justfile-migration` lands; the Phase 3 config-precedence design
+  (flag > env > `.env` > user config) is direnv-friendly either way.
+- **Options**: minimal `.envrc` (`layout uv` / `source .venv/bin/activate`) vs. a fuller
+  `dotenv`-integrated setup.
+- **Effort**: Trivial–Small.
+- **Decision**: 2026-09-08 — direnv kept in BACKLOG (not bundled into the justfile migration,
+  per PLAN); promote to a draft when triggered.
 
 ### Guided TUI mode for the pipeline
 

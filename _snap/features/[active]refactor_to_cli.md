@@ -123,8 +123,10 @@ see [`[draft]refactor_for_opensource_portfolio.md`](./%5Bdraft%5Drefactor_for_op
 - [ ] **Milestone check**: run one real meeting end-to-end with only CLI commands; retire
       the notebook for daily use *(user's next real meeting — everything short of a live
       Whisper+API run is verified)*
+      **→ SPLIT OUT 2026-09-08** into `features/[ready]finish-cli-parity.md`. This spec closes
+      (`→[done]`) when that milestone passes.
 
-### Phase 5: Eval Seams — NOT STARTED
+### Phase 5: Eval Seams — NOT STARTED → SPLIT OUT to `features/[ready]eval-seams.md` (2026-09-08)
 - [ ] `clients/summary_client.py`: `SummaryClient` protocol —
       `complete(system_prompt, text, *, model, max_tokens, temperature) -> str` — plus
       `AnthropicSummaryClient`; refactor `generate_long_summary`/`generate_summary` to accept
@@ -134,7 +136,7 @@ see [`[draft]refactor_for_opensource_portfolio.md`](./%5Bdraft%5Drefactor_for_op
       model, params, token counts, estimated cost, timestamps, output path (unit test:
       sidecar schema round-trips)
 
-### Phase 6: Orchestrator Hardening & Baseline Retirement — NOT STARTED
+### Phase 6: Orchestrator Hardening & Baseline Retirement — NOT STARTED → SPLIT OUT to `features/[ready]orchestrator-retire-baseline.md` (2026-09-08)
 - [ ] Add `prompt_kind`, `notes_path`, `personal_info_path`, `generate_markdown` fields to
       `PipelineConfig`; wire the summarize step through the same
       prompt-registry + `generate_long_summary` + report path the CLI uses

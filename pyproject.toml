@@ -50,6 +50,7 @@ dev = [
     "pytest-cov",
     "pytest-mock>=3.15.1",
     "ruff",
+    "ty",
 ]
 # Notebook environment + plotting (`uv sync --group jupyter`)
 jupyter = [
@@ -118,6 +119,35 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+
+[tool.ty.environment]
+# Match requires-python (ty defaults to 3.14).
+python-version = "3.12"
+
+[tool.ty.src]
+# Type-check the package source only. Legacy Jupyter-widget code (not used by the
+# CLI) is out of scope. Tests are gated by a future tests-refactor feature.
+include = ["src"]
+exclude = ["src/minutia/legacy"]
+
+# --- ty baseline (adopted 2026-09-08, justfile-migration) ---
+# Pre-existing type errors captured when `ty` was first adopted. Scoped per-file
+# and per-rule so NEW errors elsewhere still fail `just ty`. Driving these to zero
+# (and fixing the latent None-subscript bug in summarize_transcript) is a tracked
+# follow-up — see ROADMAP "Known issues".
+[[tool.ty.overrides]]
+include = [
+    "src/minutia/logging.py",
+    "src/minutia/pipeline/orchestrator.py",
+    "src/minutia/steps/summarize_transcript.py",
+    "src/minutia/steps/video_extraction.py",
+]
+
+[tool.ty.overrides.rules]
+no-matching-overload = "ignore"
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+not-subscriptable = "ignore"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
