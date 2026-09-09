@@ -1,0 +1,29 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.12" # pin for reproducibility; bump alongside local uv
+      # The tag must equal v$(uv version --short). scripts/release.py bumps the
+      # version, commits, then tags in that order, so a tag pushed by the bumper
+      # always satisfies this guard; a hand-pushed mismatched tag fails here.
+      - name: Verify tag matches pyproject version
+        run: |
+          PYPROJECT="v$(uv version --short)"
+          if [ "$PYPROJECT" != "${GITHUB_REF_NAME}" ]; then
+            echo "::error::tag ${GITHUB_REF_NAME} != pyproject ${PYPROJECT}"; exit 1
+          fi
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true

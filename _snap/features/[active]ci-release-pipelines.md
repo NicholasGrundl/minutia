@@ -1,9 +1,13 @@
 ---
-state: ready          # draft | ready | active | done | deprecated
+state: active          # draft | ready | active | done | deprecated
 changelog:
   "2026-09-08": "Initial spec — the release/CI half of the tooling modernization. Blocked by
     main promotion; started as a fresh feature once main is the real trunk. Sibling of
     [ready]justfile-migration."
+  "2026-09-09": "Flipped [ready]→[active]: precondition met (main promoted via PR #1, base
+    stable + green; ci-release-pipelines branch cut from it). Starting BUILD — author
+    scripts/release.py + ci.yml + release.yml + justfile recipes, then dry-run validate.
+    Cutting the first real release (task 7) deferred until the workflows land on main."
 ---
 
 # CI + release pipelines (GitHub Actions + semver tagging)
@@ -37,19 +41,21 @@ CI runs it).
 
 ## Task Checklist
 
-- [ ] **Precondition:** `main` is the real trunk (base promoted). Do not start otherwise.
-- [ ] Add `scripts/release.py`, adapted from `_snap/reference/ci_content/release.py` (align the
+- [x] **Precondition:** `main` is the real trunk (base promoted). Do not start otherwise.
+      (Met 2026-09-09: `main` carries the stabilized base via PR #1; this branch cut from it.)
+- [x] Add `scripts/release.py`, adapted from `_snap/reference/ci_content/release.py` (align the
       `chore: release <tag>` commit message with repo convention if desired; keep the dirty-tree
       and existing-tag guards and the `uv version --bump … --dry-run --short` preview).
-- [ ] Add `.github/workflows/ci.yml` (checkout, `astral-sh/setup-uv` with cache, `uv sync`,
+- [x] Add `.github/workflows/ci.yml` (checkout, `astral-sh/setup-uv` with cache, `uv sync`,
       `ruff format --check`, `ruff check`, `ty check`).
-- [ ] Add `.github/workflows/release.yml` (`on: push tags v*`, `contents: write`, verify
+- [x] Add `.github/workflows/release.yml` (`on: push tags v*`, `contents: write`, verify
       `v$(uv version --short) == GITHUB_REF_NAME`, `action-gh-release` with
       `generate_release_notes: true`).
-- [ ] Add justfile recipes `tag-patch` / `tag-minor` / `tag-major` →
+- [x] Add justfile recipes `tag-patch` / `tag-minor` / `tag-major` →
       `uv run python scripts/release.py <level>`.
-- [ ] Dry-run validate: `uv run python scripts/release.py patch -n` previews the right tag and
-      the guards fire on a dirty tree / pre-existing tag.
+- [x] Dry-run validate: `uv run python scripts/release.py patch -n` previews the right tag and
+      the guards fire on a dirty tree / pre-existing tag. (Validated 2026-09-09: previewed
+      `v0.1.1`; both warnings fired — dirty tree + a throwaway `v0.1.1` tag, since deleted.)
 - [ ] Cut a first real release to validate end-to-end (tag pushes → `release.yml` publishes a
       Release with notes). Likely `v0.2.0` (first release off the stabilized `main`).
 

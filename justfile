@@ -36,14 +36,6 @@ create-env-file:
 # Code quality
 # ---------------------------------------------------------------------------
 
-# Lint (read-only) — package source + tests
-lint:
-    uv run ruff check src tests
-
-# Format code — package source + tests
-format:
-    uv run ruff format src tests
-
 # Format code and apply all safe lint fixes (mutating) — package source + tests
 ruff:
     uv run ruff format src tests
@@ -55,7 +47,7 @@ ty:
     uv run ty check
 
 # Dev gate: mutating ruff, then ty, then the test suite
-check-all: ruff ty test
+ci: ruff ty
 
 # ---------------------------------------------------------------------------
 # Testing
@@ -80,6 +72,25 @@ test-all:
 # Tests with coverage report (terminal + HTML)
 test-cov:
     uv run pytest --cov=src/minutia --cov-report=html --cov-report=term
+
+# ---------------------------------------------------------------------------
+# Release
+# ---------------------------------------------------------------------------
+# Bump the version, commit, tag, and push — pushing the v* tag triggers the
+# release workflow (.github/workflows/release.yml). Preview first with
+# `uv run python scripts/release.py patch -n`.
+
+# Cut a patch release (e.g. 0.1.0 -> 0.1.1): bump, commit, tag, push.
+tag-patch:
+    uv run python scripts/release.py patch
+
+# Cut a minor release (e.g. 0.1.0 -> 0.2.0): bump, commit, tag, push.
+tag-minor:
+    uv run python scripts/release.py minor
+
+# Cut a major release (e.g. 0.1.0 -> 1.0.0): bump, commit, tag, push.
+tag-major:
+    uv run python scripts/release.py major
 
 # ---------------------------------------------------------------------------
 # Development
