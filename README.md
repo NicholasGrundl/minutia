@@ -15,22 +15,25 @@ Minutia is managed with [`uv`](https://docs.astral.sh/uv/) and requires
 **Python `>=3.12,<3.14`** (Whisper's `torch` has no `cp314` wheels yet). It uses
 the **anthropic 1.x** SDK.
 
-```bash
-# 1. Development environment (creates .venv, installs the dev group)
-uv sync
+The recommended way to run minutia is as a `uv` tool installed from the repo:
 
-# 2. Install the `minutia` command itself (editable, pinned interpreter)
-uv tool install --editable . --python 3.12
+```bash
+# One-time GitHub auth (only while the repo is private):
+gh auth setup-git
+
+# Install the `minutia` command in its own isolated environment:
+uv tool install git+https://github.com/NicholasGrundl/minutia@main
 ```
+
+A recent uv selects a compatible interpreter automatically — no `--python` flag
+needed. See **[docs/setup.md](docs/setup.md)** for the SSH alternative, upgrading,
+the interpreter note, and developing from a local clone.
 
 Set your API key before summarizing:
 
 ```bash
 export ANTHROPIC_API_KEY=sk-ant-...
 ```
-
-If the `minutia` console script isn't on your `PATH`, prefix commands with
-`uv run` (e.g. `uv run minutia go`).
 
 ## Quickstart
 
