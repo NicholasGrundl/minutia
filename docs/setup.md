@@ -119,3 +119,18 @@ uv tool install --editable .
 
 (No `--python` needed with a recent uv.) See the README's **Development** section for the
 `just` task recipes (`just sync`, `just lint`, `just ty`, `just test`, `just check-all`).
+
+### PyTorch build (CPU vs CUDA)
+
+`torch` comes in transitively via Whisper. A bare `uv sync` resolves it from PyPI — the
+**CUDA (GPU) build** on Linux, which is what you want for real transcription. Two extras let
+you pin the build explicitly (they're mutually exclusive):
+
+```bash
+uv sync --extra cpu     # CPU-only wheels (~200 MB, no nvidia-* libs) — what CI installs
+uv sync --extra cu124   # CUDA 12.4 wheels from the PyTorch index
+```
+
+CI uses `--extra cpu` because the runners have no GPU and only run the lint + type gate;
+that avoids downloading the ~2.5 GB CUDA stack. Reproduce CI's environment locally with
+`just sync-cpu`.

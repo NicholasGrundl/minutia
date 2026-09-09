@@ -11,9 +11,13 @@ default:
 # Environment
 # ---------------------------------------------------------------------------
 
-# Install/sync the environment (default dev group)
+# Install/sync the environment (dev group + CUDA torch — the GPU build from PyPI)
 sync:
     uv sync
+
+# Sync with the CPU-only torch build (no CUDA/nvidia libs) — what CI runs
+sync-cpu:
+    uv sync --extra cpu
 
 # Install/sync with all dependency groups (dev, jupyter, diagnostics, experiments, media)
 sync-all:
