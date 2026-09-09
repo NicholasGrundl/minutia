@@ -36,22 +36,21 @@ create-env-file:
 # Code quality
 # ---------------------------------------------------------------------------
 
-# Lint (read-only) — scoped to package source
+# Lint (read-only) — package source + tests
 lint:
-    uv run ruff check src
+    uv run ruff check src tests
 
-# Format code — scoped to package source
+# Format code — package source + tests
 format:
-    uv run ruff format src
+    uv run ruff format src tests
 
-# Format code and apply all safe lint fixes (mutating) — scoped to package source
+# Format code and apply all safe lint fixes (mutating) — package source + tests
 ruff:
-    uv run ruff format src
-    uv run ruff check --fix src
+    uv run ruff format src tests
+    uv run ruff check --fix src tests
 
 # Type check (read-only — ty has no autofix; errors need manual edits)
-# Scope is set by [tool.ty.src] in pyproject.toml (src). Tests are gated in a
-# future tests-refactor feature.
+# Scope is set by [tool.ty.src] in pyproject.toml (src + tests).
 ty:
     uv run ty check
 

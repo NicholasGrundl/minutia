@@ -1,5 +1,5 @@
 ---
-state: draft
+state: done
 changelog:
   "2026-09-08": "Initial stub — collects the test-suite work deferred by
     justfile-migration (gate scoping, failing e2e tests, fixture-registration gotcha) plus the
@@ -7,9 +7,16 @@ changelog:
     the Test Architecture section (env isolation / lifecycle-per-tag / ordering / conftest scoping);
     diagnosed the full-suite hang as ffmpeg env-leak (not the LLM mock) and skipped the offending
     test; reordered the checklist isolation-first."
+  "2026-09-08 (BUILD)": "Completed the last two tasks — directory-based tier triage
+    (+ tests/slow/ real-key guard) and bringing tests/ into the ruff + ty gate (13 ty diagnostics
+    baselined; tests/scripts/ excluded). All six checklist items now [x]; feature is
+    checklist-complete and ready to flip [draft]→[done] on the next approved git mv."
 ---
 
 # tests-refactor (parked)
+
+> **Status (2026-09-08):** checklist-complete. Kept `[draft]` only because the `[draft]→[done]`
+> filename flip is a separately-approved `git mv` (per `_snap` convention). Content below is final.
 
 ## Executive Overview
 
@@ -42,7 +49,7 @@ caused the full-suite hang. Close the environment in the **top-level `tests/conf
 - **`cli_runner` — wraps `CliRunner`** and always invokes with `env=minutia_env` + `input=""`, so a
   stray interactive prompt errors instead of blocking on stdin.
 
-The production-side companion is [`[active]settings-resolution.md`](./%5Bactive%5Dsettings-resolution.md):
+The production-side companion is [`settings-resolution.md`](./%5Bdone%5Dsettings-resolution.md):
 replace the current `load_dotenv()` process mutation with Pydantic Settings and explicit source
 composition. That prevents one config load from contaminating the next. The scrub above remains
 necessary because process environment variables are legitimate settings inputs and tests must not
@@ -91,9 +98,14 @@ grouping, doubles, the known failures, and finally the gate.
       `test_process_all_without_input_and_without_recordings_dir_errors` once the scrub is in.
 - [x] **Adopt `pytest-timeout`** — dev dep + a default `--timeout` in `pyproject.toml` so a future
       blocker fails fast with a traceback instead of hanging (§3).
-- [ ] **Triage & group** every test into `unit` / `integration` / `slow` per the §2 table; mark or
+- [x] **Triage & group** every test into `unit` / `integration` / `slow` per the §2 table; mark or
       delete dead tests; add `tests/slow/` with the real-key skip guard (§4). Fast subset = the
       normal loop; full suite opt-in.
+      **Done (2026-09-08):** tier == directory via `pytest_collection_modifyitems` in the root
+      conftest (single source of truth); per-file `pytestmark`/decorators removed;
+      `git mv test_mocks_sanity.py → tests/unit/`; `tests/slow/` added with an import-time real-key
+      capture + skip guard (re-injects past the autouse env-scrub). Result: 83 unit / 14 integration
+      / 0 slow / **0 unmarked**.
 - [x] **Rework fixtures & mocks** — rebuild `tests/mocks/` against current deps; register them via
       `pytest_plugins` (§2) instead of conftest re-imports that `ruff --fix` deletes (F401). Include
       the anthropic-1.x mock-shape fix (below) as part of this.
@@ -102,10 +114,14 @@ grouping, doubles, the known failures, and finally the gate.
       align to the real interface. Overlaps `orchestrator-retire-baseline`.
 - [x] **Fix the anthropic-1.x mock shape** — make `llm_mock.py` intercept correctly under
       anthropic 1.x (correctness; note per Details it was *not* the cause of the full-suite hang).
-- [ ] **Bring `tests/` into the gate** — clean the ~28 lint + 13 format items and re-scope
+- [x] **Bring `tests/` into the gate** — clean the ~28 lint + 13 format items and re-scope
       ruff + ty to `src` + `tests` (justfile-migration gated on `src` only).
-      **Partial:** tests are now Ruff-clean/formatted and `ty check src tests` passes; updating the
-      persisted `justfile`/`[tool.ty.src]` scopes is the next BUILD action.
+      **Done (2026-09-08):** `justfile` `lint`/`format`/`ruff` now run `src tests`;
+      `[tool.ty.src].include = ["src", "tests"]` (excluding `tests/scripts/` — fixture-gen tooling +
+      notebook with optional-only deps, not the suite). Tests were Ruff-clean, but with tests
+      *actually* in the gate `ty` found 13 diagnostics in real test files (dynamic-pattern inference
+      gaps, not runtime bugs) — **baselined** via a dedicated `[[tool.ty.overrides]]` block, per-file
+      + per-rule, mirroring the src baseline. Full gate green (ruff + ty + 97 pytest).
 
 ## Details
 

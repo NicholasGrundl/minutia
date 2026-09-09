@@ -10,8 +10,6 @@ from minutia import config as config_module
 from minutia.config import ConfigurationError, discover_env_file, resolve_settings
 from minutia.paths import resolve_input_video
 
-pytestmark = pytest.mark.unit
-
 SETTINGS_ENV_KEYS = (
     "ANTHROPIC_API_KEY",
     "CLAUDE_API_KEY",

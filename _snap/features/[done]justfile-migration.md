@@ -47,8 +47,7 @@ Reference: `just` and `ty` usage patterns come from the sibling-project sibling 
       — **48 → 26 (scoped) → 9 (src-only)**; large count → **baselined** via a narrow per-file
       `[[tool.ty.overrides]]` on 4 src files. `just ty` exits 0. Follow-up filed (see Build notes).
 - [x] Wire `ty` into the `check-all` recipe so the dev gate is ruff + ty + test.
-- [ ] `git rm Makefile` (its own individually-committed step, per `_snap` mv/rm etiquette).
-      — **handed to user** to run.
+- [x] `git rm Makefile` — done (Makefile removed; repo is `just`-only).
 - [x] Confirm `just check-all` is green on `uv_refactor`. — **ruff + ty GREEN on `src`**; the
       `test` step surfaces **5 pre-existing e2e failures** that are **deferred** (see Build notes).
 

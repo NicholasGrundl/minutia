@@ -7,8 +7,6 @@ from click.testing import CliRunner
 
 import minutia.cli
 
-pytestmark = pytest.mark.unit
-
 
 @pytest.fixture
 def runner(tmp_path, monkeypatch):

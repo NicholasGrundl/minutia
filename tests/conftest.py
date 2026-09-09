@@ -20,6 +20,24 @@ pytest_plugins = (
     "tests.mocks.whisper_mock",
 )
 
+# Tier == directory: this is the single source of truth for the unit /
+# integration / slow markers. Files carry no per-file `pytestmark`; putting a
+# test in the right directory is all that's needed. Kills the marker-drift class.
+_TIER_DIRS = {"unit", "integration", "slow"}
+
+
+def pytest_collection_modifyitems(config, items):
+    """Auto-apply the tier marker from each test's top-level directory."""
+    tests_root = Path(__file__).parent
+    for item in items:
+        try:
+            rel = item.path.relative_to(tests_root)
+        except ValueError:
+            continue
+        top = rel.parts[0] if rel.parts else ""
+        if top in _TIER_DIRS:
+            item.add_marker(getattr(pytest.mark, top))
+
 
 @pytest.fixture(autouse=True)
 def _scrub_minutia_environment(monkeypatch):

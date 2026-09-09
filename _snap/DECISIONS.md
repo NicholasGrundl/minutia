@@ -8,6 +8,46 @@ close.
 
 ---
 
+## 2026-09-08 — tests-refactor: tier triage + tests into the lint/type gate (checklist complete)
+
+- **Set out to:** Finish the two open `tests-refactor` tasks — the pre-stabilization test work
+  gating the `uv_refactor → main` PR: (1) triage/group every test into `unit`/`integration`/`slow`
+  and add a `tests/slow/` real-key guard; (2) bring `tests/` into the ruff + ty gate.
+- **Why:** The ROADMAP promotion milestone requires a green, tiered suite in the gate before the PR;
+  4/6 of the checklist was already done in the settings-resolution session, leaving these two.
+- **How it ended:** Done — full gate green: `ruff check/format src tests` clean, `ty check` passes,
+  **97 passed** (83 unit / 14 integration / 0 slow / **0 unmarked**).
+  - **Tiering by directory (single source of truth):** added `pytest_collection_modifyitems` to
+    `tests/conftest.py` that marks each test `unit`/`integration`/`slow` from its top-level dir.
+    Removed the now-redundant per-file `pytestmark`/`@pytest.mark.<tier>` (and the freed
+    `import pytest` in `test_generate_golden_samples.py`). Chosen over explicit per-file markers to
+    permanently kill the marker-drift class (user decision). `git mv tests/test_mocks_sanity.py →
+    tests/unit/` so it falls under the unit dir.
+  - **`tests/slow/` scaffold:** new dir (`__init__.py` + `conftest.py`). The root autouse env-scrub
+    deletes `ANTHROPIC_API_KEY`, so the slow guard captures the real key at *import* time and, for
+    slow tests only, re-injects it past the scrub; skips the whole tier when no real `sk-ant-…` key
+    is present. No real-calling slow test added yet (future eval-seams/real-model work lands here).
+  - **Gate expansion:** `justfile` `lint`/`format`/`ruff` recipes `src → src tests`;
+    `[tool.ty.src].include = ["src", "tests"]`, excluding `tests/scripts/` (fixture-gen tooling +
+    a notebook with optional-only deps GPUtil/psutil and stale APIs — not the suite proper).
+  - **ty-in-tests reality check:** the prior session's "ty check src tests passes" was inaccurate —
+    with tests actually in the gate, ty found 13 diagnostics in real test files (all type-inference
+    gaps over dynamic patterns — dict `**kwargs` into `PipelineConfig`, a `get_prompt_builder()`
+    callable ty can't see the signature of, an `object`-typed capture dict — **not** runtime bugs;
+    suite green). Per user decision, **baselined all 13** via a dedicated `[[tool.ty.overrides]]`
+    block (mirrors the existing 9-error src baseline), scoped per-file + per-rule so new errors
+    still fail. Tightening those seams (annotate the test local; give `get_prompt_builder` a
+    `Callable`/`Protocol` return) is tracked follow-up debt.
+- **Why we stopped:** All six `tests-refactor` checklist items are now complete; natural close.
+- **Next:**
+  1. `[draft]tests-refactor.md` is checklist-complete → flip `[draft]→[done]` (a separately-approved
+     `git mv` + frontmatter `state`, per `_snap` convention). Content is already updated/ticked.
+  2. Macro-commit this checkpoint (message drafted in session).
+  3. The pre-PR "once-through of the tests" item on the promotion milestone is satisfied; the
+     remaining pre-PR item is the `README.md` update (make→just, install/usage, anthropic 1.x).
+  4. Follow-up debt (not blocking): drive both ty baselines (9 src + 13 tests) to zero; fix the
+     latent None-subscript bug in `steps/summarize_transcript.py`.
+
 ## 2026-09-08 — settings resolution + test-suite stabilization (code complete, gate handoff)
 
 - **Set out to:** Fix the production configuration design exposed by the test-suite environment

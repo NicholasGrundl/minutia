@@ -2,10 +2,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
 
-
-@pytest.mark.integration
 def test_generate_golden_samples_discovery(tmp_path):
     """Test that the generate_golden_samples script can discover scenarios."""
     # Create a dummy scenario structure

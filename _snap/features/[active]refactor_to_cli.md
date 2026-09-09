@@ -194,7 +194,7 @@ convenience. Design:
 
 **Superseded config-loading details (2026-09-08):** the platformdirs location and defaults remain,
 but the hand-written dotenv loader proved stateful during the test-refactor investigation. The
-replacement design lives in [`[active]settings-resolution.md`](./%5Bactive%5Dsettings-resolution.md):
+replacement design lives in [`settings-resolution.md`](./%5Bdone%5Dsettings-resolution.md):
 Pydantic Settings, one cwd-contextual `.env` discovered with explicit boundaries, no `.minutia`,
 no `os.environ` mutation, source-relative paths, and pipeline specifications kept orthogonal.
 

@@ -132,10 +132,12 @@ line-ending = "auto"
 python-version = "3.12"
 
 [tool.ty.src]
-# Type-check the package source only. Legacy Jupyter-widget code (not used by the
-# CLI) is out of scope. Tests are gated by a future tests-refactor feature.
-include = ["src"]
-exclude = ["src/minutia/legacy"]
+# Type-check the package source and the test suite. Legacy Jupyter-widget code
+# (not used by the CLI) is out of scope, as is tests/scripts/ — fixture-generation
+# tooling and a notebook with optional-only deps (GPUtil, psutil) and stale APIs,
+# not part of the test suite proper (folded into the notebooks-clean-rebuild work).
+include = ["src", "tests"]
+exclude = ["src/minutia/legacy", "tests/scripts"]
 
 # --- ty baseline (adopted 2026-09-08, justfile-migration) ---
 # Pre-existing type errors captured when `ty` was first adopted. Scoped per-file
@@ -155,6 +157,27 @@ no-matching-overload = "ignore"
 invalid-argument-type = "ignore"
 invalid-assignment = "ignore"
 not-subscriptable = "ignore"
+
+# --- ty baseline for tests (adopted 2026-09-08, tests-refactor) ---
+# 13 pre-existing diagnostics captured when the test suite was brought into the
+# gate. All are ty type-inference gaps over dynamic test patterns, NOT runtime
+# bugs (the suite is green): dict `**kwargs` unpacking into `PipelineConfig`
+# (conftest), a `get_prompt_builder()` callable whose signature ty can't see
+# (test_prompts), and an `object`-typed capture dict (test_cli_process_all).
+# Scoped per-file + per-rule so NEW errors elsewhere in tests still fail `ty`.
+# Tighten by annotating these seams (see the "Fix them properly" option) later.
+[[tool.ty.overrides]]
+include = [
+    "tests/conftest.py",
+    "tests/unit/test_prompts.py",
+    "tests/integration/test_cli_process_all.py",
+]
+
+[tool.ty.overrides.rules]
+invalid-argument-type = "ignore"
+missing-argument = "ignore"
+unknown-argument = "ignore"
+unresolved-attribute = "ignore"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

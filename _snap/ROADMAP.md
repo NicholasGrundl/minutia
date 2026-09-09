@@ -17,7 +17,7 @@ parked the portfolio vision as scoped `[draft]` stubs; added `notebooks-clean-re
 
 ## A. Stabilize the base, then promote to `main`
 
-1. **`[active]`** [`justfile-migration`](./features/%5Bactive%5Djustfile-migration.md) — replace the
+1. **`[done]`** [`justfile-migration`](./features/%5Bdone%5Djustfile-migration.md) — replace the
    `Makefile` with a `justfile` and adopt `ty` for type-checking. **Lands on the base
    (`uv_refactor`) now**, so it rides along at promotion. Code done 2026-09-08 (justfile authored;
    `ty` adopted + baselined; gate scoped to `src`). Closes once the user runs the `git mv`
@@ -31,7 +31,7 @@ parked the portfolio vision as scoped `[draft]` stubs; added `notebooks-clean-re
      + run-metadata sidecar (was Phase 5).
    - **`[ready]`** [`orchestrator-retire-baseline`](./features/%5Bready%5Dorchestrator-retire-baseline.md)
      — orchestrator parity + delete `baseline_pipeline.py` (was Phase 6).
-3. **`[active]`** [`settings-resolution`](./features/%5Bactive%5Dsettings-resolution.md) — replace
+3. **`[done]`** [`settings-resolution`](./features/%5Bdone%5Dsettings-resolution.md) — replace
    the stateful dotenv loader with Pydantic Settings; retain the platformdirs global config,
    discover one cwd-contextual `.env`, expose explicit dotenv controls, preserve provenance, and
    isolate tests from ambient configuration. Pipeline YAML/JSON remains a separate future domain.
@@ -40,8 +40,10 @@ parked the portfolio vision as scoped `[draft]` stubs; added `notebooks-clean-re
    retire `uv_refactor`. (Note: PR-based, updating `EXECUTIVE_SUMMARY.md` §4's original
    force-reset mechanic — decided 2026-09-08.)
    **Before the PR (added 2026-09-08 after CLI dogfooding):** (1) update `README.md` (make→just,
-   install/usage, anthropic 1.x + python `<3.14` notes); (2) a once-through of the tests together
-   (triage/group + rework fixtures/mocks — see `[draft]tests-refactor.md`).
+   install/usage, anthropic 1.x + python `<3.14` notes); (2) ~~a once-through of the tests together
+   (triage/group + rework fixtures/mocks — see `[draft]tests-refactor.md`)~~ **DONE 2026-09-08** —
+   `tests-refactor` is checklist-complete (tiered by directory, `tests/` in the ruff + ty gate, 97
+   green). Only (1) `README.md` remains before the PR.
 
 ## B. Feature branches from the new `main`
 
@@ -62,9 +64,11 @@ Split out of the former `refactor_for_opensource_portfolio` draft (kept as the v
 - **`[draft]`** [`local-llm-summarization`](./features/%5Bdraft%5Dlocal-llm-summarization.md)
   (depends on `eval-seams`)
 - **`[draft]`** [`evals-harness`](./features/%5Bdraft%5Devals-harness.md) (depends on `eval-seams`)
-- **`[draft]`** [`tests-refactor`](./features/%5Bdraft%5Dtests-refactor.md) — triage/group tests,
-  rework fixtures+mocks (incl. the anthropic-1.x mock-drift hang), fix the 5 e2e failures, bring
-  `tests/` into the ruff+ty gate. Collects the test debt deferred by `justfile-migration`.
+- **`[done]`** [`tests-refactor`](./features/%5Bdone%5Dtests-refactor.md) — **checklist-complete
+  2026-09-08** (awaiting the `[draft]→[done]` git mv): triaged/grouped tests by directory,
+  reworked fixtures+mocks (incl. the anthropic-1.x mock drift), fixed the 5 e2e failures, and
+  brought `tests/` into the ruff+ty gate (13 ty diagnostics baselined). Collected the test debt
+  deferred by `justfile-migration`.
 
 ## D. Open-source release prep
 
@@ -76,12 +80,15 @@ Split out of the former `refactor_for_opensource_portfolio` draft (kept as the v
 
 - FFmpeg audio extraction may fail on re-run if output files already exist (missing overwrite
   flag) — see the `refactor_to_cli` spec's Known Issues section.
-- **`ty` baseline debt** (from `justfile-migration`, 2026-09-08): 9 errors baselined in 4 src
-  files via `[[tool.ty.overrides]]` in `pyproject.toml`. Includes a **latent bug** —
+- **`ty` baseline debt** (2026-09-08): **9 src errors** (from `justfile-migration`, 4 src files) +
+  **13 test errors** (from `tests-refactor` — dynamic-pattern inference gaps in `conftest.py`,
+  `test_prompts.py`, `test_cli_process_all.py`), all baselined via `[[tool.ty.overrides]]` in
+  `pyproject.toml`. The src set includes a **latent bug** —
   `anthropic_models.get(model_name)["name"]` in `steps/summarize_transcript.py` subscripts `None`
-  for an unknown model. Drive to zero + fix the bug when convenient.
-- **tests not in the lint/type gate** (deferred by `justfile-migration`): `tests/` has ~28 lint +
-  13 format items of pre-existing debt, plus 5 failing e2e tests (`test_e2e_permutations.py`,
-  referencing non-existent step fns) and a fixture-registration issue (`ruff --fix` deletes
-  conftest F401 re-imports). All folded into a future **tests-refactor** feature; overlaps
-  `orchestrator-retire-baseline`.
+  for an unknown model. Drive both baselines to zero + fix the bug when convenient (the test set is
+  tightenable by annotating the seams: a `Callable`/`Protocol` return for `get_prompt_builder`, an
+  explicit type on the capture dict).
+- ~~**tests not in the lint/type gate**~~ **RESOLVED 2026-09-08 (tests-refactor):** `tests/` is now
+  in the ruff + ty gate (recipes run `src tests`; `[tool.ty.src]` includes `tests`, excludes
+  `tests/scripts/`). 13 ty diagnostics were baselined via `[[tool.ty.overrides]]` — driving both ty
+  baselines (9 src + 13 tests) to zero remains follow-up debt below.

@@ -4,8 +4,6 @@ import pytest
 
 from minutia import prompts
 
-pytestmark = pytest.mark.unit
-
 EXPECTED_KINDS = {
     "baseline",
     "realtor",

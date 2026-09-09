@@ -7,8 +7,6 @@ import pytest
 from minutia.paths import RunPaths
 from minutia.pipeline.orchestrator import PipelineConfig, PipelineOrchestrator
 
-pytestmark = pytest.mark.integration
-
 
 def _default_steps_through(step_name: str):
     """Return the real orchestrator adapters through the named step."""

@@ -1,5 +1,5 @@
 ---
-state: active
+state: done
 changelog:
   "2026-09-08 BUILD": "Scoped after the test-refactor investigation exposed production config
     state leakage. Agreed on Pydantic Settings, a platformdirs global config, cwd-contextual

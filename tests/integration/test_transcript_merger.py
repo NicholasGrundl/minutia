@@ -23,7 +23,6 @@ STABLE_METADATA_KEYS = (
 )
 
 
-@pytest.mark.integration
 @pytest.mark.parametrize("scenario", GOLDEN_SCENARIOS)
 def test_merger_reproduces_golden_fixture(scenario, test_scenarios, tmp_path):
     """Merging the 02_transcribed fixtures must reproduce the 03_merged golden."""

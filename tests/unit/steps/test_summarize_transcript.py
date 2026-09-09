@@ -4,8 +4,6 @@ import pytest
 
 from minutia.steps import summarize_transcript
 
-pytestmark = pytest.mark.unit
-
 
 def test_get_filename_from_content_returns_model_text(mock_llm):
     mock_llm.set_responses(["20260702_test_meeting_summary"])
