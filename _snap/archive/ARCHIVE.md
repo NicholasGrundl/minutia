@@ -7,6 +7,14 @@ Each entry: `YYYY-MM-DD` · `path(s)` · short why.
 
 ---
 
+**2026-09-09** · `features/[done]{ci-release-pipelines,finish-cli-parity,justfile-migration,refactor_to_cli,settings-resolution,tests-refactor}.md`
+→ `archive/features/` · The stabilization arc is complete and shipped (base on `main`, CI +
+releases live, `v0.3.0` out). Archived all six `[done]` specs to keep `features/` scoped to live
+work (`[ready]`/`[draft]`) during the post-stabilization reprioritization. `ci-release-pipelines`
+was flipped `[active]→[done]` first (its own move). History/narrative for all six lives in
+[`DECISIONS.md`](../DECISIONS.md); `ROADMAP.md` §Done keeps a condensed summary with links
+repointed here. Files keep their `[done]` names.
+
 **2026-07-01** · `blueprint/` (whole tree, formerly repo-root `_blueprint/`) · Unifying onto
 `_snap` as the single AI-workspace system ahead of open-source release. Content that was still
 live/useful was migrated first (see [`DECISIONS.md`](../DECISIONS.md) 2026-07-01 entry):

@@ -8,6 +8,43 @@ close.
 
 ---
 
+## 2026-09-09 — promotion + first releases shipped; reprioritization after stabilization
+
+- **Set out to:** (BUILD/discussion session) Take stock now that the base is stable, reconcile the
+  spine with what actually shipped, and re-order the ROADMAP around current priorities. The prior
+  flush left `ci-release-pipelines` `[active]` with the real release "deferred until workflows land
+  on main" — but a lot landed since, outside snap sessions.
+- **Why:** The ROADMAP was stabilization-era and no longer reflected reality: the base is on `main`,
+  CI + releases are live, and two versions are out. User called it: "the ROADMAP is good but may not
+  reflect the priorities now that things are stabilized."
+- **What actually shipped (the unflushed drift, now reconciled):**
+  - **PR #1** — `uv_refactor → main` promotion: the entire stabilized base (uv + just + ty,
+    settings-resolution, CLI parity, tiered tests) landed on `main`. `uv_refactor` retired.
+  - **PR #2** — `ci-release-pipelines` merged; `ci.yml` (lint + `ty`, no pytest) and `release.yml`
+    (tag-driven GitHub Releases) are now live on `main`.
+  - **PR #3** — CPU-only torch in CI (GPU stays the local default) — CI hardening follow-up.
+  - **Releases:** `v0.2.0` (validated `release.yml` end-to-end — task 7) and `v0.3.0` (carries the
+    PR #3 fix). `pyproject` is `0.3.0`; both tags published.
+  - **Spine effect:** `ci-release-pipelines` → `[done]` (frontmatter + checklist updated; awaiting
+    the `[active]→[done]` git mv). ROADMAP Section A + item 4 are complete.
+- **Reprioritization decision (user):** **finish the refactor tail first** —
+  `eval-seams` (keystone: unblocks evals + local-LLM, adds the `run.json` sidecar) → then
+  `orchestrator-retire-baseline` (its e2e test depends on eval-seams). **Dogfood in parallel** on
+  real meetings; findings logged to `_snap/reference/dogfood-findings.md` to feed the expansion
+  decision. The parked §C vision drafts (OBS recorder, background-process, sql-job-tracking,
+  video-filestore, local-llm, evals-harness) become a *decision checkpoint after the tail*, steered
+  by dogfooding — not a committed order yet.
+- **How it ended:** ROADMAP rewritten (Done / Now / In parallel / Next-checkpoint / Later);
+  `ci-release-pipelines` closed out; dogfood log seeded. No code changed this session.
+- **Why we stopped:** Discussion + ROADMAP update was the whole scope.
+- **Next:**
+  1. User runs the `git mv "[active]ci-release-pipelines.md" "[done]ci-release-pipelines.md"` (its
+     own commit, per convention).
+  2. Next BUILD session: flip `eval-seams` `[ready]→[active]` and start task 1 (`SummaryClient`).
+  3. Housekeeping (deferred, non-blocking): `BACKLOG.md` still holds stale items from an unrelated
+     project (LanceDB/metrochat/SDS retrieval, D3 web-app `context/` folders) — flag for a future
+     ALIGN/prune.
+
 ## 2026-09-09 — ci-release-pipelines: CI + release tooling authored and validated (feature [active])
 
 - **Set out to:** Author the CI/release half of the tooling modernization — tasks 2–6 of the

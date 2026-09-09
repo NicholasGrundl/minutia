@@ -29,5 +29,5 @@ harness / scoring (that's `[draft]evals-harness`).
 
 ## Details
 
-Source: `_snap/features/[done]refactor_to_cli.md` Phase 5. Anthropic client wrapping: keep the
+Source: `_snap/archive/features/[done]refactor_to_cli.md` Phase 5. Anthropic client wrapping: keep the
 existing cost-estimation path intact; mock the API in unit/integration tests (never a real call).
