@@ -1,6 +1,7 @@
 ---
-state: active
+state: done
 changelog:
+  "2026-09-09 CLOSE": "Closed [done]. finish-cli-parity's real-meeting milestone passed (full CLI-only run via minutia go: GPU Whisper on both tracks, merge, AI-named report). Phases 0-4 code complete + validated on real audio. Eval seams and orchestrator/baseline retirement remain their own [ready] specs."
   "2026-07-01 15h": "created by consolidating _blueprint architecture/testing docs + REFACTOR_ACTION_PLAN, cross-checked against actual src/ state"
   "2026-07-02 PLAN": "re-planned against the real daily workflow (SummaryPromptVariations.ipynb): parity target changed from baseline_pipeline.py to the notebook driver; 'Soul' phase replaced by prompt-kind + per-meeting context files; added low-surface eval seams (SummaryClient protocol, run-metadata sidecar, enumerable prompt registry); orchestrator hardening resequenced after CLI parity"
   "2026-07-02 PLAN(2)": "added CLI Foundations phase: click→typer migration; platformdirs-backed defaults (output home ~/Documents/minutia, user-global config, recordings dir + latest-MKV input discovery); light interactive mode in parity phase; full guided TUI deferred to BACKLOG"

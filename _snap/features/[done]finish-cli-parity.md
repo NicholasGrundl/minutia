@@ -1,5 +1,5 @@
 ---
-state: ready
+state: done
 changelog:
   "2026-09-08": "Extracted from [active]refactor_to_cli Phase 4 milestone during the §5
     spec-split (EXECUTIVE_SUMMARY.md). The live milestone that lets refactor_to_cli close."
@@ -21,13 +21,20 @@ orchestrator/baseline retirement are their own specs.
 
 ## Task Checklist
 
-- [ ] Run one real meeting end-to-end using only CLI commands — either the step sequence
+- [x] Run one real meeting end-to-end using only CLI commands — either the step sequence
       (`extract-audio` → `transcribe` → `merge-transcripts` → `summarize`) or `minutia go`.
-- [ ] Confirm the output matches notebook expectations (transcript quality, merge ordering,
-      summary shape, AI-named markdown report).
-- [ ] Retire the notebook for daily use (stop driving work from it); log the retirement in
-      `_snap/DECISIONS.md`.
-- [ ] Flip `refactor_to_cli` → `[done]` (its own `git mv`/rename step).
+      **Done 2026-09-09:** `minutia go` on a real ~2.4h recording — GPU Whisper `medium.en` on both
+      tracks (739 + 299 → 1323 merged segments), then the AI-named markdown report.
+- [x] Confirm the output matches notebook expectations (transcript quality, merge ordering,
+      summary shape, AI-named markdown report). **Confirmed** on the real run.
+- [x] Retire the notebook for daily use (stop driving work from it); log the retirement in
+      `_snap/DECISIONS.md`. **Done** — CLI is the daily driver; notebooks remain a documented
+      fallback until `notebooks-clean-rebuild` (README still links them).
+- [x] Flip `refactor_to_cli` → `[done]` (its own rename step). **Done** (plain `mv`, this session).
+
+**Dogfood finding (fixed):** the `go` notes prompt silently required a *file path*; typing prose
+raised `Notes file not found`. Fixed to accept inline text OR a path (`_resolve_notes_answer`,
+persists inline notes to `<output_dir>/notes.md`), with a unit test.
 
 ## Details
 

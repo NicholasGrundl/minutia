@@ -22,11 +22,12 @@ parked the portfolio vision as scoped `[draft]` stubs; added `notebooks-clean-re
    (`uv_refactor`) now**, so it rides along at promotion. Code done 2026-09-08 (justfile authored;
    `ty` adopted + baselined; gate scoped to `src`). Closes once the user runs the `git mv`
    (`[ready]→[active]`... then `→[done]`) + `git rm Makefile`. Tests deferred (see below).
-2. **`[active]`** [`refactor_to_cli`](./features/%5Bactive%5Drefactor_to_cli.md) — Phases 0–4 code
-   **DONE** (2026-07-02). Its unfinished tail is now split into the three specs below; it closes
-   (`→[done]`) when `finish-cli-parity`'s milestone passes.
-   - **`[ready]`** [`finish-cli-parity`](./features/%5Bready%5Dfinish-cli-parity.md) — the live
-     milestone: one real meeting CLI-only, then retire the notebook as daily driver.
+2. **`[done]`** [`refactor_to_cli`](./features/%5Bdone%5Drefactor_to_cli.md) — Phases 0–4 code
+   **DONE** (2026-07-02), **closed 2026-09-09** when `finish-cli-parity`'s milestone passed. Its
+   unfinished tail was split into the three specs below (two still open):
+   - **`[done]`** [`finish-cli-parity`](./features/%5Bdone%5Dfinish-cli-parity.md) — **DONE
+     2026-09-09**: one real meeting CLI-only via `minutia go` (GPU Whisper both tracks → merge →
+     AI-named report); notebook retired as daily driver. Surfaced + fixed the go notes-prompt footgun.
    - **`[ready]`** [`eval-seams`](./features/%5Bready%5Deval-seams.md) — `SummaryClient` protocol
      + run-metadata sidecar (was Phase 5).
    - **`[ready]`** [`orchestrator-retire-baseline`](./features/%5Bready%5Dorchestrator-retire-baseline.md)
@@ -39,11 +40,14 @@ parked the portfolio vision as scoped `[draft]` stubs; added `notebooks-clean-re
    ➡️ **Promotion milestone:** with the base stable + green, PR `uv_refactor` → `main`, then
    retire `uv_refactor`. (Note: PR-based, updating `EXECUTIVE_SUMMARY.md` §4's original
    force-reset mechanic — decided 2026-09-08.)
-   **Before the PR (added 2026-09-08 after CLI dogfooding):** (1) update `README.md` (make→just,
-   install/usage, anthropic 1.x + python `<3.14` notes); (2) ~~a once-through of the tests together
-   (triage/group + rework fixtures/mocks — see `[draft]tests-refactor.md`)~~ **DONE 2026-09-08** —
-   `tests-refactor` is checklist-complete (tiered by directory, `tests/` in the ruff + ty gate, 97
-   green). Only (1) `README.md` remains before the PR.
+   **Before the PR (added 2026-09-08 after CLI dogfooding) — both DONE:** (1) ~~update `README.md`
+   (make→just, install/usage, anthropic 1.x + python `<3.14` notes)~~ **DONE** (README already
+   reflects `just` + editable `uv tool install` + `>=3.12,<3.14` + anthropic 1.x); (2) ~~a
+   once-through of the tests together~~ **DONE 2026-09-08** — `tests-refactor` checklist-complete
+   (tiered by directory, `tests/` in the ruff + ty gate).
+
+   ✅ **Section A is fully `[done]` and the base is green (ruff + ty + 100 pytest); the CLI is
+   validated on a real meeting. The `uv_refactor → main` PR is unblocked.**
 
 ## B. Feature branches from the new `main`
 

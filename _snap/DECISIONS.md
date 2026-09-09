@@ -8,6 +8,36 @@ close.
 
 ---
 
+## 2026-09-09 — finish-cli-parity: real-meeting run validated; refactor_to_cli closed
+
+- **Set out to:** Prove the CLI at parity with the notebook by running one real meeting
+  end-to-end, CLI-only — the live milestone that lets `refactor_to_cli` close.
+- **Why:** Everything short of a live Whisper + Anthropic run was already validated against the
+  golden-sample fixtures; this was the human-in-the-loop confirmation on real audio, and the last
+  gate before the `uv_refactor → main` PR.
+- **How it ended:** Done. `minutia go` ran a real ~2.4h recording fully: 3 audio tracks extracted,
+  GPU Whisper `medium.en` on both tracks (mic 739 + desktop 299 → 1323 merged segments), then the
+  AI-named markdown report. Transcript quality, merge ordering, and summary shape matched notebook
+  expectations.
+  - **Dogfood finding (fixed):** the guided `go` notes prompt silently required a *file path* —
+    typing prose ('microphone track is Nick Grundl, desktop track is client') raised
+    `Notes file not found`. Fixed to accept inline text OR a path: new `_resolve_notes_answer` in
+    `cli.py` (existing file → used as path; otherwise persisted to `<output_dir>/notes.md` and fed
+    to the summarizer), prompt relabeled 'Notes (text or a file path; blank for none)', plus a
+    `TestResolveNotesAnswer` unit test. Gate green: ruff + ty + **100 pytest**.
+  - **Notebook retired** as the daily driver — CLI is now the primary path. The notebook files
+    remain a documented fallback until `notebooks-clean-rebuild` (README still links them).
+  - **Spine:** `finish-cli-parity → [done]`, `refactor_to_cli → [done]` (plain `mv` renames);
+    ROADMAP section A is now fully `[done]` and the promotion PR is marked unblocked; sibling-spec
+    `Source:` pointers repointed to `[done]refactor_to_cli.md`.
+- **Why we stopped:** Milestone complete; `refactor_to_cli` closed.
+- **Next:**
+  1. The go notes-prompt bugfix is uncommitted in the working tree (plus these spine edits) —
+     land as a `[MACRO] fix(finish-cli-parity)` checkpoint.
+  2. **Promotion:** PR `uv_refactor → main`, then retire `uv_refactor`. Base is stable + green.
+  3. Post-merge / feature branches off the new `main`: `ci-release-pipelines`, then the two
+     remaining `refactor_to_cli` tail specs (`eval-seams`, `orchestrator-retire-baseline`).
+
 ## 2026-09-08 — tests-refactor: tier triage + tests into the lint/type gate (checklist complete)
 
 - **Set out to:** Finish the two open `tests-refactor` tasks — the pre-stabilization test work
