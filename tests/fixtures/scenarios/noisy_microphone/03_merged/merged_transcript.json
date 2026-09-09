@@ -1,0 +1,230 @@
+{
+  "metadata": {
+    "schema_version": "1.0",
+    "parse_overlaps": false,
+    "segment_count": 8,
+    "total_duration": 24.32,
+    "sources": {
+      "microphone": {
+        "source_file": "../../+outputs/microphone_audio.wav",
+        "model": "medium.en",
+        "language": "en",
+        "processed_at": "2025-10-18T00:19:28.425326+00:00",
+        "schema_version": "1.0",
+        "format": "json",
+        "segment_count": 8
+      },
+      "desktop": {
+        "source_file": "../../+outputs/desktop_audio.wav",
+        "model": "medium.en",
+        "language": "en",
+        "processed_at": "2025-10-18T00:19:32.802725+00:00",
+        "schema_version": "1.0",
+        "format": "json",
+        "segment_count": 0
+      }
+    },
+    "source_files": {
+      "microphone": "../../+outputs/microphone-whisper-medium.en_transcription.json",
+      "desktop": "../../+outputs/desktop-whisper-medium.en_transcription.json"
+    }
+  },
+  "transcript": [
+    {
+      "start_time": 0.0,
+      "end_time": 3.5,
+      "text": "This is a noisy recording on the microphone side.",
+      "id": 0,
+      "tokens": [
+        50363,
+        770,
+        318,
+        257,
+        31210,
+        8296,
+        319,
+        262,
+        21822,
+        1735,
+        13,
+        50538
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.20133016464558054,
+      "compression_ratio": 1.6243902439024391,
+      "no_speech_prob": 0.03373275324702263,
+      "source": "microphone"
+    },
+    {
+      "start_time": 3.5,
+      "end_time": 6.0,
+      "text": "I have my phone playing in the background",
+      "id": 1,
+      "tokens": [
+        50538,
+        314,
+        423,
+        616,
+        3072,
+        2712,
+        287,
+        262,
+        4469,
+        50663
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.20133016464558054,
+      "compression_ratio": 1.6243902439024391,
+      "no_speech_prob": 0.03373275324702263,
+      "source": "microphone"
+    },
+    {
+      "start_time": 6.0,
+      "end_time": 8.28,
+      "text": "and it's fairly noisy.",
+      "id": 2,
+      "tokens": [
+        50663,
+        290,
+        340,
+        338,
+        6547,
+        31210,
+        13,
+        50777
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.20133016464558054,
+      "compression_ratio": 1.6243902439024391,
+      "no_speech_prob": 0.03373275324702263,
+      "source": "microphone"
+    },
+    {
+      "start_time": 8.28,
+      "end_time": 10.0,
+      "text": "It's hard to tell how much that shows up,",
+      "id": 3,
+      "tokens": [
+        50777,
+        632,
+        338,
+        1327,
+        284,
+        1560,
+        703,
+        881,
+        326,
+        2523,
+        510,
+        11,
+        50863
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.20133016464558054,
+      "compression_ratio": 1.6243902439024391,
+      "no_speech_prob": 0.03373275324702263,
+      "source": "microphone"
+    },
+    {
+      "start_time": 10.0,
+      "end_time": 12.48,
+      "text": "but you know, we'll see what happens.",
+      "id": 4,
+      "tokens": [
+        50863,
+        475,
+        345,
+        760,
+        11,
+        356,
+        1183,
+        766,
+        644,
+        4325,
+        13,
+        50987
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.20133016464558054,
+      "compression_ratio": 1.6243902439024391,
+      "no_speech_prob": 0.03373275324702263,
+      "source": "microphone"
+    },
+    {
+      "start_time": 17.52,
+      "end_time": 19.0,
+      "text": "Now I'm at the end of this section.",
+      "id": 5,
+      "tokens": [
+        51239,
+        2735,
+        314,
+        1101,
+        379,
+        262,
+        886,
+        286,
+        428,
+        2665,
+        13,
+        51313
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.20133016464558054,
+      "compression_ratio": 1.6243902439024391,
+      "no_speech_prob": 0.03373275324702263,
+      "source": "microphone"
+    },
+    {
+      "start_time": 19.0,
+      "end_time": 21.76,
+      "text": "I turned the microphone or the background music off",
+      "id": 6,
+      "tokens": [
+        51313,
+        314,
+        2900,
+        262,
+        21822,
+        393,
+        262,
+        4469,
+        2647,
+        572,
+        51451
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.20133016464558054,
+      "compression_ratio": 1.6243902439024391,
+      "no_speech_prob": 0.03373275324702263,
+      "source": "microphone"
+    },
+    {
+      "start_time": 21.76,
+      "end_time": 24.32,
+      "text": "and it should be more clear at this point in time.",
+      "id": 7,
+      "tokens": [
+        51451,
+        290,
+        340,
+        815,
+        307,
+        517,
+        1598,
+        379,
+        428,
+        966,
+        287,
+        640,
+        13,
+        51579
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.20133016464558054,
+      "compression_ratio": 1.6243902439024391,
+      "no_speech_prob": 0.03373275324702263,
+      "source": "microphone"
+    }
+  ]
+}

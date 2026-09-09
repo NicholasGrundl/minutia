@@ -1,0 +1,49 @@
+{
+  "scenario_name": "noisy_microphone",
+  "description": "Noisy microphone recording with background interference",
+  "characteristics": [
+    "Primary source: microphone audio (track 3)",
+    "Background noise and interference present",
+    "Challenging audio conditions",
+    "Good for testing transcription robustness"
+  ],
+  "source_file": "input.mkv",
+  "pipeline_parameters": {
+    "whisper_model": "medium.en",
+    "mic_track": 3,
+    "desktop_track": 2
+  },
+  "stages": {
+    "01_extracted": {
+      "description": "FFmpeg audio extraction outputs",
+      "files": [
+        "audio_track_1.wav",
+        "audio_track_2.wav", 
+        "audio_track_3.wav",
+        "microphone_audio.wav",
+        "desktop_audio.wav"
+      ]
+    },
+    "02_transcribed": {
+      "description": "Whisper transcription outputs",
+      "files": [
+        "microphone-whisper-medium.en_transcription.json",
+        "desktop-whisper-medium.en_transcription.json"
+      ]
+    },
+    "03_merged": {
+      "description": "Chronologically merged transcript",
+      "files": [
+        "merged_transcript.json"
+      ]
+    },
+    "04_summarized": {
+      "description": "AI-generated meeting summary", 
+      "files": [
+        "20251018_audio_recording_test_summary.md"
+      ]
+    }
+  },
+  "generated_at": "2025-10-18T00:00:00Z",
+  "original_source": "+outputs/noisy_microphone/"
+}

@@ -1,0 +1,49 @@
+{
+  "scenario_name": "youtube_desktop",
+  "description": "Mixed desktop audio from YouTube (music + speech)",
+  "characteristics": [
+    "Primary source: desktop audio (track 2)",
+    "Mixed content: music and speech",
+    "Complex audio with overlapping elements",
+    "Good for testing challenging desktop audio scenarios"
+  ],
+  "source_file": "input.mkv",
+  "pipeline_parameters": {
+    "whisper_model": "medium.en",
+    "mic_track": 3,
+    "desktop_track": 2
+  },
+  "stages": {
+    "01_extracted": {
+      "description": "FFmpeg audio extraction outputs",
+      "files": [
+        "audio_track_1.wav",
+        "audio_track_2.wav", 
+        "audio_track_3.wav",
+        "microphone_audio.wav",
+        "desktop_audio.wav"
+      ]
+    },
+    "02_transcribed": {
+      "description": "Whisper transcription outputs",
+      "files": [
+        "microphone-whisper-medium.en_transcription.json",
+        "desktop-whisper-medium.en_transcription.json"
+      ]
+    },
+    "03_merged": {
+      "description": "Chronologically merged transcript",
+      "files": [
+        "merged_transcript.json"
+      ]
+    },
+    "04_summarized": {
+      "description": "AI-generated meeting summary", 
+      "files": [
+        "20251018_audio_recording_system_test_summary.md"
+      ]
+    }
+  },
+  "generated_at": "2025-10-18T00:00:00Z",
+  "original_source": "+outputs/youtube_desktop/"
+}

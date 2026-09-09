@@ -1,0 +1,24 @@
+1. Completed Work Overview
+   - Phase 1–6 deliverables in `TASKS-TODO.md` are checked off, indicating the MVP foundation, path abstractions, orchestrator, logging/config, CLI wrapper, and JSON format migration are in place (`TASKS-TODO.md:8`-`TASKS-TODO.md:59`).
+   - Rich CLI UX (Phase 7), resume-from-failure (Phase 8), and deferred documentation/performance/packaging work remain unchecked, so they are still outstanding (`TASKS-TODO.md:63`-`TASKS-TODO.md:118`).
+   - Implementation artifacts align with design expectations: orchestrator models and result types (`src/minutia/pipeline.py:135`-`src/minutia/pipeline.py:239`), RunPaths factory (`src/minutia/paths.py:193`-`src/minutia/paths.py:287`), unified logging (`src/minutia/logging.py:1`-`src/minutia/logging.py:88`), and CLI wrapper (`src/minutia/cli.py:22`-`src/minutia/cli.py:216`).
+
+2. Functional Assessment
+   - Unit coverage exists for orchestrator behaviour, CLI wiring, RunPaths, transcript merger, and baseline pipeline smoke tests (`tests/test_pipeline_orchestrator.py:1`-`tests/test_pipeline_orchestrator.py:93`, `tests/test_cli_process_all.py:1`-`tests/test_cli_process_all.py:70`, `tests/test_paths.py:1`-`tests/test_paths.py:69`, `tests/test_transcript_merger.py:1`-`tests/test_transcript_merger.py:30`, `tests/test_baseline_pipeline.py:1`-`tests/test_baseline_pipeline.py:147`). I did not run the suite during this review; please run `make test` to confirm green status.
+   - Baseline pipeline and orchestrator both write run metadata, keeping legacy and new flows consistent (`src/minutia/baseline_pipeline.py:436`-`src/minutia/baseline_pipeline.py:498`, `src/minutia/pipeline.py:324`-`src/minutia/pipeline.py:373`).
+   - CLI process-all command delegates to the orchestrator and reports artifacts as designed; tests simulate successful runs (`src/minutia/cli.py:158`-`src/minutia/cli.py:216`, `tests/test_cli_process_all.py:24`-`tests/test_cli_process_all.py:70`).
+
+3. Identified Bugs
+   - Baseline pipeline markdown export always fails when `--generate-markdown` is set because `create_markdown_report` reaches for `summarize_transcript.ANTHROPIC_API_KEY`, which is never defined in that module. Configuration now resolves keys via `load_config`, so the call constructs an Anthropic client with `None` credentials and raises at runtime (`src/minutia/baseline_pipeline.py:76`-`src/minutia/baseline_pipeline.py:94`). The fix is to pass the resolved API key into the helper (mirroring summary generation) instead of referencing a removed global.
+
+4. Design Adherence Review
+   - Data models and orchestration flow mirror the MVP design: immutable `PipelineConfig`, progress callbacks, structured `PipelineResult`, and metadata capture are present (`design/design.md:400`-`design/design.md:452`, `src/minutia/pipeline.py:135`-`src/minutia/pipeline.py:373`).
+   - RunPaths centralises directory management with collision handling as specified, and tests confirm behaviours (`design/design.md:100`-`design/design.md:210`, `src/minutia/paths.py:193`-`src/minutia/paths.py:360`, `tests/test_paths.py:1`-`tests/test_paths.py:69`).
+   - Unified logging via Loguru matches the design’s contextual logging requirement, including run-scoped sinks (`design/design.md:550`-`design/design.md:604`, `src/minutia/logging.py:1`-`src/minutia/logging.py:88`).
+   - Gaps relative to design: resume-from-failure state persistence and rich CLI presentation are not yet implemented (deferred Phases 7–8); cleanup policy hooks are defined in config but not exercised in pipeline steps, so the designed cleanup behaviours are still pending (`design/design.md:618`-`design/design.md:792`, `src/minutia/config.py:114`-`src/minutia/config.py:190`, `src/minutia/pipeline.py:282`-`src/minutia/pipeline.py:373`).
+
+5. Areas of Concern & Recommendations
+   - Wire cleanup policies into execution paths: `MinutiaConfig.cleanup_policy` is parsed but never used; incorporate it into the orchestrator and baseline pipeline to meet the design’s artifact management goals (`src/minutia/config.py:114`-`src/minutia/config.py:190`, `design/design.md:107`-`design/design.md:210`).
+   - Hard failures on missing Anthropic keys should surface earlier. The CLI process-all command still raises only after transcription, which can waste time; preflight checks matching the config loader would improve UX (`src/minutia/cli.py:144`-`src/minutia/cli.py:216`).
+   - Rich CLI features (progress bars, structured error panels) and resume support remain sizable gaps for the planned experience; prioritise these once current defects are resolved (`design/design.md:618`-`design/design.md:792`, `TASKS-TODO.md:63`-`TASKS-TODO.md:85`).
+   - Continue expanding automated coverage around failure paths (e.g., missing tracks, transcription errors) to match the design’s resilience goals, and rerun the full test suite after addressing the markdown export bug.

@@ -1,0 +1,209 @@
+[project]
+name = "minutia"
+version = "0.1.0"
+description = "Meeting recording, transcription, and summarization tool"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "Nicholas Grundl", email = "nicholasgrundl@gmail.com" }
+]
+# Upper-capped at <3.14 because PyTorch has no cp314 wheels yet (uv tool install
+# otherwise defaults to the newest interpreter, 3.14, and fails to resolve torch).
+# Lift the cap once torch ships cp314 wheels.
+requires-python = ">=3.12,<3.14"
+keywords = ["meeting", "transcription", "audio", "summarization", "whisper"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+    "Topic :: Office/Business",
+]
+dependencies = [
+    "isodate",
+    "loguru>=0.7.3",
+    "nanoid",
+    # Data / validation
+    "numpy",
+    "pydantic",
+    "scipy",
+    # Audio IO
+    "ffmpeg-python",
+    "sounddevice",
+    # Models / inference
+    "openai-whisper",
+    "tiktoken",
+    "torch>=2.4,<2.6",
+    "transformers",
+    # LLM clients
+    # Pin to the 1.x major: the 0.x -> 1.x jump removed sampling params
+    # (temperature/top_p/top_k) from messages.create(). Keep dev and tool
+    # installs on the same major so this drift can't recur.
+    "anthropic>=1.4",
+    "instructor",
+    "openai",
+    "typer>=0.25.1",
+    "platformdirs>=4.9.6",
+    "pydantic-settings>=2.15.0",
+]
+
+[dependency-groups]
+# Installed by default on `uv sync`
+dev = [
+    "pytest",
+    "pytest-cov",
+    "pytest-mock>=3.15.1",
+    "pytest-timeout>=2.4.0",
+    "ruff",
+    "ty",
+]
+# Notebook environment + plotting (`uv sync --group jupyter`)
+jupyter = [
+    "ipywidgets",
+    "jupyterlab",
+    "matplotlib",
+    "pandas",
+    "panel",
+]
+# System probing for notebooks (`uv sync --group diagnostics`)
+diagnostics = [
+    "gputil>=1.4.0",
+    "psutil>=7.1.0",
+    "pyaudio",
+]
+# Heavy ASR experiments — opt-in only (`uv sync --group experiments`)
+experiments = [
+    "faster-whisper",
+    "nemo_toolkit[asr]",
+    "pyannote.audio",
+    "whisperx",
+]
+# Alternative audio backends (`uv sync --group media`)
+media = [
+    "librosa",
+    "moviepy",
+    "pydub",
+]
+
+[project.scripts]
+minutia = "minutia.cli:main"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+exclude = [
+    ".git",
+    ".venv", 
+    "build",
+    "dist",
+    ".mypy_cache",
+    ".pytest_cache", 
+    ".ruff_cache",
+    "*.ipynb",  # Exclude Jupyter notebooks
+]
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+]
+ignore = [
+    "E501", # line too long, handled by formatter
+    "B008", # do not perform function calls in argument defaults
+    "C901", # too complex
+    "W293", # blank line contains whitespace
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.ty.environment]
+# Match requires-python (ty defaults to 3.14).
+python-version = "3.12"
+
+[tool.ty.src]
+# Type-check the package source and the test suite. Legacy Jupyter-widget code
+# (not used by the CLI) is out of scope, as is tests/scripts/ — fixture-generation
+# tooling and a notebook with optional-only deps (GPUtil, psutil) and stale APIs,
+# not part of the test suite proper (folded into the notebooks-clean-rebuild work).
+include = ["src", "tests"]
+exclude = ["src/minutia/legacy", "tests/scripts"]
+
+# --- ty baseline (adopted 2026-09-08, justfile-migration) ---
+# Pre-existing type errors captured when `ty` was first adopted. Scoped per-file
+# and per-rule so NEW errors elsewhere still fail `just ty`. Driving these to zero
+# (and fixing the latent None-subscript bug in summarize_transcript) is a tracked
+# follow-up — see ROADMAP "Known issues".
+[[tool.ty.overrides]]
+include = [
+    "src/minutia/logging.py",
+    "src/minutia/pipeline/orchestrator.py",
+    "src/minutia/steps/summarize_transcript.py",
+    "src/minutia/steps/video_extraction.py",
+]
+
+[tool.ty.overrides.rules]
+no-matching-overload = "ignore"
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+not-subscriptable = "ignore"
+
+# --- ty baseline for tests (adopted 2026-09-08, tests-refactor) ---
+# 13 pre-existing diagnostics captured when the test suite was brought into the
+# gate. All are ty type-inference gaps over dynamic test patterns, NOT runtime
+# bugs (the suite is green): dict `**kwargs` unpacking into `PipelineConfig`
+# (conftest), a `get_prompt_builder()` callable whose signature ty can't see
+# (test_prompts), and an `object`-typed capture dict (test_cli_process_all).
+# Scoped per-file + per-rule so NEW errors elsewhere in tests still fail `ty`.
+# Tighten by annotating these seams (see the "Fix them properly" option) later.
+[[tool.ty.overrides]]
+include = [
+    "tests/conftest.py",
+    "tests/unit/test_prompts.py",
+    "tests/integration/test_cli_process_all.py",
+]
+
+[tool.ty.overrides.rules]
+invalid-argument-type = "ignore"
+missing-argument = "ignore"
+unknown-argument = "ignore"
+unresolved-attribute = "ignore"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--import-mode=importlib",
+    "--strict-markers",
+    "--strict-config",
+    "--timeout=60",
+    "--cov=src/minutia",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+xfail_strict = true
+markers = [
+    "unit: Unit tests (fast, < 1s each)",
+    "integration: Integration tests (medium, < 30s)",
+    "slow: Slow tests (full pipeline, manual runs)",
+]
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s | %(levelname)s | %(message)s"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
