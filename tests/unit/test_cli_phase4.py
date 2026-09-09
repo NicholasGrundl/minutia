@@ -137,7 +137,7 @@ class TestIdempotency:
         def boom(*args, **kwargs):
             raise AssertionError("process_mkv_file should not be called")
 
-        monkeypatch.setattr(minutia.cli, "process_mkv_file", boom)
+        monkeypatch.setattr("minutia.steps.video_extraction.process_mkv_file", boom)
         result = runner.invoke(
             minutia.cli.main,
             ["extract-audio", str(video), str(out)],
@@ -161,7 +161,7 @@ class TestIdempotency:
         def boom(*args, **kwargs):
             raise AssertionError("process_audio_files should not be called")
 
-        monkeypatch.setattr(minutia.cli, "process_audio_files", boom)
+        monkeypatch.setattr("minutia.steps.audio_transcription.process_audio_files", boom)
         result = runner.invoke(
             minutia.cli.main,
             ["transcribe", str(mic), str(desk), str(out)],
@@ -234,9 +234,13 @@ class TestGo:
                 json.dump(data, f)
             return data
 
-        monkeypatch.setattr(minutia.cli, "process_mkv_file", fake_extract)
-        monkeypatch.setattr(minutia.cli, "process_audio_files", fake_transcribe)
-        monkeypatch.setattr(minutia.cli, "process_transcripts", fake_merge)
+        monkeypatch.setattr(
+            "minutia.steps.video_extraction.process_mkv_file", fake_extract
+        )
+        monkeypatch.setattr(
+            "minutia.steps.audio_transcription.process_audio_files", fake_transcribe
+        )
+        monkeypatch.setattr(minutia.cli.app, "process_transcripts", fake_merge)
         mock_llm.set_responses(["Guided summary.", "20260702_guided_report"])
 
         # Give `go` a concrete resolved settings object for this run.
@@ -256,7 +260,7 @@ class TestGo:
             user_config_file=tmp_path / "config.env",
         )
         monkeypatch.setattr(
-            minutia.cli, "resolve_settings", lambda **kwargs: resolution
+            minutia.cli.app, "resolve_settings", lambda **kwargs: resolution
         )
 
         result = runner.invoke(
@@ -277,13 +281,13 @@ class TestResolveNotesAnswer:
     """`go` notes answer accepts inline text OR a file path (finish-cli-parity fix)."""
 
     def test_blank_returns_none(self, tmp_path):
-        assert minutia.cli._resolve_notes_answer("", tmp_path) is None
-        assert minutia.cli._resolve_notes_answer("   ", tmp_path) is None
+        assert minutia.cli._steps._resolve_notes_answer("", tmp_path) is None
+        assert minutia.cli._steps._resolve_notes_answer("   ", tmp_path) is None
 
     def test_existing_file_is_used_as_path(self, tmp_path):
         notes = tmp_path / "my_notes.md"
         notes.write_text("desktop=Alice", encoding="utf-8")
-        result = minutia.cli._resolve_notes_answer(str(notes), tmp_path)
+        result = minutia.cli._steps._resolve_notes_answer(str(notes), tmp_path)
         assert result == notes
         # a real path must not spawn an inline notes.md
         assert not (tmp_path / "notes.md").exists()
@@ -292,7 +296,7 @@ class TestResolveNotesAnswer:
         out = tmp_path / "run"
         out.mkdir()
         text = "microphone track is Nick Grundl, desktop track is client"
-        result = minutia.cli._resolve_notes_answer(text, out)
+        result = minutia.cli._steps._resolve_notes_answer(text, out)
         assert result is not None
         assert result == out / "notes.md"
         assert result.read_text(encoding="utf-8") == text + "\n"

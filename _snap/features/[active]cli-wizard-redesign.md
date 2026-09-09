@@ -1,9 +1,11 @@
 ---
-state: ready          # draft | ready | active | done | deprecated
+state: active         # draft | ready | active | done | deprecated
 changelog:
   "2026-09-09": "Initial spec — converged from an interactive PLAN session. Models the CLI on the
     sibling-project reference at _snap/reference/+cli_content/cli/. Prioritized FIRST, ahead of the
     refactor tail (eval-seams → orchestrator-retire-baseline)."
+  "2026-09-09b": "Flipped [ready]→[active]; BUILD session begins on task 1 (scaffold the cli/
+    package)."
 ---
 
 # cli-wizard-redesign — CLI subpackage + rich first-run/guided wizard

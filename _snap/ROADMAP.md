@@ -46,8 +46,9 @@ releases; `pyproject` at `0.3.0`.
 The CLI is where the tool is actually used, so it goes **first** (user decision, 2026-09-09);
 the tail is low-risk consolidation that every future direction wants.
 
-1. **`[ready]`** [`cli-wizard-redesign`](./features/%5Bready%5Dcli-wizard-redesign.md) — **do this
-   first.** Rebuild the flat `cli.py` into a `cli/` subpackage with a concise top-level surface
+1. **`[active]`** [`cli-wizard-redesign`](./features/%5Bactive%5Dcli-wizard-redesign.md) — **in
+   progress** (flipped `[ready]→[active]` 2026-09-09; BUILD on task 1, scaffold the `cli/` package).
+   Rebuild the flat `cli.py` into a `cli/` subpackage with a concise top-level surface
    (`run` / `setup` / `info`) and a full-screen **rich wizard**, modeled on the sibling-project reference
    (`_snap/reference/+cli_content/cli/`). Bare `minutia` self-determines (guided run, or first-run
    setup that persists the API key + recordings dir, then runs); first-class notes panel; cold-start

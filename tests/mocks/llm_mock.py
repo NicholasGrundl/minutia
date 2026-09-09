@@ -57,7 +57,7 @@ def mock_llm(mocker, chaos_config):
     mocker.patch(
         "minutia.baseline_pipeline.resolve_settings", return_value=mock_resolution
     )
-    mocker.patch("minutia.cli.resolve_settings", return_value=mock_resolution)
+    mocker.patch("minutia.cli.app.resolve_settings", return_value=mock_resolution)
 
     mock_inst = LLMMock()
 

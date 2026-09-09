@@ -62,7 +62,7 @@ def test_process_all_runs_pipeline_orchestrator(
                 artifacts={"summary": run_paths.summary_file},
             )
 
-    monkeypatch.setattr(minutia.cli, "PipelineOrchestrator", StubOrchestrator)
+    monkeypatch.setattr(minutia.cli.app, "PipelineOrchestrator", StubOrchestrator)
 
     runner = CliRunner()
     result = runner.invoke(minutia.cli.main, ["process-all", str(input_video)], env=env)
