@@ -36,14 +36,6 @@ create-env-file:
 # Code quality
 # ---------------------------------------------------------------------------
 
-# Lint (read-only) — package source + tests
-lint:
-    uv run ruff check src tests
-
-# Format code — package source + tests
-format:
-    uv run ruff format src tests
-
 # Format code and apply all safe lint fixes (mutating) — package source + tests
 ruff:
     uv run ruff format src tests
@@ -55,7 +47,7 @@ ty:
     uv run ty check
 
 # Dev gate: mutating ruff, then ty, then the test suite
-check-all: ruff ty test
+ci: ruff ty
 
 # ---------------------------------------------------------------------------
 # Testing
