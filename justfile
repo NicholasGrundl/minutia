@@ -82,6 +82,25 @@ test-cov:
     uv run pytest --cov=src/minutia --cov-report=html --cov-report=term
 
 # ---------------------------------------------------------------------------
+# Release
+# ---------------------------------------------------------------------------
+# Bump the version, commit, tag, and push — pushing the v* tag triggers the
+# release workflow (.github/workflows/release.yml). Preview first with
+# `uv run python scripts/release.py patch -n`.
+
+# Cut a patch release (e.g. 0.1.0 -> 0.1.1): bump, commit, tag, push.
+tag-patch:
+    uv run python scripts/release.py patch
+
+# Cut a minor release (e.g. 0.1.0 -> 0.2.0): bump, commit, tag, push.
+tag-minor:
+    uv run python scripts/release.py minor
+
+# Cut a major release (e.g. 0.1.0 -> 1.0.0): bump, commit, tag, push.
+tag-major:
+    uv run python scripts/release.py major
+
+# ---------------------------------------------------------------------------
 # Development
 # ---------------------------------------------------------------------------
 

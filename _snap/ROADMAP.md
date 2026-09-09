@@ -51,9 +51,12 @@ parked the portfolio vision as scoped `[draft]` stubs; added `notebooks-clean-re
 
 ## B. Feature branches from the new `main`
 
-4. **`[ready]`** [`ci-release-pipelines`](./features/%5Bready%5Dci-release-pipelines.md) — GitHub
+4. **`[active]`** [`ci-release-pipelines`](./features/%5Bactive%5Dci-release-pipelines.md) — GitHub
    Actions CI (lint + `ty`, no pytest) + tag-driven releases + `scripts/release.py`. **Started as
    a fresh feature after `main` promotion** (its workflows only go live on `main`/tags).
+   `[active]` 2026-09-09: workflows + `scripts/release.py` + justfile `tag-*` recipes authored and
+   dry-run validated (tasks 2–6 ✓). Task 7 — cut the first real release (`v0.2.0`) — deferred until
+   the workflows land on `main` (they only fire there); PR the branch, then release + flip `[done]`.
 5. **`[draft]`** [`notebooks-clean-rebuild`](./features/%5Bdraft%5Dnotebooks-clean-rebuild.md) —
    rebuild `notebooks/` on synthetic data, outputs stripped, thin over the package (§6). §7's
    suggested first branch off the new `main`.

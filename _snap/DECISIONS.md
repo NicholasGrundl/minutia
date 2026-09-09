@@ -8,6 +8,53 @@ close.
 
 ---
 
+## 2026-09-09 — ci-release-pipelines: CI + release tooling authored and validated (feature [active])
+
+- **Set out to:** Author the CI/release half of the tooling modernization — tasks 2–6 of the
+  spec: `scripts/release.py`, `.github/workflows/ci.yml` + `release.yml`, justfile `tag-*`
+  recipes — adapted from the sibling-project templates at `_snap/reference/ci_content/`.
+- **Why:** With `main` promoted (PR #1) and the base green, the branch precondition was met; a
+  lint/type gate on `main` plus reproducible tagged releases is the next block off the new trunk.
+- **How it ended:** Done for tasks 2–6, all validated locally.
+  - `scripts/release.py` ported near-verbatim (dirty-tree + existing-tag guards, the
+    `uv version --bump --dry-run --short` preview, `chore: release <tag>` commit). Dry-run
+    previews `v0.1.1`; both guard warnings fired (dirty tree; a throwaway `v0.1.1` tag, since
+    deleted). ruff clean (scripts/ is outside the gate — verified anyway).
+  - `ci.yml`: on push-`main` + PRs — checkout, `setup-uv@v6` (uv pinned `0.12.12` + cache),
+    `uv sync`, `ruff format --check` + `ruff check` over `src tests` (matches the local gate, not
+    the reference's `.`), `ty check` (no path arg — scope lives in `[tool.ty.src]`). No pytest,
+    per spec.
+  - `release.yml`: on push tags `v*`, `contents: write`, guard `tag == v$(uv version --short)`,
+    `softprops/action-gh-release@v2` with `generate_release_notes`. Both YAMLs parse.
+  - `justfile`: new Release section, `tag-patch|minor|major` → `scripts/release.py`.
+- **Why we stopped:** Tasks 2–6 complete; task 7 (cut the first real release, likely `v0.2.0`) is
+  deferred by design — the workflows only fire once they are on `main`, so the real release waits
+  until this branch merges. Feature stays `[active]`.
+- **Next:**
+  1. Commit: the flip (rename + frontmatter + ROADMAP `[active]`) as its own commit; the four
+     authored files (+ this flush) as the `[MACRO] ci-release-pipelines` checkpoint.
+  2. PR `ci-release-pipelines → main`; on merge `ci.yml` goes live on `main` + PRs.
+  3. Post-merge: cut the first release via `just tag-minor` (0.1.0 → `v0.2.0`) to validate
+     `release.yml` end-to-end, then flip the feature `[active]→[done]`.
+
+## 2026-09-09 — tool-install: uv tool install interpreter fix + setup docs (committed e72a8b5)
+
+- **Set out to:** Fix installing minutia as a `uv` tool — it required a forced `--python 3.12` —
+  and document the smoothed flow, since the user's preferred run mode is `uv tool install`.
+- **Why:** `uv tool install` kept selecting Python 3.14 (no torch `cp314` wheels) and failing to
+  resolve, forcing the manual pin.
+- **How it ended:** Done. Root cause: uv `0.9.10` ignored the `requires-python <3.14` cap during
+  interpreter selection for git/local tool installs (and `.python-version` is ignored by tool
+  installs entirely). `uv self update` → `0.12.12` fixed it — install now auto-picks 3.12.12 with
+  no flag. Standardized on installing from git `main` over HTTPS via the `gh` credential helper
+  (`gh auth setup-git`). Wrote `docs/setup.md` (tool-install primary + SSH alternative +
+  interpreter note + old-uv fallback ladder + dev-from-clone); README §Install dropped the
+  `--python` workaround and links it. The `requires-python` cap and torch pin were left as-is
+  (already correct). Committed as MACRO `e72a8b5`.
+- **Why we stopped:** Install works cleanly; docs written and committed.
+- **Next:** CI pins uv (`0.12.12`) via `setup-uv` so it can't regress to the ignoring behavior
+  (folded into the ci-release-pipelines work above).
+
 ## 2026-09-09 — finish-cli-parity: real-meeting run validated; refactor_to_cli closed
 
 - **Set out to:** Prove the CLI at parity with the notebook by running one real meeting

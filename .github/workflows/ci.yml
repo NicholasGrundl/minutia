@@ -1,0 +1,24 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.12" # pin for reproducibility; bump alongside local uv
+          enable-cache: true
+      - run: uv sync
+      # No pytest in CI (deliberate — see the ci-release-pipelines spec). The value
+      # here is a fast, green lint + type gate on main and PRs. Scope matches the
+      # local gate (justfile + [tool.ty.src]): src + tests. `ty check` takes no path
+      # arg — its scope lives in [tool.ty.src] in pyproject.toml.
+      - run: uv run ruff format --check src tests
+      - run: uv run ruff check src tests
+      - run: uv run ty check
