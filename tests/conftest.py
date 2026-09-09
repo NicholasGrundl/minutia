@@ -5,6 +5,7 @@ https://docs.pytest.org/en/stable/how-to/fixtures.html#conftest-py-sharing-fixtu
 """
 
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -12,13 +13,27 @@ import pytest
 from minutia.paths import RunPaths
 from minutia.pipeline.orchestrator import PipelineConfig
 
-# Import mocks to register them as fixtures
-from tests.mocks.ffmpeg_mock import mock_ffmpeg, dummy_wav
-from tests.mocks.whisper_mock import mock_whisper
-from tests.mocks.llm_mock import mock_llm
-from tests.mocks.chaos_config import chaos_config
+pytest_plugins = (
+    "tests.mocks.chaos_config",
+    "tests.mocks.ffmpeg_mock",
+    "tests.mocks.llm_mock",
+    "tests.mocks.whisper_mock",
+)
+
+
+@pytest.fixture(autouse=True)
+def _scrub_minutia_environment(monkeypatch):
+    """Keep tests independent from developer and previously loaded settings."""
+    for key in tuple(os.environ):
+        if key.startswith("MINUTIA_") or key in {
+            "ANTHROPIC_API_KEY",
+            "CLAUDE_API_KEY",
+        }:
+            monkeypatch.delenv(key)
+
 
 # Session-scoped fixtures for expensive resources
+
 
 @pytest.fixture(scope="session")
 def test_fixtures_dir():
@@ -43,11 +58,12 @@ def scenario_loader(test_scenarios, mock_whisper, mock_llm, mock_ffmpeg):
     """
     Helper to load a specific scenario and configure mocks accordingly.
     """
+
     def _load(name: str):
         scenario_path = test_scenarios.get(name)
         if not scenario_path:
             pytest.fail(f"Scenario '{name}' not found in {test_scenarios.keys()}")
-        
+
         metadata_path = scenario_path / "metadata.json"
         if metadata_path.exists():
             metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
@@ -61,6 +77,7 @@ def scenario_loader(test_scenarios, mock_whisper, mock_llm, mock_ffmpeg):
 
 # Factory fixtures for more complex scenarios
 
+
 @pytest.fixture
 def run_paths_factory(tmp_path):
     """Factory fixture to create multiple RunPaths instances.
@@ -72,6 +89,7 @@ def run_paths_factory(tmp_path):
             run1 = run_paths_factory("meeting1.mkv")
             run2 = run_paths_factory("meeting2.mkv")
     """
+
     def _create_run_paths(video_filename: str, **kwargs):
         video_file = tmp_path / video_filename
         video_file.write_text("video-content", encoding="utf-8")
@@ -92,6 +110,7 @@ def pipeline_config_factory(run_paths_factory):
                 summary_model="claude-3-haiku"
             )
     """
+
     def _create_config(video_filename: str = "test.mkv", **overrides):
         run_paths = run_paths_factory(video_filename)
         base_config = {

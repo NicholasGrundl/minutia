@@ -30,7 +30,7 @@ from . import (
     transcript_merger,
     video_extraction,
 )
-from .config import load_config
+from .config import resolve_settings
 from .logging import configure_logging as setup_logging
 from .logging import logger, logging_context
 from .paths import RunPaths
@@ -278,7 +278,7 @@ def summarise_transcript(
     model: str,
     use_long_summary: bool,
     system_prompt: str | None,
-    api_key: str | None,
+    api_key: str,
 ) -> str:
     """Generate a meeting summary using either the short or long flow."""
     if use_long_summary:
@@ -314,7 +314,7 @@ def estimate_summary_cost(
 
 def run_pipeline(args: argparse.Namespace) -> PipelineArtifacts:
     """Execute the end-to-end workflow using the supplied CLI arguments."""
-    app_config = load_config()
+    app_config = resolve_settings().settings
     base_output_dir = args.output_dir or app_config.base_output_dir
     base_output_dir = base_output_dir.expanduser().resolve()
     run_suffix = args.subfolder

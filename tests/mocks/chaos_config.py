@@ -1,10 +1,11 @@
 import pytest
 
+
 class ChaosConfig:
     """Manages error injection for mocks."""
-    
+
     def __init__(self):
-        self.failures = {} # mock_name -> exception_to_raise
+        self.failures = {}  # mock_name -> exception_to_raise
 
     def set_failure(self, mock_name: str, exception: Exception):
         """Set an exception to be raised when mock_name is called."""
@@ -22,6 +23,7 @@ class ChaosConfig:
             raise exc
 
     from contextlib import contextmanager
+
     @contextmanager
     def set_error(self, mock_name: str, exception: Exception):
         """Context manager to set a failure and clear it after."""
@@ -31,6 +33,7 @@ class ChaosConfig:
         finally:
             if mock_name in self.failures:
                 del self.failures[mock_name]
+
 
 @pytest.fixture
 def chaos_config():

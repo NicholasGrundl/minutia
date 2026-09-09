@@ -4,7 +4,6 @@ from pathlib import Path
 import tiktoken
 from anthropic import Anthropic
 
-from ..config import resolve_anthropic_api_key
 from ..logging import logger
 
 # Model registry re-exported for backwards compatibility — notebooks and
@@ -147,7 +146,8 @@ def generate_long_summary(
     model_name="claude-sonnet-4-6",
     max_output_tokens=None,
     system_prompt=None,
-    api_key=None,
+    *,
+    api_key: str,
     **kwargs,
 ):
     """Generate a summary using the Anthropic API. Allow multiple continues for length"""
@@ -158,7 +158,6 @@ def generate_long_summary(
         raise KeyError(f"model must be one of [{list(anthropic_models.keys())}]")
     model = anthropic_models.get(model_name)["name"]
 
-    api_key = api_key or resolve_anthropic_api_key()
     if not api_key:
         raise RuntimeError("Anthropic API key not configured")
     client = Anthropic(api_key=api_key)
@@ -209,7 +208,8 @@ def generate_summary(
     model_name="claude-sonnet-4-6",
     max_output_tokens=None,
     system_prompt=None,
-    api_key=None,
+    *,
+    api_key: str,
     **kwargs,
 ):
     """Generate a summary using the Anthropic API."""
@@ -220,7 +220,6 @@ def generate_summary(
         raise KeyError(f"model must be one of [{list(anthropic_models.keys())}]")
     model = anthropic_models.get(model_name)["name"]
 
-    api_key = api_key or resolve_anthropic_api_key()
     if not api_key:
         raise RuntimeError("Anthropic API key not configured")
     client = Anthropic(api_key=api_key)
@@ -249,14 +248,13 @@ def generate_summary(
 
 
 def get_filename_from_content(
-    content, model_name="claude-sonnet-4-6", api_key=None
+    content, model_name="claude-sonnet-4-6", *, api_key: str
 ) -> str:
     """Use Anthropic to generate a descriptive filename for markdown exports."""
     if model_name not in anthropic_models:
         raise KeyError(f"model must be one of [{list(anthropic_models.keys())}]")
     model = anthropic_models[model_name]["name"]
 
-    api_key = api_key or resolve_anthropic_api_key()
     if not api_key:
         raise RuntimeError("Anthropic API key not configured")
     client = Anthropic(api_key=api_key)
@@ -278,7 +276,8 @@ def create_markdown_report(
     content,
     output_path,
     model_name="claude-sonnet-4-6",
-    api_key=None,
+    *,
+    api_key: str,
 ) -> Path:
     """Persist a markdown report using an Anthropic-generated filename."""
     filename = get_filename_from_content(

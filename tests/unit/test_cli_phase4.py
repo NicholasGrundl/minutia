@@ -241,16 +241,25 @@ class TestGo:
         monkeypatch.setattr(minutia.cli, "process_transcripts", fake_merge)
         mock_llm.set_responses(["Guided summary.", "20260702_guided_report"])
 
-        # mock_llm patches load_config with a MagicMock; give `go` a real config.
-        from minutia.config import MinutiaConfig
+        # Give `go` a concrete resolved settings object for this run.
+        from minutia.config import MinutiaSettings, SettingsResolution
 
-        cfg = MinutiaConfig(
+        settings = MinutiaSettings(
             whisper_model="base",
             recordings_dir=recordings,
             base_output_dir=out_root,
             anthropic_api_key="fake-key-for-tests",
         )
-        monkeypatch.setattr(minutia.cli, "load_config", lambda: cfg)
+        resolution = SettingsResolution(
+            settings=settings,
+            sources={},
+            invocation_dir=tmp_path,
+            context_env_file=None,
+            user_config_file=tmp_path / "config.env",
+        )
+        monkeypatch.setattr(
+            minutia.cli, "resolve_settings", lambda **kwargs: resolution
+        )
 
         result = runner.invoke(
             minutia.cli.main,

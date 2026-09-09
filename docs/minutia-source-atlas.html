@@ -542,30 +542,29 @@ DEFAULT_SUMMARY_MODEL = <span class="s">"claude-sonnet-4-6"</span></code></pre>
 <!-- ================================================================ -->
 <section id="config">
   <p class="eyebrow">Section 4</p>
-  <h2><span class="secno">4</span>config.py — layered resolution with provenance</h2>
+  <h2><span class="secno">4</span>config.py — validated settings with provenance</h2>
   <div class="prose">
-    <p>Configuration went from "read some env vars" to a small resolution engine this week.
-    The core idea: build an ordered list of <b>layers</b>, walk them per key, and remember
-    <em>which layer answered</em>. That memory is what powers <code>minutia config</code>.</p>
+    <p><code>MinutiaSettings</code> is a Pydantic Settings model. Minutia resolves an explicit set of
+    sources without mutating <code>os.environ</code>, validates the effective values, and remembers
+    <em>which layer answered</em>. That provenance powers <code>minutia config</code>.</p>
   </div>
 
   <div class="ladder" role="list" aria-label="Configuration precedence, highest first">
     <div class="rung top" role="listitem"><span class="who">CLI flags</span><span class="what">handled in cli.py — a flag simply overrides the config value after loading</span></div>
     <div class="rung" role="listitem"><span class="who">process environment</span><span class="what">MINUTIA_* vars — layer name "environment"</span></div>
-    <div class="rung" role="listitem"><span class="who">./.env then ./.minutia</span><span class="what">CWD files, project-local dev overrides</span></div>
+    <div class="rung" role="listitem"><span class="who">contextual .env</span><span class="what">nearest file from the invocation directory, with project/home boundaries</span></div>
     <div class="rung" role="listitem"><span class="who">~/.config/minutia/config.env</span><span class="what">user-global set-once home (platformdirs.user_config_path)</span></div>
     <div class="rung" role="listitem"><span class="who">built-in defaults</span><span class="what">e.g. output home = platformdirs user_documents_path()/minutia</span></div>
   </div>
 
   <div class="prose">
     <h3>How resolution works</h3>
-    <p><code>_config_layers()</code> builds <code>[(source_name, mapping), …]</code> — the env mapping first,
-    then each file read via <code>dotenv_values()</code> (files are read <em>directly</em>, not through the
-    process environment, so provenance stays truthful). <code>_resolve(layers, key)</code> walks in order and
-    returns <code>(value, source_name)</code>; misses return <code>(None, "default")</code>.</p>
-    <p><code>load_config()</code> resolves each option, records the source under a friendly name in
-    <code>MinutiaConfig.sources</code>, coerces types (<code>_coerce_int</code>, <code>_coerce_path</code> with
-    <code>expanduser</code>), validates, and returns the frozen picture:</p>
+    <p><code>discover_env_file()</code> walks from the invocation directory to the first project
+    boundary and selects at most one <code>.env</code>. <code>load_config()</code> overlays the user config,
+    contextual file, and environment before Pydantic validates the complete settings model.</p>
+    <p>Relative paths from config files are anchored to the declaring file; environment and CLI
+    paths are anchored to the invocation directory. Global <code>--env-file</code> and
+    <code>--no-env-file</code> options make discovery explicit when needed.</p>
   </div>
 
   <div class="tablewrap"><table>
@@ -582,20 +581,10 @@ DEFAULT_SUMMARY_MODEL = <span class="s">"claude-sonnet-4-6"</span></code></pre>
   </table></div>
 
   <div class="callout">
-    <span class="tag">Why load_dotenv still runs</span>
-    <p>Resolution no longer <em>needs</em> the process environment mutated — but
-    <code>_load_env_files()</code> still calls <code>load_dotenv(override=False)</code> on all three files.
-    Reason: downstream code (<code>resolve_anthropic_api_key()</code> called with no args inside the
-    summarize step) reads <code>os.environ</code> directly. Removing the mutation would silently break
-    any path that doesn't thread the key explicitly. Belt <em>and</em> suspenders, on purpose.</p>
-  </div>
-
-  <div class="callout warn">
-    <span class="tag">Gotcha</span>
-    <p>The API key is special-cased: three variable <em>names</em> are tried in priority order, and each
-    name is resolved across <em>all</em> layers before falling to the next name. So
-    <code>ANTHROPIC_API_KEY</code> in your user config file beats <code>MINUTIA_ANTHROPIC_API_KEY</code>
-    in the environment. Name priority outranks layer priority for this one key.</p>
+    <span class="tag">No process mutation</span>
+    <p>Dotenv files are read as configuration data; Minutia never calls <code>load_dotenv()</code>.
+    Repeated loads are independent, and source precedence outranks API-key alias priority. Direct
+    summarization helpers retain an environment-only compatibility lookup.</p>
   </div>
 </section>
 

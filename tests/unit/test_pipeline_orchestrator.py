@@ -35,8 +35,12 @@ def test_orchestrator_executes_steps_and_collects_artifacts(sample_run_paths) ->
 
     orchestrator = PipelineOrchestrator(
         steps=[
-            PipelineStepDefinition(name="first", runner=first_step, description="First step"),
-            PipelineStepDefinition(name="second", runner=second_step, description="Second step"),
+            PipelineStepDefinition(
+                name="first", runner=first_step, description="First step"
+            ),
+            PipelineStepDefinition(
+                name="second", runner=second_step, description="Second step"
+            ),
         ],
         progress_callback=progress_events.append,
     )
@@ -117,7 +121,9 @@ def test_orchestrator_skips_disabled_steps(sample_run_paths) -> None:
     orchestrator = PipelineOrchestrator(
         steps=[
             PipelineStepDefinition(name="always", runner=runner),
-            PipelineStepDefinition(name="maybe", runner=runner, is_enabled=lambda cfg: not cfg.skip_summary),
+            PipelineStepDefinition(
+                name="maybe", runner=runner, is_enabled=lambda cfg: not cfg.skip_summary
+            ),
         ],
         progress_callback=progress_events.append,
     )
@@ -128,7 +134,9 @@ def test_orchestrator_skips_disabled_steps(sample_run_paths) -> None:
     assert result.completed_steps == ["always"]
     assert "ran" in result.artifacts
 
-    emitted = [(event.step_name, event.status, event.message) for event in progress_events]
+    emitted = [
+        (event.step_name, event.status, event.message) for event in progress_events
+    ]
     assert emitted[0] == ("always", StepStatus.RUNNING, "")
     assert emitted[1] == ("always", StepStatus.COMPLETED, "Completed")
     assert emitted[2] == ("maybe", StepStatus.COMPLETED, "Skipped")
@@ -142,7 +150,7 @@ def test_orchestrator_skips_disabled_steps(sample_run_paths) -> None:
 def test_cleanup_policy_keep_final_on_success(sample_run_paths) -> None:
     """Test that KEEP_FINAL cleanup policy removes intermediate files on success."""
     config = _make_config(sample_run_paths, cleanup_policy=CleanupPolicy.KEEP_FINAL)
-    
+
     # Create some fake intermediate files
     config.run_paths.ensure_directories()
     config.run_paths.microphone_audio.write_text("fake audio data")
@@ -168,8 +176,10 @@ def test_cleanup_policy_keep_final_on_success(sample_run_paths) -> None:
 
 def test_cleanup_policy_cleanup_on_error_on_failure(sample_run_paths) -> None:
     """Test that CLEANUP_ON_ERROR policy removes entire run directory on failure."""
-    config = _make_config(sample_run_paths, cleanup_policy=CleanupPolicy.CLEANUP_ON_ERROR)
-    
+    config = _make_config(
+        sample_run_paths, cleanup_policy=CleanupPolicy.CLEANUP_ON_ERROR
+    )
+
     # Create some files
     config.run_paths.ensure_directories()
     config.run_paths.microphone_audio.write_text("fake audio data")
@@ -192,7 +202,7 @@ def test_cleanup_policy_cleanup_on_error_on_failure(sample_run_paths) -> None:
 def test_cleanup_policy_keep_all_preserves_files(sample_run_paths) -> None:
     """Test that KEEP_ALL policy preserves all files regardless of outcome."""
     config = _make_config(sample_run_paths, cleanup_policy=CleanupPolicy.KEEP_ALL)
-    
+
     # Create some files
     config.run_paths.ensure_directories()
     config.run_paths.microphone_audio.write_text("fake audio data")
@@ -218,11 +228,11 @@ def test_cleanup_policy_keep_all_preserves_files(sample_run_paths) -> None:
 def test_cleanup_policy_safety_checks(tmp_path) -> None:
     """Test that cleanup safety checks prevent dangerous operations."""
     from minutia.paths import CleanupPolicy, RunPaths
-    
+
     # Test 1: Refuse to clean non-minutia directory
     dangerous_path = tmp_path / "not-a-minutia-run"
     dangerous_path.mkdir()
-    
+
     # Create a RunPaths with a non-standard directory name
     fake_run_paths = RunPaths(
         run_root=dangerous_path,
@@ -236,18 +246,18 @@ def test_cleanup_policy_safety_checks(tmp_path) -> None:
         metadata_file=dangerous_path / "metadata.json",
         logs_file=dangerous_path / "minutia.log",
     )
-    
+
     # This should raise RuntimeError due to safety checks
     try:
         fake_run_paths.cleanup(CleanupPolicy.CLEANUP_ON_ERROR)
         raise AssertionError("Expected RuntimeError for unsafe directory")
     except RuntimeError as e:
         assert "doesn't appear to be a minutia run" in str(e)
-    
+
     # Test 2: Verify proper minutia directory gets cleaned
     proper_minutia_dir = tmp_path / "runs" / "2024-01-15_test-meeting"
     proper_minutia_dir.mkdir(parents=True)
-    
+
     proper_run_paths = RunPaths(
         run_root=proper_minutia_dir,
         input_path=tmp_path / "meeting.mkv",
@@ -260,14 +270,14 @@ def test_cleanup_policy_safety_checks(tmp_path) -> None:
         metadata_file=proper_minutia_dir / "metadata.json",
         logs_file=proper_minutia_dir / "minutia.log",
     )
-    
+
     # Create some test files
     proper_run_paths.ensure_directories()
     proper_run_paths.microphone_audio.write_text("test")
     proper_run_paths.merged_transcript.write_text('{"test": "data"}')
-    
+
     # This should work safely
     proper_run_paths.cleanup(CleanupPolicy.CLEANUP_ON_ERROR)
-    
+
     # Directory should be cleaned up
     assert not proper_minutia_dir.exists()

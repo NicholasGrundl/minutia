@@ -26,7 +26,9 @@ def test_pipeline_config_defaults(sample_run_paths):
 
 
 def test_step_progress_representation():
-    progress = StepProgress(step_name="extract_audio", status=StepStatus.RUNNING, message="starting")
+    progress = StepProgress(
+        step_name="extract_audio", status=StepStatus.RUNNING, message="starting"
+    )
     assert progress.step_name == "extract_audio"
     assert progress.status is StepStatus.RUNNING
     assert progress.message == "starting"

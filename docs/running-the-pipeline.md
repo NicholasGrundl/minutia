@@ -38,6 +38,31 @@ export MINUTIA_WHISPER_MODEL=medium.en        # transcription model (default: ba
 minutia config
 ```
 
+### Configuration layers
+
+Minutia resolves settings in this order, with the leftmost value winning:
+
+```text
+CLI arguments > process environment > contextual .env > user config > built-in defaults
+```
+
+Durable personal defaults belong in
+`platformdirs.user_config_path("minutia")/config.env` (`~/.config/minutia/config.env` on Linux).
+Project-specific or temporary values—including API keys—belong in a contextual `.env` or the
+process environment.
+
+By default Minutia starts at the directory where it was invoked and loads the nearest `.env`,
+stopping at the first `.git` or `pyproject.toml` project boundary and before the user's home
+directory. It never chooses configuration based on the input recording or output directory.
+
+```bash
+minutia --env-file ./client.env config  # select an exact contextual file
+minutia --no-env-file config            # use global config + process env only
+```
+
+Relative paths in an env-format file are resolved from that file's directory. Relative paths from
+the process environment or CLI are resolved from the invocation directory.
+
 ---
 
 ## Recommended: step-by-step

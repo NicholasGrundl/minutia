@@ -5,9 +5,9 @@ import pytest
 
 class LLMMock:
     """Simulates Anthropic Claude API behavior for testing."""
-    
+
     def __init__(self):
-        self.responses = [] # List of strings to return in sequence
+        self.responses = []  # List of strings to return in sequence
         self.calls = []
 
     def set_responses(self, responses: list[str]):
@@ -16,12 +16,12 @@ class LLMMock:
 
     def create_message(self, **kwargs):
         self.calls.append(kwargs)
-        
+
         if not self.responses:
             text = "Default mocked summary."
         else:
             text = self.responses.pop(0)
-            
+
         # Mimic the Anthropic SDK response structure: response.content[0].text
         # Using MagicMock to simulate the Pydantic models in the real SDK.
         mock_response = MagicMock()
@@ -40,8 +40,6 @@ def mock_llm(mocker, chaos_config):
     """
     Mock the Anthropic client and configuration globally.
     """
-    # We patch load_config in multiple places where it might be imported
-    # to ensure all components see the same mock configuration.
     mock_app_config = MagicMock()
     mock_app_config.anthropic_api_key = "fake-api-key"
     mock_app_config.base_output_dir = "runs"
@@ -53,12 +51,16 @@ def mock_llm(mocker, chaos_config):
     mock_app_config.recordings_dir = None
     mock_app_config.personal_info_path = None
 
-    mocker.patch("minutia.config.load_config", return_value=mock_app_config)
-    mocker.patch("minutia.baseline_pipeline.load_config", return_value=mock_app_config)
-    mocker.patch("minutia.cli.load_config", return_value=mock_app_config)
-    
+    mock_resolution = MagicMock()
+    mock_resolution.settings = mock_app_config
+    mocker.patch("minutia.config.resolve_settings", return_value=mock_resolution)
+    mocker.patch(
+        "minutia.baseline_pipeline.resolve_settings", return_value=mock_resolution
+    )
+    mocker.patch("minutia.cli.resolve_settings", return_value=mock_resolution)
+
     mock_inst = LLMMock()
-    
+
     def mock_create_message(**kwargs):
         chaos_config.trigger_if_set("anthropic.messages.create")
         return mock_inst.create_message(**kwargs)
@@ -69,12 +71,10 @@ def mock_llm(mocker, chaos_config):
         mock_client = MagicMock()
         mock_client.messages.create.side_effect = mock_create_message
         return mock_client
-    
+
     # Patch Anthropic class where it is used
-    mocker.patch("minutia.steps.summarize_transcript.Anthropic", side_effect=mock_anthropic_init)
-    
-    # Also mock API key resolution helper
-    mocker.patch("minutia.steps.summarize_transcript.resolve_anthropic_api_key", return_value="fake-api-key")
-    mocker.patch("minutia.config.resolve_anthropic_api_key", return_value="fake-api-key")
-    
+    mocker.patch(
+        "minutia.steps.summarize_transcript.Anthropic", side_effect=mock_anthropic_init
+    )
+
     return mock_inst

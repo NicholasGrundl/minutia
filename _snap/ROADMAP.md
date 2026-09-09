@@ -31,17 +31,24 @@ parked the portfolio vision as scoped `[draft]` stubs; added `notebooks-clean-re
      + run-metadata sidecar (was Phase 5).
    - **`[ready]`** [`orchestrator-retire-baseline`](./features/%5Bready%5Dorchestrator-retire-baseline.md)
      — orchestrator parity + delete `baseline_pipeline.py` (was Phase 6).
+3. **`[active]`** [`settings-resolution`](./features/%5Bactive%5Dsettings-resolution.md) — replace
+   the stateful dotenv loader with Pydantic Settings; retain the platformdirs global config,
+   discover one cwd-contextual `.env`, expose explicit dotenv controls, preserve provenance, and
+   isolate tests from ambient configuration. Pipeline YAML/JSON remains a separate future domain.
 
    ➡️ **Promotion milestone:** with the base stable + green, PR `uv_refactor` → `main`, then
    retire `uv_refactor`. (Note: PR-based, updating `EXECUTIVE_SUMMARY.md` §4's original
    force-reset mechanic — decided 2026-09-08.)
+   **Before the PR (added 2026-09-08 after CLI dogfooding):** (1) update `README.md` (make→just,
+   install/usage, anthropic 1.x + python `<3.14` notes); (2) a once-through of the tests together
+   (triage/group + rework fixtures/mocks — see `[draft]tests-refactor.md`).
 
 ## B. Feature branches from the new `main`
 
-3. **`[ready]`** [`ci-release-pipelines`](./features/%5Bready%5Dci-release-pipelines.md) — GitHub
+4. **`[ready]`** [`ci-release-pipelines`](./features/%5Bready%5Dci-release-pipelines.md) — GitHub
    Actions CI (lint + `ty`, no pytest) + tag-driven releases + `scripts/release.py`. **Started as
    a fresh feature after `main` promotion** (its workflows only go live on `main`/tags).
-4. **`[draft]`** [`notebooks-clean-rebuild`](./features/%5Bdraft%5Dnotebooks-clean-rebuild.md) —
+5. **`[draft]`** [`notebooks-clean-rebuild`](./features/%5Bdraft%5Dnotebooks-clean-rebuild.md) —
    rebuild `notebooks/` on synthetic data, outputs stripped, thin over the package (§6). §7's
    suggested first branch off the new `main`.
 

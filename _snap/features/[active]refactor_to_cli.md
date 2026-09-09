@@ -192,6 +192,12 @@ convenience. Design:
 - **platformdirs** is a tiny pure-Python dep and the right call ahead of open-sourcing —
   correct locations on Linux/macOS/Windows for free. Reference notes: `_snap/context/platformdirs/`.
 
+**Superseded config-loading details (2026-09-08):** the platformdirs location and defaults remain,
+but the hand-written dotenv loader proved stateful during the test-refactor investigation. The
+replacement design lives in [`[active]settings-resolution.md`](./%5Bactive%5Dsettings-resolution.md):
+Pydantic Settings, one cwd-contextual `.env` discovered with explicit boundaries, no `.minutia`,
+no `os.environ` mutation, source-relative paths, and pipeline specifications kept orthogonal.
+
 **Typer over Click** (2026-07-02 PLAN(2)): user preference, consistent with the
 `snap-script` convention (typer + loguru). Typer is built on Click so the port is
 mechanical; do it 1:1 *before* the parity features so new commands are written once, in

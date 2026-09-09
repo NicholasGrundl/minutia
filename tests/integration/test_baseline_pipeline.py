@@ -1,15 +1,9 @@
 import json
-from pathlib import Path
 
-from minutia import (
-    audio_transcription,
-    baseline_pipeline,
-    summarize_transcript,
-    video_extraction,
-)
+from minutia import baseline_pipeline
 
 
-def test_baseline_pipeline_smoke(tmp_path, mocker, mock_ffmpeg, mock_whisper, mock_llm):
+def test_baseline_pipeline_smoke(tmp_path, mock_ffmpeg, mock_whisper, mock_llm):
     # Arrange fixture files
     input_video = tmp_path / "sample.mkv"
     input_video.write_text("fake-video", encoding="utf-8")
@@ -21,24 +15,23 @@ def test_baseline_pipeline_smoke(tmp_path, mocker, mock_ffmpeg, mock_whisper, mo
     )
 
     markdown_notes_file = tmp_path / "notes.md"
-    markdown_notes_file.write_text("# Extra context\nDetails go here.\n", encoding="utf-8")
+    markdown_notes_file.write_text(
+        "# Extra context\nDetails go here.\n", encoding="utf-8"
+    )
 
     # Configure Mocks
     mock_ffmpeg.set_probe_data(input_video, audio_tracks=3)
-    
+
     # Set scenarios for whisper mock to return specific text
-    mock_whisper.set_scenario("microphone_audio", [
-        {"start": 0.0, "end": 1.0, "text": "Hello from mic"}
-    ])
-    mock_whisper.set_scenario("desktop_audio", [
-        {"start": 0.25, "end": 1.25, "text": "Hello from desktop"}
-    ])
-    
+    mock_whisper.set_scenario(
+        "microphone_audio", [{"start": 0.0, "end": 1.0, "text": "Hello from mic"}]
+    )
+    mock_whisper.set_scenario(
+        "desktop_audio", [{"start": 0.25, "end": 1.25, "text": "Hello from desktop"}]
+    )
+
     # Configure LLM mock responses
     mock_llm.set_responses(["Summary content"])
-
-    # Mock environment for Anthropic API
-    mocker.patch("os.getenv", side_effect=lambda key, default=None: "test-key" if key == "MINUTIA_ANTHROPIC_API_KEY" else default)
 
     # Run the pipeline
     args = baseline_pipeline.build_parser().parse_args(

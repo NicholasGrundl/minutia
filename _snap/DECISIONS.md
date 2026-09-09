@@ -8,6 +8,86 @@ close.
 
 ---
 
+## 2026-09-08 — settings resolution + test-suite stabilization (code complete, gate handoff)
+
+- **Set out to:** Fix the production configuration design exposed by the test-suite environment
+  leak, test the new stable boundary, then return to the deferred suite failures without inventing
+  production APIs for stale tests.
+- **Why:** The hand-written loader called `load_dotenv()` and mutated `os.environ`, so config loads
+  were stateful and provenance could be false. At the same time, pytest inherited legitimate
+  developer settings and could select a real recording, causing an ffmpeg hang.
+- **How it ended:** The settings feature is code-complete and the previously failing suite reached
+  **97 passed / 0 failed / 0 skipped** before the final mechanical test formatting pass.
+  - **Settings boundary:** added `pydantic-settings`; removed direct `python-dotenv`. The public
+    boundary is now `MinutiaSettings` plus immutable `SettingsResolution`, produced by
+    `resolve_settings()`. Per user direction (pre-v0, no users), the old `MinutiaConfig`,
+    `load_config()`, `env_sources`, and environment-reading API-key compatibility helper were
+    removed rather than shimmed.
+  - **Resolution policy:** defaults < platformdirs `config.env` < one cwd-contextual `.env` <
+    process environment < CLI arguments. `discover_env_file()` selects the nearest file, stops at
+    `.git`/`pyproject.toml` or before home, and never anchors to input/output. File-declared paths
+    are relative to their file; environment/CLI paths are relative to the invocation directory.
+    `--env-file` and `--no-env-file` are global CLI options; `minutia config` reports discovery and
+    winning sources without exposing the key.
+  - **Explicit dependencies:** summarize/report helpers now require an explicit `api_key`; CLI,
+    orchestrator, baseline fallback, mocks, and fixture scripts receive resolved settings instead
+    of independently rereading process state.
+  - **Settings tests:** expanded focused config/CLI coverage to 29 passing tests (precedence,
+    aliases, validation, boundaries, explicit/disabled discovery, path anchoring, provenance, and
+    no process mutation). The full unit directory passed **79/79** at that checkpoint.
+  - **Suite isolation:** root autouse fixture scrubs `MINUTIA_*`, `ANTHROPIC_API_KEY`, and
+    `CLAUDE_API_KEY`; the skipped CLI test was re-enabled. `pytest-timeout` is now a dev dependency
+    with `--timeout=60` in pytest defaults.
+  - **Stale e2e tests:** rewrote `test_e2e_permutations.py` against the orchestrator's real default
+    step adapters and correct chaos triggers. No aliases/adapters were added to production. The
+    five failures now pass, including partial completion and artifact preservation.
+  - **Test hygiene:** mock fixtures are registered via top-level `pytest_plugins`; Anthropic mocks
+    match the explicit-key/current-client boundary. Ruff safe-fixes + formatting were applied to
+    `tests/`; `ruff check tests` and `ty check src tests` both pass.
+  - **Docs:** updated AGENTS, README, the running guide, source atlas, active CLI-refactor spec,
+    settings spec, and tests-refactor spec for the new configuration tree.
+- **Why we stopped:** User requested a session flush so a fresh BUILD session can perform the final
+  gate work with compact context.
+- **Next:**
+  1. Persist the already-validated gate expansion: `[tool.ty.src].include = ["src", "tests"]` in
+     `pyproject.toml`; change `justfile` lint/format/ruff recipes from `src` to `src tests`. A combined
+     patch was attempted but did not apply, so neither of those scope edits was made.
+  2. Run `just lint`, `just ty`, and plain `uv run pytest` (the timeout is now built in). The last
+     full green run preceded the final mechanical Ruff formatting, so repeat it once.
+  3. Finish the remaining tests-refactor tier work: ensure every test is deliberately marked
+     unit/integration/slow and decide whether tier-specific conftests need any additional autouse
+     bundles. Then update the feature checklists.
+  4. `settings-resolution` is checklist-complete but remains `[active]`; any filename state change
+     requires the repository's separately approved `git mv` workflow.
+
+## 2026-09-08 — stabilization / editable-install + anthropic 1.x fixes (post-migration dogfooding)
+
+- **Set out to:** Clear loose ends so `uv_refactor` can PR → `main` in a workable state — install
+  minutia as an editable `uv` tool and run it on a real recording.
+- **Why:** Dogfooding the CLI end-to-end before promotion surfaced two install/runtime blockers.
+- **How it ended:** Done — CLI installs editable and runs `go`/`summarize` end-to-end on a real
+  meeting. Committed as `[MACRO] fix(stabilization)`.
+  - **install:** `uv tool install` defaults to the newest interpreter (3.14) and **ignores the
+    project `.python-version`**; torch has no cp314 wheels → resolution failed. Capped
+    `requires-python <3.14` (torch stays 2.5.1). Workaround if needed: `--python 3.12`.
+  - **anthropic 0.x→1.x:** unpinned `anthropic` drifted to 1.x in the tool env (dev was 0.102).
+    1.x **removed sampling params from `messages.create()`** → `TypeError` on `temperature`.
+    Removed `temperature` from the 3 `create()` calls; pinned `anthropic>=1.4`; re-locked; dev
+    now 1.4.0 == tool. Verified: `summarize` wrote an AI-named report on a real transcript.
+  - **docs:** added `docs/running-the-pipeline.md` (tiered run guide).
+  - **tests:** parked deferred debt as `[draft]tests-refactor.md` + ROADMAP entry.
+- **Findings:**
+  - `ty` earned its keep — the baselined `no-matching-overload` on `messages.create` *was* this
+    bug. Un-baseline it during tests-refactor.
+  - The None-subscript `ty` flagged in `summarize_transcript` is guarded by a `KeyError` above —
+    not a real bug.
+  - **Full test suite hangs under anthropic 1.x** (`llm_mock` is 0.x-shaped → a real API call).
+    Don't debug via full-suite runs; tracked in tests-refactor.
+- **Why we stopped:** increment committed + validated on a real meeting.
+- **Next (to finish the PR → stable `main`):** (1) **update README** (make→just, install/usage,
+  anthropic 1.x + python `<3.14` notes); (2) **do a once-through of the tests together** (triage/
+  group + rework fixtures/mocks per `[draft]tests-refactor.md`). Then PR `uv_refactor` → `main`.
+
 ## 2026-09-08 — justfile-migration / justfile + `ty` adopted (code complete)
 
 - **Set out to:** Replace the `Makefile` with a `justfile` task runner and adopt Astral's `ty`

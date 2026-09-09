@@ -6,7 +6,12 @@ from typing import Annotated
 import click
 import typer
 
-from .config import USER_CONFIG_FILE, ConfigurationError, MinutiaConfig, load_config
+from .config import (
+    USER_CONFIG_FILE,
+    ConfigurationError,
+    MinutiaSettings,
+    resolve_settings,
+)
 from .logging import configure_logging, logger
 from .model_registry import anthropic_models
 from .paths import RunPaths, resolve_input_video
@@ -60,18 +65,49 @@ SummaryModelOption = Annotated[
 ForceOption = Annotated[
     bool, typer.Option("--force", help="Redo the work even if outputs already exist")
 ]
+EnvFileOption = Annotated[
+    Path | None,
+    typer.Option(
+        "--env-file",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        readable=True,
+        help="Use this contextual .env file instead of automatic discovery",
+    ),
+]
+NoEnvFileOption = Annotated[
+    bool,
+    typer.Option(
+        "--no-env-file",
+        help="Disable contextual .env discovery (the user config still loads)",
+    ),
+]
 
 
 @app.callback()
-def main_callback(ctx: typer.Context):
+def main_callback(
+    ctx: typer.Context,
+    env_file: EnvFileOption = None,
+    no_env_file: NoEnvFileOption = False,
+):
     """OBS Video Processing CLI"""
+    if env_file is not None and no_env_file:
+        raise click.ClickException(
+            "--env-file and --no-env-file cannot be used together"
+        )
     try:
-        config = load_config()
+        resolution = resolve_settings(
+            env_file=env_file,
+            discover_dotenv=not no_env_file,
+        )
     except ConfigurationError as exc:
         raise click.ClickException(str(exc)) from exc
+    config = resolution.settings
     configure_logging(level=config.log_level)
     ctx.ensure_object(dict)
     ctx.obj["config"] = config
+    ctx.obj["settings_resolution"] = resolution
     logger.info(
         "CLI initialised with whisper_model={}, summary_model={}, output_dir={}, anthropic_key={}",
         config.whisper_model,
@@ -81,7 +117,7 @@ def main_callback(ctx: typer.Context):
     )
 
 
-def _resolve_input_or_fail(config: MinutiaConfig, input_video: Path | None) -> Path:
+def _resolve_input_or_fail(config: MinutiaSettings, input_video: Path | None) -> Path:
     """Resolve the input MKV (explicit or newest recording), echoing discovery."""
     try:
         resolved = resolve_input_video(input_video, config.recordings_dir)
@@ -103,7 +139,7 @@ def _read_optional_text(path: Path | None, label: str) -> str:
 
 
 def _extract_audio_step(
-    config: MinutiaConfig,
+    config: MinutiaSettings,
     input_video: Path,
     output_dir: Path,
     mic_track: int | None,
@@ -129,7 +165,7 @@ def _extract_audio_step(
 
 
 def _transcribe_step(
-    config: MinutiaConfig,
+    config: MinutiaSettings,
     mic_audio: Path,
     desktop_audio: Path,
     output_dir: Path,
@@ -160,7 +196,7 @@ def _transcribe_step(
 
 
 def _summarize_step(
-    config: MinutiaConfig,
+    config: MinutiaSettings,
     merged_transcript: Path,
     output_dir: Path,
     prompt_kind: str,
@@ -410,7 +446,7 @@ def go(
     force: ForceOption = False,
 ):
     """Guided run: pick a recording, choose a prompt kind, confirm cost, get a report."""
-    config: MinutiaConfig = ctx.obj["config"]
+    config: MinutiaSettings = ctx.obj["config"]
 
     if recordings_path is not None:
         recordings_dir = recordings_path.expanduser()
@@ -501,7 +537,8 @@ def go(
 @app.command("config")
 def show_config(ctx: typer.Context):
     """Show resolved configuration values and where each came from."""
-    config: MinutiaConfig = ctx.obj["config"]
+    resolution = ctx.obj["settings_resolution"]
+    config: MinutiaSettings = resolution.settings
     rows: Iterable[tuple[str, object]] = (
         ("whisper_model", config.whisper_model),
         ("summary_model", config.summary_model),
@@ -515,15 +552,20 @@ def show_config(ctx: typer.Context):
         ("anthropic_api_key", config.masked_anthropic_key),
     )
     for name, value in rows:
-        source = config.sources.get(name, "default")
+        source = resolution.sources.get(name, "default")
         typer.echo(f"{name} = {value if value is not None else '<unset>'}  [{source}]")
-    typer.echo(f"\nuser config file: {USER_CONFIG_FILE}")
+    typer.echo(f"\ninvocation directory: {resolution.invocation_dir}")
     typer.echo(
-        "precedence: CLI flag > environment > ./.env, ./.minutia > user config > default"
+        "contextual env file: "
+        f"{resolution.context_env_file if resolution.context_env_file else '<none>'}"
+    )
+    typer.echo(f"user config file: {resolution.user_config_file}")
+    typer.echo(
+        "precedence: CLI flag > environment > contextual .env > user config > default"
     )
 
 
-def _resolve_output_dir(config: MinutiaConfig, output_dir: Path | None) -> Path:
+def _resolve_output_dir(config: MinutiaSettings, output_dir: Path | None) -> Path:
     """Return the output directory for the run respecting CLI overrides."""
     if output_dir:
         return output_dir.expanduser()
@@ -532,7 +574,7 @@ def _resolve_output_dir(config: MinutiaConfig, output_dir: Path | None) -> Path:
 
 def _build_pipeline_config(
     *,
-    cli_config: MinutiaConfig,
+    cli_config: MinutiaSettings,
     input_video: str,
     output_directory: Path,
     mic_track: int,

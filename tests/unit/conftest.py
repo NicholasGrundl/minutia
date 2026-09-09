@@ -1,5 +1,7 @@
 import pytest
+
 from minutia.paths import RunPaths
+
 
 @pytest.fixture
 def sample_video_file(tmp_path):
@@ -22,6 +24,5 @@ def sample_run_paths(sample_video_file, tmp_path):
     across multiple test modules.
     """
     return RunPaths.from_video_input(
-        sample_video_file,
-        base_output_dir=tmp_path / "runs"
+        sample_video_file, base_output_dir=tmp_path / "runs"
     )

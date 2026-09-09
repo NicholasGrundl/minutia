@@ -245,12 +245,18 @@ MINUTIA_LOG_LEVEL=INFO
 ### Configuration Precedence
 
 ```
-CLI flags > Environment variables > ./.env, ./.minutia > user config > platformdirs defaults
+CLI flags > Environment variables > contextual .env > user config > platformdirs defaults
 ```
 
 The user-global config is an env-format file at `platformdirs.user_config_path("minutia")/config.env`
-(e.g. `~/.config/minutia/config.env` on Linux). Run **`minutia config`** to print every resolved
-value and which layer supplied it.
+(e.g. `~/.config/minutia/config.env` on Linux). Minutia discovers the nearest `.env` from the
+invocation directory, stopping at the first `.git`/`pyproject.toml` project boundary and before the
+user's home directory. Use global `--env-file PATH` to select one explicitly or `--no-env-file` to
+disable contextual discovery. Input and output paths do not affect discovery. Run **`minutia
+config`** to print every resolved value and which layer supplied it.
+
+Relative paths in the user config and contextual `.env` are anchored to the file that declares
+them. Relative process-environment and CLI paths are anchored to the invocation directory.
 
 **Never commit `.env` or real API keys.** `.gitignore` already excludes `.env*`.
 
@@ -270,6 +276,17 @@ The prior `align-design` / `begin-tasks` / `commit-progress` / `macro-commit` sl
 are retired and archived at `_snap/archive/old_claude_stuff/`.
 
 ## Testing Strategy
+
+**Always run tests through `uv`** — either `just test` (which shells out to `uv run pytest`) or
+`uv run pytest ...` directly. Do **not** invoke the interpreter under `.venv/` (e.g.
+`.venv/bin/python -m pytest`); that bypasses `uv`'s environment resolution and can run against a
+stale or mismatched dependency set. Examples:
+
+```bash
+just test                       # full suite via uv run pytest (forwards args: just test -k merge)
+uv run pytest -m unit            # a marker subset
+uv run pytest path::to::test -q  # a single test
+```
 
 Three-tier approach, already implemented under `tests/`:
 - **Unit** (`tests/unit/`, fast, < 1s each): mocked dependencies, individual functions
