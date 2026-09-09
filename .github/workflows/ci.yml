@@ -14,7 +14,11 @@ jobs:
         with:
           version: "0.12.12" # pin for reproducibility; bump alongside local uv
           enable-cache: true
-      - run: uv sync
+      # --extra cpu pulls the CPU-only torch wheels (~200 MB) instead of the default
+      # CUDA stack (~2.5 GB of nvidia-* libs) that these GPU-less runners can't use.
+      # Local dev keeps GPU: a bare `uv sync` resolves torch from PyPI (CUDA). The
+      # cpu / cu124 extras + their indexes are declared in pyproject.toml [tool.uv].
+      - run: uv sync --extra cpu
       # No pytest in CI (deliberate — see the ci-release-pipelines spec). The value
       # here is a fast, green lint + type gate on main and PRs. Scope matches the
       # local gate (justfile + [tool.ty.src]): src + tests. `ty check` takes no path

@@ -2,19 +2,55 @@ version = 1
 revision = 3
 requires-python = ">=3.12, <3.14"
 resolution-markers = [
-    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform == 'win32'",
-    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform == 'win32'",
-    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform == 'emscripten'",
-    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform == 'emscripten'",
-    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform != 'emscripten' and sys_platform != 'win32'",
-    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform != 'emscripten' and sys_platform != 'win32'",
-    "python_full_version < '3.13' and platform_machine != 's390x' and sys_platform == 'win32'",
-    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform == 'win32'",
-    "python_full_version < '3.13' and platform_machine != 's390x' and sys_platform == 'emscripten'",
-    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform == 'emscripten'",
-    "python_full_version < '3.13' and platform_machine != 's390x' and sys_platform != 'emscripten' and sys_platform != 'win32'",
-    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform == 'win32' and extra != 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124'",
+    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform == 'win32' and extra != 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124'",
+    "python_full_version < '3.13' and platform_machine != 's390x' and sys_platform == 'win32' and extra != 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124'",
+    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform == 'win32' and extra != 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124'",
+    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform == 'emscripten' and extra != 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124'",
+    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform == 'emscripten' and extra != 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124'",
+    "python_full_version < '3.13' and platform_machine != 's390x' and sys_platform == 'emscripten' and extra != 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124'",
+    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform == 'emscripten' and extra != 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124'",
+    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124'",
+    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124'",
+    "(python_full_version < '3.13' and platform_machine != 'aarch64' and platform_machine != 's390x' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and platform_machine != 's390x' and sys_platform != 'emscripten' and sys_platform != 'linux' and sys_platform != 'win32' and extra != 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')",
+    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124'",
+    "python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124'",
+    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform == 'win32' and extra == 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform == 'win32' and extra == 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version < '3.13' and platform_machine != 's390x' and sys_platform == 'win32' and extra == 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform == 'win32' and extra == 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform == 'emscripten' and extra == 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform == 'emscripten' and extra == 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version < '3.13' and platform_machine != 's390x' and sys_platform == 'emscripten' and extra == 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform == 'emscripten' and extra == 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "(python_full_version < '3.13' and platform_machine != 'aarch64' and platform_machine != 's390x' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (python_full_version < '3.13' and platform_machine != 's390x' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'linux' and sys_platform != 'win32' and extra == 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')",
+    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (python_full_version < '3.13' and platform_machine != 's390x' and sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')",
+    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform == 'win32' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform == 'win32' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version < '3.13' and platform_machine != 's390x' and sys_platform == 'win32' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform == 'win32' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform == 'emscripten' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform == 'emscripten' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version < '3.13' and platform_machine != 's390x' and sys_platform == 'emscripten' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform == 'emscripten' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version < '3.13' and platform_machine != 's390x' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
+    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124'",
 ]
+conflicts = [[
+    { package = "minutia", extra = "cpu" },
+    { package = "minutia", extra = "cu124" },
+]]
+
+[manifest]
+constraints = [{ name = "torch", specifier = ">=2.4,<2.6" }]
 
 [[package]]
 name = "absl-py"
@@ -36,7 +72,11 @@ dependencies = [
     { name = "psutil" },
     { name = "pyyaml" },
     { name = "safetensors" },
-    { name = "torch" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cu124", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/ca/14/787e5498cd062640f0f3d92ef4ae4063174f76f9afd29d13fc52a319daae/accelerate-1.13.0.tar.gz", hash = "sha256:d631b4e0f5b3de4aff2d7e9e6857d164810dfc3237d54d017f075122d057b236", size = 402835, upload-time = "2026-03-04T19:34:12.359Z" }
 wheels = [
@@ -109,7 +149,7 @@ version = "1.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "frozenlist" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/61/62/06741b579156360248d1ec624842ad0edf697050bbaf7c3e46394e106ad1/aiosignal-1.4.0.tar.gz", hash = "sha256:f47eecd9468083c2029cc99945502cb7708b082c232f9aca65da147157b251c7", size = 25007, upload-time = "2025-07-03T22:54:43.528Z" }
 wheels = [
@@ -178,7 +218,7 @@ version = "4.13.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "idna" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/19/14/2c5dd9f512b66549ae92767a9c7b330ae88e1932ca57876909410251fe13/anyio-4.13.0.tar.gz", hash = "sha256:334b70e641fd2221c1505b3890c69882fe4a2df910cba14d97019b90b24439dc", size = 231622, upload-time = "2026-03-24T12:59:09.671Z" }
 wheels = [
@@ -246,7 +286,11 @@ version = "0.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
-    { name = "torch" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cu124", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
     { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/90/fa/5c2be1f96dc179f83cdd3bb267edbd1f47d08f756785c016d5c2163901a7/asteroid-filterbanks-0.4.0.tar.gz", hash = "sha256:415f89d1dcf2b13b35f03f7a9370968ac4e6fa6800633c522dac992b283409b9", size = 24599, upload-time = "2021-04-09T20:03:07.456Z" }
@@ -326,8 +370,8 @@ name = "audioread"
 version = "3.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "standard-aifc", marker = "python_full_version >= '3.13'" },
-    { name = "standard-sunau", marker = "python_full_version >= '3.13'" },
+    { name = "standard-aifc", marker = "python_full_version >= '3.13' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "standard-sunau", marker = "python_full_version >= '3.13' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/a1/4a/874ecf9b472f998130c2b5e145dcdb9f6131e84786111489103b66772143/audioread-3.1.0.tar.gz", hash = "sha256:1c4ab2f2972764c896a8ac61ac53e261c8d29f0c6ccd652f84e18f08a4cab190", size = 20082, upload-time = "2025-10-26T19:44:13.484Z" }
 wheels = [
@@ -401,7 +445,7 @@ dependencies = [
     { name = "packaging" },
     { name = "pillow" },
     { name = "pyyaml" },
-    { name = "tornado", marker = "sys_platform != 'emscripten'" },
+    { name = "tornado", marker = "sys_platform != 'emscripten' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
     { name = "xyzservices" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/bf/0d/fabb70707646217e4b0e3943e05730eab8c1f7b7e7485145f8594b52e606/bokeh-3.9.0.tar.gz", hash = "sha256:775219714a8496973ddbae16b1861606ba19fe670a421e4d43267b41148e07a3", size = 5740345, upload-time = "2026-03-11T17:58:34.062Z" }
@@ -432,7 +476,7 @@ name = "cffi"
 version = "2.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pycparser", marker = "implementation_name != 'PyPy'" },
+    { name = "pycparser", marker = "implementation_name != 'PyPy' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/eb/56/b1ba7935a17738ae8453301356628e8147c79dbb825bcbc73dc7401f9846/cffi-2.0.0.tar.gz", hash = "sha256:44d1b5909021139fe36001ae048dbdde8214afa20200eda0f64c068cac5d5529", size = 523588, upload-time = "2025-09-08T23:24:04.541Z" }
 wheels = [
@@ -508,7 +552,7 @@ name = "click"
 version = "8.3.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/bb/63/f9e1ea081ce35720d8b92acde70daaedace594dc93b693c869e0d5910718/click-8.3.3.tar.gz", hash = "sha256:398329ad4837b2ff7cbe1dd166a4c0f8900c3ca3a218de04466f38f6497f18a2", size = 328061, upload-time = "2026-04-22T15:11:27.506Z" }
 wheels = [
@@ -538,7 +582,7 @@ name = "colorlog"
 version = "6.10.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/a2/61/f083b5ac52e505dfc1c624eafbf8c7589a0d7f32daa398d2e7590efa5fda/colorlog-6.10.1.tar.gz", hash = "sha256:eb4ae5cb65fe7fec7773c2306061a8e63e02efc2c72eba9d27b0fa23c94f1321", size = 17162, upload-time = "2025-10-16T16:14:11.978Z" }
 wheels = [
@@ -1136,7 +1180,9 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/ef/32/f2ce6d4cac3e55bc6173f92dbe627e782e1850f89d986c3606feb63aafa7/greenlet-3.5.0-cp312-cp312-macosx_11_0_universal2.whl", hash = "sha256:db2910d3c809444e0a20147361f343fe2798e106af8d9d8506f5305302655a9f", size = 286228, upload-time = "2026-04-27T12:20:34.421Z" },
     { url = "https://files.pythonhosted.org/packages/b7/aa/caed9e5adf742315fc7be2a84196373aab4816e540e38ba0d76cb7584d68/greenlet-3.5.0-cp312-cp312-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:3ec9ea74e7268ace7f9aab1b1a4e730193fc661b39a993cd91c606c32d4a3628", size = 601775, upload-time = "2026-04-27T12:52:41.045Z" },
     { url = "https://files.pythonhosted.org/packages/c7/af/90ae08497400a941595d12774447f752d3dfe0fbb012e35b76bc5c0ff37e/greenlet-3.5.0-cp312-cp312-manylinux_2_24_ppc64le.manylinux_2_28_ppc64le.whl", hash = "sha256:54d243512da35485fc7a6bf3c178fdda6327a9d6506fcdd62b1abd1e41b2927b", size = 614436, upload-time = "2026-04-27T12:59:41.595Z" },
+    { url = "https://files.pythonhosted.org/packages/3f/e9/4eeadf8cb3403ac274245ba75f07844abc7fa5f6787583fc9156ba741e0f/greenlet-3.5.0-cp312-cp312-manylinux_2_24_s390x.manylinux_2_28_s390x.whl", hash = "sha256:41353ec2ecedf7aa8f682753a41919f8718031a6edac46b8d3dc7ed9e1ceb136", size = 620610, upload-time = "2026-04-27T13:02:39.194Z" },
     { url = "https://files.pythonhosted.org/packages/2b/e0/2e13df68f367e2f9960616927d60857dd7e56aaadd59a47c644216b2f920/greenlet-3.5.0-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:9d280a7f5c331622c69f97eb167f33577ff2d1df282c41cd15907fc0a3ca198c", size = 611388, upload-time = "2026-04-27T12:25:28.008Z" },
+    { url = "https://files.pythonhosted.org/packages/ee/ef/f913b3c0eb7d26d86a2401c5e1546c9d46b657efee724b06f6f4ac5d8824/greenlet-3.5.0-cp312-cp312-manylinux_2_39_riscv64.whl", hash = "sha256:58c1c374fe2b3d852f9b6b11a7dff4c85404e51b9a596fd9e89cf904eb09866d", size = 422775, upload-time = "2026-04-27T13:05:14.261Z" },
     { url = "https://files.pythonhosted.org/packages/82/f7/393c64055132ac0d488ef6be549253b7e6274194863967ddc0bc8f5b87b8/greenlet-3.5.0-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:1eb67d5adefb5bd2e182d42678a328979a209e4e82eb93575708185d31d1f588", size = 1570768, upload-time = "2026-04-27T12:53:28.099Z" },
     { url = "https://files.pythonhosted.org/packages/b8/4b/eaf7735253522cf56d1b74d672a58f54fc114702ceaf05def59aae72f6e1/greenlet-3.5.0-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:2628d6c86f6cb0cb45e0c3c54058bbec559f57eaae699447748cb3928150577e", size = 1635983, upload-time = "2026-04-27T12:25:26.903Z" },
     { url = "https://files.pythonhosted.org/packages/4c/fe/4fb3a0805bd5165da5ebf858da7cc01cce8061674106d2cf5bdab32cbfde/greenlet-3.5.0-cp312-cp312-win_amd64.whl", hash = "sha256:d4d9f0624c775f2dfc56ba54d515a8c771044346852a918b405914f6b19d7fd8", size = 238840, upload-time = "2026-04-27T12:23:54.806Z" },
@@ -1144,7 +1190,9 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/0c/58/fc576f99037ce19c5aa16628e4c3226b6d1419f72a62c79f5f40576e6eb3/greenlet-3.5.0-cp313-cp313-macosx_11_0_universal2.whl", hash = "sha256:5a5ed18de6a0f6cc7087f1563f6bd93fc7df1c19165ca01e9bde5a5dc281d106", size = 285066, upload-time = "2026-04-27T12:23:05.033Z" },
     { url = "https://files.pythonhosted.org/packages/4a/ba/b28ddbe6bfad6a8ac196ef0e8cff37bc65b79735995b9e410923fffeeb70/greenlet-3.5.0-cp313-cp313-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:3a717fbc46d8a354fa675f7c1e813485b6ba3885f9bef0cd56e5ba27d758ff5b", size = 604414, upload-time = "2026-04-27T12:52:42.358Z" },
     { url = "https://files.pythonhosted.org/packages/09/06/4b69f8f0b67603a8be2790e55107a190b376f2627fe0eaf5695d85ffb3cd/greenlet-3.5.0-cp313-cp313-manylinux_2_24_ppc64le.manylinux_2_28_ppc64le.whl", hash = "sha256:ddc090c5c1792b10246a78e8c2163ebbe04cf877f9d785c230a7b27b39ad038e", size = 617349, upload-time = "2026-04-27T12:59:43.32Z" },
+    { url = "https://files.pythonhosted.org/packages/6a/15/a643b4ecd09969e30b8a150d5919960caae0abe4f5af75ab040b1ab85e78/greenlet-3.5.0-cp313-cp313-manylinux_2_24_s390x.manylinux_2_28_s390x.whl", hash = "sha256:4964101b8585c144cbda5532b1aa644255126c08a265dae90c16e7a0e63aaa9d", size = 623234, upload-time = "2026-04-27T13:02:40.611Z" },
     { url = "https://files.pythonhosted.org/packages/8a/17/a3918541fd0ddefe024a69de6d16aa7b46d36ac19562adaa63c7fa180eff/greenlet-3.5.0-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:2094acd54b272cb6eae8c03dd87b3fa1820a4cef18d6889c378d503500a1dc13", size = 613927, upload-time = "2026-04-27T12:25:30.28Z" },
+    { url = "https://files.pythonhosted.org/packages/77/18/3b13d5ef1275b0ffaf933b05efa21408ac4ca95823c7411d79682e4fdcff/greenlet-3.5.0-cp313-cp313-manylinux_2_39_riscv64.whl", hash = "sha256:7022615368890680e67b9965d33f5773aade330d5343bbe25560135aaa849eae", size = 425243, upload-time = "2026-04-27T13:05:15.689Z" },
     { url = "https://files.pythonhosted.org/packages/ee/e1/bd0af6213c7dd33175d8a462d4c1fe1175124ebed4855bc1475a5b5242c2/greenlet-3.5.0-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:5e05ba267789ea87b5a155cf0e810b1ab88bf18e9e8740813945ceb8ee4350ba", size = 1570893, upload-time = "2026-04-27T12:53:29.483Z" },
     { url = "https://files.pythonhosted.org/packages/9b/2a/0789702f864f5382cb476b93d7a9c823c10472658102ccd65f415747d2e2/greenlet-3.5.0-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:0ecec963079cd58cbd14723582384f11f166fd58883c15dcbfb342e0bc9b5846", size = 1636060, upload-time = "2026-04-27T12:25:28.845Z" },
     { url = "https://files.pythonhosted.org/packages/b2/8f/22bf9df92bbff0eb07842b60f7e63bf7675a9742df628437a9f02d09137f/greenlet-3.5.0-cp313-cp313-win_amd64.whl", hash = "sha256:728d9667d8f2f586644b748dbd9bb67e50d6a9381767d1357714ea6825bb3bf5", size = 238740, upload-time = "2026-04-27T12:24:01.341Z" },
@@ -1233,8 +1281,8 @@ name = "httpcore2"
 version = "2.12.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "h11" },
-    { name = "truststore" },
+    { name = "h11", marker = "sys_platform != 'emscripten' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "truststore", marker = "sys_platform != 'emscripten' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/be/ad/f4f0e57345f1870f3e8cb624e058d7eca6e5a27d33bcc3311d9b618734cd/httpcore2-2.12.0.tar.gz", hash = "sha256:9293522bba0aa7c4c8e9e3f040c16575bd8868e155a77fa30c7a9085a5eae648", size = 67548, upload-time = "2026-08-18T13:22:08.211Z" }
 wheels = [
@@ -1261,12 +1309,12 @@ name = "httpx2"
 version = "2.12.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "anyio", marker = "sys_platform != 'emscripten'" },
-    { name = "httpcore2", marker = "sys_platform != 'emscripten'" },
-    { name = "httpx2-jsfetch", marker = "sys_platform == 'emscripten'" },
+    { name = "anyio", marker = "sys_platform != 'emscripten' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "httpcore2", marker = "sys_platform != 'emscripten' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "httpx2-jsfetch", marker = "sys_platform == 'emscripten' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
     { name = "idna" },
-    { name = "truststore", marker = "sys_platform != 'emscripten'" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "truststore", marker = "sys_platform != 'emscripten' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/7f/f8/579a8b51e42e38ee32647df9f08aa25643ae788e275cc625b199829c4671/httpx2-2.12.0.tar.gz", hash = "sha256:7631fe9887a8a2275f4a2540e053aa670fcc50742864a9ae7c66e609fdcf12cf", size = 100040, upload-time = "2026-08-18T13:22:09.086Z" }
 wheels = [
@@ -1289,7 +1337,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "filelock" },
     { name = "fsspec" },
-    { name = "hf-xet", marker = "platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'arm64' or platform_machine == 'x86_64'" },
+    { name = "hf-xet", marker = "platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'arm64' or platform_machine == 'x86_64' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
     { name = "packaging" },
     { name = "pyyaml" },
     { name = "requests" },
@@ -1434,7 +1482,7 @@ name = "ipykernel"
 version = "7.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "appnope", marker = "sys_platform == 'darwin'" },
+    { name = "appnope", marker = "sys_platform == 'darwin' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
     { name = "comm" },
     { name = "debugpy" },
     { name = "ipython" },
@@ -1458,12 +1506,12 @@ name = "ipython"
 version = "9.13.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
     { name = "decorator" },
     { name = "ipython-pygments-lexers" },
     { name = "jedi" },
     { name = "matplotlib-inline" },
-    { name = "pexpect", marker = "sys_platform != 'emscripten' and sys_platform != 'win32'" },
+    { name = "pexpect", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32') or (sys_platform == 'emscripten' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'win32' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
     { name = "prompt-toolkit" },
     { name = "psutil" },
     { name = "pygments" },
@@ -1676,7 +1724,11 @@ name = "julius"
 version = "0.2.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "torch" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cu124", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/a1/19/c9e1596b5572c786b93428d0904280e964c930fae7e6c9368ed9e1b63922/julius-0.2.7.tar.gz", hash = "sha256:3c0f5f5306d7d6016fcc95196b274cae6f07e2c9596eed314e4e7641554fbb08", size = 59640, upload-time = "2022-09-19T16:13:34.2Z" }
 
@@ -1756,7 +1808,7 @@ dependencies = [
     { name = "nbformat" },
     { name = "packaging" },
     { name = "prometheus-client" },
-    { name = "pywinpty", marker = "os_name == 'nt'" },
+    { name = "pywinpty", marker = "(python_full_version >= '3.13' and os_name == 'nt' and sys_platform == 'linux') or (python_full_version < '3.13' and os_name == 'nt' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (os_name == 'nt' and platform_machine != 'aarch64' and sys_platform == 'linux') or (os_name == 'nt' and platform_python_implementation != 'CPython' and sys_platform == 'linux') or (os_name == 'nt' and sys_platform != 'darwin' and sys_platform != 'linux') or (os_name == 'nt' and sys_platform == 'darwin' and extra != 'extra-7-minutia-cpu') or (os_name != 'nt' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
     { name = "pyzmq" },
     { name = "send2trash" },
     { name = "terminado" },
@@ -1774,7 +1826,7 @@ name = "jupyter-server-terminals"
 version = "0.5.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pywinpty", marker = "os_name == 'nt'" },
+    { name = "pywinpty", marker = "(python_full_version >= '3.13' and os_name == 'nt' and sys_platform == 'linux') or (python_full_version < '3.13' and os_name == 'nt' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (os_name == 'nt' and platform_machine != 'aarch64' and sys_platform == 'linux') or (os_name == 'nt' and platform_python_implementation != 'CPython' and sys_platform == 'linux') or (os_name == 'nt' and sys_platform != 'darwin' and sys_platform != 'linux') or (os_name == 'nt' and sys_platform == 'darwin' and extra != 'extra-7-minutia-cpu') or (os_name != 'nt' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
     { name = "terminado" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/f4/a7/bcd0a9b0cbba88986fe944aaaf91bfda603e5a50bda8ed15123f381a3b2f/jupyter_server_terminals-0.5.4.tar.gz", hash = "sha256:bbda128ed41d0be9020349f9f1f2a4ab9952a73ed5f5ac9f1419794761fb87f5", size = 31770, upload-time = "2026-01-14T16:53:20.213Z" }
@@ -1957,7 +2009,11 @@ dependencies = [
     { name = "pyyaml" },
     { name = "soundfile" },
     { name = "tabulate" },
-    { name = "torch" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cu124", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
     { name = "tqdm" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/03/28/ef2fb33e424e29dec83d2a150d76fb1920418a5d93d5268e6ce401cc33ad/lhotse-1.31.1.tar.gz", hash = "sha256:2ebc3c103c3e09313dff0c4e8740584e28ec35d74e985412c6b37279144a9716", size = 654706, upload-time = "2025-09-18T21:43:51.262Z" }
@@ -1970,8 +2026,8 @@ name = "libcst"
 version = "1.8.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pyyaml", marker = "python_full_version < '3.13'" },
-    { name = "pyyaml-ft", marker = "python_full_version >= '3.13'" },
+    { name = "pyyaml", marker = "python_full_version < '3.13' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "pyyaml-ft", marker = "python_full_version >= '3.13' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/de/cd/337df968b38d94c5aabd3e1b10630f047a2b345f6e1d4456bd9fe7417537/libcst-1.8.6.tar.gz", hash = "sha256:f729c37c9317126da9475bdd06a7208eb52fcbd180a6341648b45a56b4ba708b", size = 891354, upload-time = "2025-11-03T22:33:30.621Z" }
 wheels = [
@@ -2018,8 +2074,8 @@ dependencies = [
     { name = "scipy" },
     { name = "soundfile" },
     { name = "soxr" },
-    { name = "standard-aifc", marker = "python_full_version >= '3.13'" },
-    { name = "standard-sunau", marker = "python_full_version >= '3.13'" },
+    { name = "standard-aifc", marker = "python_full_version >= '3.13' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "standard-sunau", marker = "python_full_version >= '3.13' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
     { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/64/36/360b5aafa0238e29758729e9486c6ed92a6f37fa403b7875e06c115cdf4a/librosa-0.11.0.tar.gz", hash = "sha256:f5ed951ca189b375bbe2e33b2abd7e040ceeee302b9bbaeeffdfddb8d0ace908", size = 327001, upload-time = "2025-03-11T15:09:54.884Z" }
@@ -2037,7 +2093,11 @@ dependencies = [
     { name = "packaging" },
     { name = "pytorch-lightning" },
     { name = "pyyaml" },
-    { name = "torch" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cu124", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
     { name = "torchmetrics" },
     { name = "tqdm" },
     { name = "typing-extensions" },
@@ -2112,8 +2172,8 @@ name = "loguru"
 version = "0.7.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
-    { name = "win32-setctime", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "win32-setctime", marker = "sys_platform == 'win32' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/3a/05/a1dae3dffd1116099471c643b8924f5aa6524411dc6c63fdae648c4f1aca/loguru-0.7.3.tar.gz", hash = "sha256:19480589e77d47b8d85b2c827ad95d49bf31b0dcde16593892eb51dd18706eb6", size = 63559, upload-time = "2024-12-06T11:20:56.608Z" }
 wheels = [
@@ -2311,9 +2371,18 @@ dependencies = [
     { name = "scipy" },
     { name = "sounddevice" },
     { name = "tiktoken" },
-    { name = "torch" },
     { name = "transformers" },
     { name = "typer" },
+]
+
+[package.optional-dependencies]
+cpu = [
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+]
+cu124 = [
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cu124", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
 ]
 
 [package.dev-dependencies]
@@ -2366,10 +2435,12 @@ requires-dist = [
     { name = "scipy" },
     { name = "sounddevice" },
     { name = "tiktoken" },
-    { name = "torch", specifier = ">=2.4,<2.6" },
+    { name = "torch", marker = "extra == 'cpu'", specifier = ">=2.4,<2.6", index = "https://download.pytorch.org/whl/cpu", conflict = { package = "minutia", extra = "cpu" } },
+    { name = "torch", marker = "extra == 'cu124'", specifier = ">=2.4,<2.6", index = "https://download.pytorch.org/whl/cu124", conflict = { package = "minutia", extra = "cu124" } },
     { name = "transformers" },
     { name = "typer", specifier = ">=0.25.1" },
 ]
+provides-extras = ["cpu", "cu124"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -2658,11 +2729,11 @@ name = "nemo-toolkit"
 version = "2.6.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "cuda-bindings", marker = "sys_platform != 'darwin'" },
+    { name = "cuda-bindings", marker = "sys_platform != 'darwin' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
     { name = "fsspec" },
     { name = "huggingface-hub" },
-    { name = "numba", marker = "sys_platform == 'darwin'" },
-    { name = "numba-cuda", marker = "sys_platform != 'darwin'" },
+    { name = "numba", marker = "sys_platform == 'darwin' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "numba-cuda", marker = "sys_platform != 'darwin' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
     { name = "numexpr" },
     { name = "numpy" },
     { name = "onnx" },
@@ -2673,7 +2744,11 @@ dependencies = [
     { name = "setuptools" },
     { name = "tensorboard" },
     { name = "text-unidecode" },
-    { name = "torch" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cu124", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
     { name = "tqdm" },
     { name = "wget" },
     { name = "wrapt" },
@@ -2930,7 +3005,9 @@ name = "nvidia-cublas-cu12"
 version = "12.4.5.8"
 source = { registry = "https://pypi.org/simple" }
 wheels = [
+    { url = "https://files.pythonhosted.org/packages/7f/7f/7fbae15a3982dc9595e49ce0f19332423b260045d0a6afe93cdbe2f1f624/nvidia_cublas_cu12-12.4.5.8-py3-none-manylinux2014_aarch64.whl", hash = "sha256:0f8aa1706812e00b9f19dfe0cdb3999b092ccb8ca168c0db5b8ea712456fd9b3", size = 363333771, upload-time = "2024-06-18T19:28:09.881Z" },
     { url = "https://files.pythonhosted.org/packages/ae/71/1c91302526c45ab494c23f61c7a84aa568b8c1f9d196efa5993957faf906/nvidia_cublas_cu12-12.4.5.8-py3-none-manylinux2014_x86_64.whl", hash = "sha256:2fc8da60df463fdefa81e323eef2e36489e1c94335b5358bcb38360adf75ac9b", size = 363438805, upload-time = "2024-04-03T20:57:06.025Z" },
+    { url = "https://files.pythonhosted.org/packages/e2/2a/4f27ca96232e8b5269074a72e03b4e0d43aa68c9b965058b1684d07c6ff8/nvidia_cublas_cu12-12.4.5.8-py3-none-win_amd64.whl", hash = "sha256:5a796786da89203a0657eda402bcdcec6180254a8ac22d72213abc42069522dc", size = 396895858, upload-time = "2024-04-03T21:03:31.996Z" },
 ]
 
 [[package]]
@@ -2938,7 +3015,9 @@ name = "nvidia-cuda-cupti-cu12"
 version = "12.4.127"
 source = { registry = "https://pypi.org/simple" }
 wheels = [
+    { url = "https://files.pythonhosted.org/packages/93/b5/9fb3d00386d3361b03874246190dfec7b206fd74e6e287b26a8fcb359d95/nvidia_cuda_cupti_cu12-12.4.127-py3-none-manylinux2014_aarch64.whl", hash = "sha256:79279b35cf6f91da114182a5ce1864997fd52294a87a16179ce275773799458a", size = 12354556, upload-time = "2024-06-18T19:30:40.546Z" },
     { url = "https://files.pythonhosted.org/packages/67/42/f4f60238e8194a3106d06a058d494b18e006c10bb2b915655bd9f6ea4cb1/nvidia_cuda_cupti_cu12-12.4.127-py3-none-manylinux2014_x86_64.whl", hash = "sha256:9dec60f5ac126f7bb551c055072b69d85392b13311fcc1bcda2202d172df30fb", size = 13813957, upload-time = "2024-04-03T20:55:01.564Z" },
+    { url = "https://files.pythonhosted.org/packages/f3/79/8cf313ec17c58ccebc965568e5bcb265cdab0a1df99c4e674bb7a3b99bfe/nvidia_cuda_cupti_cu12-12.4.127-py3-none-win_amd64.whl", hash = "sha256:5688d203301ab051449a2b1cb6690fbe90d2b372f411521c86018b950f3d7922", size = 9938035, upload-time = "2024-04-03T21:01:01.109Z" },
 ]
 
 [[package]]
@@ -2946,7 +3025,9 @@ name = "nvidia-cuda-nvrtc-cu12"
 version = "12.4.127"
 source = { registry = "https://pypi.org/simple" }
 wheels = [
+    { url = "https://files.pythonhosted.org/packages/77/aa/083b01c427e963ad0b314040565ea396f914349914c298556484f799e61b/nvidia_cuda_nvrtc_cu12-12.4.127-py3-none-manylinux2014_aarch64.whl", hash = "sha256:0eedf14185e04b76aa05b1fea04133e59f465b6f960c0cbf4e37c3cb6b0ea198", size = 24133372, upload-time = "2024-06-18T19:32:00.576Z" },
     { url = "https://files.pythonhosted.org/packages/2c/14/91ae57cd4db3f9ef7aa99f4019cfa8d54cb4caa7e00975df6467e9725a9f/nvidia_cuda_nvrtc_cu12-12.4.127-py3-none-manylinux2014_x86_64.whl", hash = "sha256:a178759ebb095827bd30ef56598ec182b85547f1508941a3d560eb7ea1fbf338", size = 24640306, upload-time = "2024-04-03T20:56:01.463Z" },
+    { url = "https://files.pythonhosted.org/packages/7c/30/8c844bfb770f045bcd8b2c83455c5afb45983e1a8abf0c4e5297b481b6a5/nvidia_cuda_nvrtc_cu12-12.4.127-py3-none-win_amd64.whl", hash = "sha256:a961b2f1d5f17b14867c619ceb99ef6fcec12e46612711bcec78eb05068a60ec", size = 19751955, upload-time = "2024-04-03T21:01:51.133Z" },
 ]
 
 [[package]]
@@ -2954,7 +3035,9 @@ name = "nvidia-cuda-runtime-cu12"
 version = "12.4.127"
 source = { registry = "https://pypi.org/simple" }
 wheels = [
+    { url = "https://files.pythonhosted.org/packages/a1/aa/b656d755f474e2084971e9a297def515938d56b466ab39624012070cb773/nvidia_cuda_runtime_cu12-12.4.127-py3-none-manylinux2014_aarch64.whl", hash = "sha256:961fe0e2e716a2a1d967aab7caee97512f71767f852f67432d572e36cb3a11f3", size = 894177, upload-time = "2024-06-18T19:32:52.877Z" },
     { url = "https://files.pythonhosted.org/packages/ea/27/1795d86fe88ef397885f2e580ac37628ed058a92ed2c39dc8eac3adf0619/nvidia_cuda_runtime_cu12-12.4.127-py3-none-manylinux2014_x86_64.whl", hash = "sha256:64403288fa2136ee8e467cdc9c9427e0434110899d07c779f25b5c068934faa5", size = 883737, upload-time = "2024-04-03T20:54:51.355Z" },
+    { url = "https://files.pythonhosted.org/packages/a8/8b/450e93fab75d85a69b50ea2d5fdd4ff44541e0138db16f9cd90123ef4de4/nvidia_cuda_runtime_cu12-12.4.127-py3-none-win_amd64.whl", hash = "sha256:09c2e35f48359752dfa822c09918211844a3d93c100a715d79b59591130c5e1e", size = 878808, upload-time = "2024-04-03T21:00:49.77Z" },
 ]
 
 [[package]]
@@ -2962,10 +3045,11 @@ name = "nvidia-cudnn-cu12"
 version = "9.1.0.70"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-cublas-cu12" },
+    { name = "nvidia-cublas-cu12", marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu') or (sys_platform != 'emscripten' and sys_platform != 'linux' and sys_platform != 'win32' and extra != 'extra-7-minutia-cpu') or (sys_platform == 'emscripten' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'win32' and extra == 'extra-7-minutia-cu124') or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/9f/fd/713452cd72343f682b1c7b9321e23829f00b842ceaedcda96e742ea0b0b3/nvidia_cudnn_cu12-9.1.0.70-py3-none-manylinux2014_x86_64.whl", hash = "sha256:165764f44ef8c61fcdfdfdbe769d687e06374059fbb388b6c89ecb0e28793a6f", size = 664752741, upload-time = "2024-04-22T15:24:15.253Z" },
+    { url = "https://files.pythonhosted.org/packages/3f/d0/f90ee6956a628f9f04bf467932c0a25e5a7e706a684b896593c06c82f460/nvidia_cudnn_cu12-9.1.0.70-py3-none-win_amd64.whl", hash = "sha256:6278562929433d68365a07a4a1546c237ba2849852c0d4b2262a486e805b977a", size = 679925892, upload-time = "2024-04-22T15:24:53.333Z" },
 ]
 
 [[package]]
@@ -2973,10 +3057,12 @@ name = "nvidia-cufft-cu12"
 version = "11.2.1.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-nvjitlink-cu12" },
+    { name = "nvidia-nvjitlink-cu12", marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu') or (sys_platform != 'emscripten' and sys_platform != 'linux' and sys_platform != 'win32' and extra != 'extra-7-minutia-cpu') or (sys_platform == 'emscripten' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'win32' and extra == 'extra-7-minutia-cu124') or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 wheels = [
+    { url = "https://files.pythonhosted.org/packages/7a/8a/0e728f749baca3fbeffad762738276e5df60851958be7783af121a7221e7/nvidia_cufft_cu12-11.2.1.3-py3-none-manylinux2014_aarch64.whl", hash = "sha256:5dad8008fc7f92f5ddfa2101430917ce2ffacd86824914c82e28990ad7f00399", size = 211422548, upload-time = "2024-06-18T19:33:39.396Z" },
     { url = "https://files.pythonhosted.org/packages/27/94/3266821f65b92b3138631e9c8e7fe1fb513804ac934485a8d05776e1dd43/nvidia_cufft_cu12-11.2.1.3-py3-none-manylinux2014_x86_64.whl", hash = "sha256:f083fc24912aa410be21fa16d157fed2055dab1cc4b6934a0e03cba69eb242b9", size = 211459117, upload-time = "2024-04-03T20:57:40.402Z" },
+    { url = "https://files.pythonhosted.org/packages/f6/ee/3f3f8e9874f0be5bbba8fb4b62b3de050156d159f8b6edc42d6f1074113b/nvidia_cufft_cu12-11.2.1.3-py3-none-win_amd64.whl", hash = "sha256:d802f4954291101186078ccbe22fc285a902136f974d369540fd4a5333d1440b", size = 210576476, upload-time = "2024-04-03T21:04:06.422Z" },
 ]
 
 [[package]]
@@ -2984,7 +3070,9 @@ name = "nvidia-curand-cu12"
 version = "10.3.5.147"
 source = { registry = "https://pypi.org/simple" }
 wheels = [
+    { url = "https://files.pythonhosted.org/packages/80/9c/a79180e4d70995fdf030c6946991d0171555c6edf95c265c6b2bf7011112/nvidia_curand_cu12-10.3.5.147-py3-none-manylinux2014_aarch64.whl", hash = "sha256:1f173f09e3e3c76ab084aba0de819c49e56614feae5c12f69883f4ae9bb5fad9", size = 56314811, upload-time = "2024-06-18T19:34:48.575Z" },
     { url = "https://files.pythonhosted.org/packages/8a/6d/44ad094874c6f1b9c654f8ed939590bdc408349f137f9b98a3a23ccec411/nvidia_curand_cu12-10.3.5.147-py3-none-manylinux2014_x86_64.whl", hash = "sha256:a88f583d4e0bb643c49743469964103aa59f7f708d862c3ddb0fc07f851e3b8b", size = 56305206, upload-time = "2024-04-03T20:58:08.722Z" },
+    { url = "https://files.pythonhosted.org/packages/1c/22/2573503d0d4e45673c263a313f79410e110eb562636b0617856fdb2ff5f6/nvidia_curand_cu12-10.3.5.147-py3-none-win_amd64.whl", hash = "sha256:f307cc191f96efe9e8f05a87096abc20d08845a841889ef78cb06924437f6771", size = 55799918, upload-time = "2024-04-03T21:04:34.45Z" },
 ]
 
 [[package]]
@@ -2992,12 +3080,14 @@ name = "nvidia-cusolver-cu12"
 version = "11.6.1.9"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-cublas-cu12" },
-    { name = "nvidia-cusparse-cu12" },
-    { name = "nvidia-nvjitlink-cu12" },
+    { name = "nvidia-cublas-cu12", marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu') or (sys_platform != 'emscripten' and sys_platform != 'linux' and sys_platform != 'win32' and extra != 'extra-7-minutia-cpu') or (sys_platform == 'emscripten' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'win32' and extra == 'extra-7-minutia-cu124') or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-cusparse-cu12", marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu') or (sys_platform != 'emscripten' and sys_platform != 'linux' and sys_platform != 'win32' and extra != 'extra-7-minutia-cpu') or (sys_platform == 'emscripten' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'win32' and extra == 'extra-7-minutia-cu124') or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-nvjitlink-cu12", marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu') or (sys_platform != 'emscripten' and sys_platform != 'linux' and sys_platform != 'win32' and extra != 'extra-7-minutia-cpu') or (sys_platform == 'emscripten' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'win32' and extra == 'extra-7-minutia-cu124') or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 wheels = [
+    { url = "https://files.pythonhosted.org/packages/46/6b/a5c33cf16af09166845345275c34ad2190944bcc6026797a39f8e0a282e0/nvidia_cusolver_cu12-11.6.1.9-py3-none-manylinux2014_aarch64.whl", hash = "sha256:d338f155f174f90724bbde3758b7ac375a70ce8e706d70b018dd3375545fc84e", size = 127634111, upload-time = "2024-06-18T19:35:01.793Z" },
     { url = "https://files.pythonhosted.org/packages/3a/e1/5b9089a4b2a4790dfdea8b3a006052cfecff58139d5a4e34cb1a51df8d6f/nvidia_cusolver_cu12-11.6.1.9-py3-none-manylinux2014_x86_64.whl", hash = "sha256:19e33fa442bcfd085b3086c4ebf7e8debc07cfe01e11513cc6d332fd918ac260", size = 127936057, upload-time = "2024-04-03T20:58:28.735Z" },
+    { url = "https://files.pythonhosted.org/packages/f2/be/d435b7b020e854d5d5a682eb5de4328fd62f6182507406f2818280e206e2/nvidia_cusolver_cu12-11.6.1.9-py3-none-win_amd64.whl", hash = "sha256:e77314c9d7b694fcebc84f58989f3aa4fb4cb442f12ca1a9bde50f5e8f6d1b9c", size = 125224015, upload-time = "2024-04-03T21:04:53.339Z" },
 ]
 
 [[package]]
@@ -3005,10 +3095,12 @@ name = "nvidia-cusparse-cu12"
 version = "12.3.1.170"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-nvjitlink-cu12" },
+    { name = "nvidia-nvjitlink-cu12", marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu') or (sys_platform != 'emscripten' and sys_platform != 'linux' and sys_platform != 'win32' and extra != 'extra-7-minutia-cpu') or (sys_platform == 'emscripten' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'win32' and extra == 'extra-7-minutia-cu124') or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 wheels = [
+    { url = "https://files.pythonhosted.org/packages/96/a9/c0d2f83a53d40a4a41be14cea6a0bf9e668ffcf8b004bd65633f433050c0/nvidia_cusparse_cu12-12.3.1.170-py3-none-manylinux2014_aarch64.whl", hash = "sha256:9d32f62896231ebe0480efd8a7f702e143c98cfaa0e8a76df3386c1ba2b54df3", size = 207381987, upload-time = "2024-06-18T19:35:32.989Z" },
     { url = "https://files.pythonhosted.org/packages/db/f7/97a9ea26ed4bbbfc2d470994b8b4f338ef663be97b8f677519ac195e113d/nvidia_cusparse_cu12-12.3.1.170-py3-none-manylinux2014_x86_64.whl", hash = "sha256:ea4f11a2904e2a8dc4b1833cc1b5181cde564edd0d5cd33e3c168eff2d1863f1", size = 207454763, upload-time = "2024-04-03T20:58:59.995Z" },
+    { url = "https://files.pythonhosted.org/packages/a2/e0/3155ca539760a8118ec94cc279b34293309bcd14011fc724f87f31988843/nvidia_cusparse_cu12-12.3.1.170-py3-none-win_amd64.whl", hash = "sha256:9bc90fb087bc7b4c15641521f31c0371e9a612fc2ba12c338d3ae032e6b6797f", size = 204684315, upload-time = "2024-04-03T21:05:26.031Z" },
 ]
 
 [[package]]
@@ -3024,7 +3116,9 @@ name = "nvidia-nvjitlink-cu12"
 version = "12.4.127"
 source = { registry = "https://pypi.org/simple" }
 wheels = [
+    { url = "https://files.pythonhosted.org/packages/02/45/239d52c05074898a80a900f49b1615d81c07fceadd5ad6c4f86a987c0bc4/nvidia_nvjitlink_cu12-12.4.127-py3-none-manylinux2014_aarch64.whl", hash = "sha256:4abe7fef64914ccfa909bc2ba39739670ecc9e820c83ccc7a6ed414122599b83", size = 20552510, upload-time = "2024-06-18T20:20:13.871Z" },
     { url = "https://files.pythonhosted.org/packages/ff/ff/847841bacfbefc97a00036e0fce5a0f086b640756dc38caea5e1bb002655/nvidia_nvjitlink_cu12-12.4.127-py3-none-manylinux2014_x86_64.whl", hash = "sha256:06b3b9b25bf3f8af351d664978ca26a16d2c5127dbd53c0497e28d1fb9611d57", size = 21066810, upload-time = "2024-04-03T20:59:46.957Z" },
+    { url = "https://files.pythonhosted.org/packages/81/19/0babc919031bee42620257b9a911c528f05fb2688520dcd9ca59159ffea8/nvidia_nvjitlink_cu12-12.4.127-py3-none-win_amd64.whl", hash = "sha256:fd9020c501d27d135f983c6d3e244b197a7ccad769e34df53a42e276b0e25fa1", size = 95336325, upload-time = "2024-04-03T21:06:25.073Z" },
 ]
 
 [[package]]
@@ -3032,7 +3126,9 @@ name = "nvidia-nvtx-cu12"
 version = "12.4.127"
 source = { registry = "https://pypi.org/simple" }
 wheels = [
+    { url = "https://files.pythonhosted.org/packages/06/39/471f581edbb7804b39e8063d92fc8305bdc7a80ae5c07dbe6ea5c50d14a5/nvidia_nvtx_cu12-12.4.127-py3-none-manylinux2014_aarch64.whl", hash = "sha256:7959ad635db13edf4fc65c06a6e9f9e55fc2f92596db928d169c0bb031e88ef3", size = 100417, upload-time = "2024-06-18T20:16:22.484Z" },
     { url = "https://files.pythonhosted.org/packages/87/20/199b8713428322a2f22b722c62b8cc278cc53dffa9705d744484b5035ee9/nvidia_nvtx_cu12-12.4.127-py3-none-manylinux2014_x86_64.whl", hash = "sha256:781e950d9b9f60d8241ccea575b32f5105a5baf4c2351cab5256a24869f12a1a", size = 99144, upload-time = "2024-04-03T20:56:12.406Z" },
+    { url = "https://files.pythonhosted.org/packages/54/1b/f77674fbb73af98843be25803bbd3b9a4f0a96c75b8d33a2854a5c7d2d77/nvidia_nvtx_cu12-12.4.127-py3-none-win_amd64.whl", hash = "sha256:641dccaaa1139f3ffb0d3164b4b84f9d253397e38246a4f2f36728b48566d485", size = 66307, upload-time = "2024-04-03T21:02:01.959Z" },
 ]
 
 [[package]]
@@ -3126,9 +3222,13 @@ dependencies = [
     { name = "numba" },
     { name = "numpy" },
     { name = "tiktoken" },
-    { name = "torch" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cu124", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
     { name = "tqdm" },
-    { name = "triton", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux') or sys_platform == 'linux2'" },
+    { name = "triton", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux') or (platform_machine != 'x86_64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or sys_platform == 'linux2' or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/35/8e/d36f8880bcf18ec026a55807d02fe4c7357da9f25aebd92f85178000c0dc/openai_whisper-20250625.tar.gz", hash = "sha256:37a91a3921809d9f44748ffc73c0a55c9f366c85a3ef5c2ae0cc09540432eb96", size = 803191, upload-time = "2025-06-26T01:06:13.34Z" }
 
@@ -3175,7 +3275,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
     { name = "python-dateutil" },
-    { name = "tzdata", marker = "sys_platform == 'emscripten' or sys_platform == 'win32'" },
+    { name = "tzdata", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/f8/87/4341c6252d1c47b08768c3d25ac487362bf403f0313ddae4a2a26c9b1b4c/pandas-3.0.3.tar.gz", hash = "sha256:696a4a00a2a2a35d4e5deb3fc946641b96c944f02230e4f76137fe35d806c4fc", size = 4651414, upload-time = "2026-05-11T18:54:29.21Z" }
 wheels = [
@@ -3268,7 +3368,11 @@ dependencies = [
     { name = "psutil" },
     { name = "pyyaml" },
     { name = "safetensors" },
-    { name = "torch" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cu124", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
     { name = "tqdm" },
     { name = "transformers" },
 ]
@@ -3282,7 +3386,7 @@ name = "pexpect"
 version = "4.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "ptyprocess" },
+    { name = "ptyprocess", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32') or (sys_platform == 'emscripten' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'win32' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/42/92/cc564bf6381ff43ce1f4d06852fc19a2f11d180f23dc32d9588bee2f149d/pexpect-4.9.0.tar.gz", hash = "sha256:ee7d41123f3c9911050ea2c2dac107568dc43b2d3b0c7557a33212c398ead30f", size = 166450, upload-time = "2023-11-25T09:07:26.339Z" }
 wheels = [
@@ -3541,7 +3645,11 @@ dependencies = [
     { name = "soundfile" },
     { name = "speechbrain" },
     { name = "tensorboardx" },
-    { name = "torch" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cu124", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
     { name = "torch-audiomentations" },
     { name = "torchaudio" },
     { name = "torchmetrics" },
@@ -3790,7 +3898,7 @@ name = "pytest"
 version = "9.0.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
     { name = "iniconfig" },
     { name = "packaging" },
     { name = "pluggy" },
@@ -3878,7 +3986,11 @@ dependencies = [
     { name = "lightning-utilities" },
     { name = "packaging" },
     { name = "pyyaml" },
-    { name = "torch" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cu124", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
     { name = "torchmetrics" },
     { name = "tqdm" },
     { name = "typing-extensions" },
@@ -3895,7 +4007,11 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
     { name = "scikit-learn" },
-    { name = "torch" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cu124", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
     { name = "tqdm" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/9b/80/6e61b1a91debf4c1b47d441f9a9d7fe2aabcdd9575ed70b2811474eb95c3/pytorch-metric-learning-2.9.0.tar.gz", hash = "sha256:27a626caf5e2876a0fd666605a78cb67ef7597e25d7a68c18053dd503830701f", size = 84530, upload-time = "2025-08-17T17:11:19.501Z" }
@@ -3986,7 +4102,7 @@ name = "pyzmq"
 version = "27.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "cffi", marker = "implementation_name == 'pypy'" },
+    { name = "cffi", marker = "implementation_name == 'pypy' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/04/0b/3c9baedbdf613ecaa7aa07027780b8867f57b6293b6ee50de316c9f3222b/pyzmq-27.1.0.tar.gz", hash = "sha256:ac0765e3d44455adb6ddbf4417dcce460fc40a05978c08efdf2948072f6db540", size = 281750, upload-time = "2025-09-08T23:10:18.157Z" }
 wheels = [
@@ -4062,7 +4178,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
     { name = "rpds-py" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/22/f5/df4e9027acead3ecc63e50fe1e36aca1523e1719559c499951bb4b53188f/referencing-0.37.0.tar.gz", hash = "sha256:44aefc3142c5b842538163acb373e24cce6632bd54bdb01b21ad5863489f50d8", size = 78036, upload-time = "2025-10-13T15:30:48.871Z" }
 wheels = [
@@ -4596,7 +4712,11 @@ dependencies = [
     { name = "scipy" },
     { name = "sentencepiece" },
     { name = "soundfile" },
-    { name = "torch" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cu124", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
     { name = "torchaudio" },
     { name = "tqdm" },
 ]
@@ -4610,7 +4730,7 @@ name = "sqlalchemy"
 version = "2.0.49"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "greenlet", marker = "platform_machine == 'AMD64' or platform_machine == 'WIN32' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'ppc64le' or platform_machine == 'win32' or platform_machine == 'x86_64'" },
+    { name = "greenlet", marker = "platform_machine == 'AMD64' or platform_machine == 'WIN32' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'ppc64le' or platform_machine == 'win32' or platform_machine == 'x86_64' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
     { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/09/45/461788f35e0364a8da7bda51a1fe1b09762d0c32f12f63727998d85a873b/sqlalchemy-2.0.49.tar.gz", hash = "sha256:d15950a57a210e36dd4cec1aac22787e2a4d57ba9318233e2ef8b2daf9ff2d5f", size = 9898221, upload-time = "2026-04-03T16:38:11.704Z" }
@@ -4657,8 +4777,8 @@ name = "standard-aifc"
 version = "3.13.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "audioop-lts" },
-    { name = "standard-chunk" },
+    { name = "audioop-lts", marker = "python_full_version >= '3.13' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "standard-chunk", marker = "python_full_version >= '3.13' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/c4/53/6050dc3dde1671eb3db592c13b55a8005e5040131f7509cef0215212cb84/standard_aifc-3.13.0.tar.gz", hash = "sha256:64e249c7cb4b3daf2fdba4e95721f811bde8bdfc43ad9f936589b7bb2fae2e43", size = 15240, upload-time = "2024-10-30T16:01:31.772Z" }
 wheels = [
@@ -4679,7 +4799,7 @@ name = "standard-sunau"
 version = "3.13.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "audioop-lts" },
+    { name = "audioop-lts", marker = "python_full_version >= '3.13' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/66/e3/ce8d38cb2d70e05ffeddc28bb09bad77cfef979eb0a299c9117f7ed4e6a9/standard_sunau-3.13.0.tar.gz", hash = "sha256:b319a1ac95a09a2378a8442f403c66f4fd4b36616d6df6ae82b8e536ee790908", size = 9368, upload-time = "2024-10-30T16:01:41.626Z" }
 wheels = [
@@ -4774,8 +4894,8 @@ name = "terminado"
 version = "0.18.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "ptyprocess", marker = "os_name != 'nt'" },
-    { name = "pywinpty", marker = "os_name == 'nt'" },
+    { name = "ptyprocess", marker = "os_name != 'nt' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "pywinpty", marker = "(python_full_version >= '3.13' and os_name == 'nt' and sys_platform == 'linux') or (python_full_version < '3.13' and os_name == 'nt' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (os_name == 'nt' and platform_machine != 'aarch64' and sys_platform == 'linux') or (os_name == 'nt' and platform_python_implementation != 'CPython' and sys_platform == 'linux') or (os_name == 'nt' and sys_platform != 'darwin' and sys_platform != 'linux') or (os_name == 'nt' and sys_platform == 'darwin' and extra != 'extra-7-minutia-cpu') or (os_name != 'nt' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
     { name = "tornado" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/8a/11/965c6fd8e5cc254f1fe142d547387da17a8ebfd75a3455f637c663fb38a0/terminado-0.18.1.tar.gz", hash = "sha256:de09f2c4b85de4765f7714688fff57d3e75bad1f909b589fde880460c753fd2e", size = 32701, upload-time = "2024-03-12T14:34:39.026Z" }
@@ -4892,28 +5012,86 @@ wheels = [
 [[package]]
 name = "torch"
 version = "2.5.1"
-source = { registry = "https://pypi.org/simple" }
+source = { registry = "https://download.pytorch.org/whl/cpu" }
+resolution-markers = [
+    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform == 'darwin'",
+    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform == 'darwin'",
+    "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux') or (python_full_version < '3.13' and platform_machine != 's390x' and sys_platform == 'darwin')",
+    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform == 'darwin'",
+]
 dependencies = [
-    { name = "filelock" },
-    { name = "fsspec" },
-    { name = "jinja2" },
-    { name = "networkx" },
-    { name = "nvidia-cublas-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
-    { name = "nvidia-cuda-cupti-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
-    { name = "nvidia-cuda-nvrtc-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
-    { name = "nvidia-cuda-runtime-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
-    { name = "nvidia-cudnn-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
-    { name = "nvidia-cufft-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
-    { name = "nvidia-curand-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
-    { name = "nvidia-cusolver-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
-    { name = "nvidia-cusparse-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
-    { name = "nvidia-nccl-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
-    { name = "nvidia-nvjitlink-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
-    { name = "nvidia-nvtx-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
-    { name = "setuptools" },
-    { name = "sympy" },
-    { name = "triton", marker = "python_full_version < '3.13' and platform_machine == 'x86_64' and sys_platform == 'linux'" },
-    { name = "typing-extensions" },
+    { name = "filelock", marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "fsspec", marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "jinja2", marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "networkx", marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "setuptools", marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "sympy", marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "typing-extensions", marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+]
+wheels = [
+    { url = "https://download-r2.pytorch.org/whl/cpu/torch-2.5.1-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:36d1be99281b6f602d9639bd0af3ee0006e7aab16f6718d86f709d395b6f262c", upload-time = "2024-10-29T23:02:14Z" },
+    { url = "https://download-r2.pytorch.org/whl/cpu/torch-2.5.1-cp312-none-macosx_11_0_arm64.whl", hash = "sha256:8c712df61101964eb11910a846514011f0b6f5920c55dbf567bff8a34163d5b1", upload-time = "2024-10-29T23:02:18Z" },
+]
+
+[[package]]
+name = "torch"
+version = "2.5.1"
+source = { registry = "https://download.pytorch.org/whl/cu124" }
+resolution-markers = [
+    "python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux'",
+]
+dependencies = [
+    { name = "filelock", marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "fsspec", marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "jinja2", marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "networkx", marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "setuptools", marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "sympy", marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "typing-extensions", marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+]
+wheels = [
+    { url = "https://download-r2.pytorch.org/whl/cu124/torch-2.5.1-cp312-cp312-linux_aarch64.whl", hash = "sha256:302041d457ee169fd925b53da283c13365c6de75c6bb3e84130774b10e2fbb39", upload-time = "2024-10-29T23:43:37Z" },
+]
+
+[[package]]
+name = "torch"
+version = "2.5.1"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform == 'win32'",
+    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform == 'win32'",
+    "python_full_version < '3.13' and platform_machine != 's390x' and sys_platform == 'win32'",
+    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform == 'win32'",
+    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform == 'emscripten'",
+    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform == 'emscripten'",
+    "python_full_version < '3.13' and platform_machine != 's390x' and sys_platform == 'emscripten'",
+    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform == 'emscripten'",
+    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+    "python_full_version < '3.13' and platform_machine != 's390x' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+]
+dependencies = [
+    { name = "filelock", marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "fsspec", marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "jinja2", marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "networkx", marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "nvidia-cublas-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-cuda-cupti-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-cuda-nvrtc-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-cuda-runtime-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-cudnn-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-cufft-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-curand-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-cusolver-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-cusparse-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-nccl-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-nvjitlink-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-nvtx-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "setuptools", marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "sympy", marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "triton", marker = "(python_full_version < '3.13' and platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124') or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "typing-extensions", marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8b/5c/36c114d120bfe10f9323ed35061bc5878cc74f3f594003854b0ea298942f/torch-2.5.1-cp312-cp312-manylinux1_x86_64.whl", hash = "sha256:ed231a4b3a5952177fafb661213d690a72caaad97d5824dd4fc17ab9e15cec03", size = 906389343, upload-time = "2024-10-29T17:37:06.758Z" },
@@ -4924,12 +5102,95 @@ wheels = [
 ]
 
 [[package]]
+name = "torch"
+version = "2.5.1+cpu"
+source = { registry = "https://download.pytorch.org/whl/cpu" }
+resolution-markers = [
+    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform == 'win32'",
+    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform == 'win32'",
+    "python_full_version < '3.13' and platform_machine != 's390x' and sys_platform == 'win32'",
+    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform == 'win32'",
+    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform == 'emscripten'",
+    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform == 'emscripten'",
+    "python_full_version < '3.13' and platform_machine != 's390x' and sys_platform == 'emscripten'",
+    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform == 'emscripten'",
+    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+    "(python_full_version < '3.13' and platform_machine != 'aarch64' and platform_machine != 's390x' and sys_platform == 'linux') or (python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation != 'CPython' and sys_platform == 'linux') or (python_full_version < '3.13' and platform_machine != 's390x' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'linux' and sys_platform != 'win32')",
+    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+]
+dependencies = [
+    { name = "filelock", marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "fsspec", marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "jinja2", marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "networkx", marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "setuptools", marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "sympy", marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "typing-extensions", marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+]
+wheels = [
+    { url = "https://download-r2.pytorch.org/whl/cpu/torch-2.5.1%2Bcpu-cp312-cp312-linux_x86_64.whl", hash = "sha256:4856f9d6925121d13c2df07aa7580b767f449dfe71ae5acde9c27535d5da4840", upload-time = "2024-10-29T23:01:13Z" },
+    { url = "https://download-r2.pytorch.org/whl/cpu/torch-2.5.1%2Bcpu-cp312-cp312-win_amd64.whl", hash = "sha256:a6b720410350765d3d77c01a5ce098a6c45af446284e45e87a98b8a16e7d564d", upload-time = "2024-10-29T23:01:21Z" },
+    { url = "https://download-r2.pytorch.org/whl/cpu/torch-2.5.1%2Bcpu-cp313-cp313-linux_x86_64.whl", hash = "sha256:5dbbdf83caa90d0bcaa50e4933ca424889133b35226db79000877d4ec5d9ea37", upload-time = "2024-10-29T23:01:30Z" },
+]
+
+[[package]]
+name = "torch"
+version = "2.5.1+cu124"
+source = { registry = "https://download.pytorch.org/whl/cu124" }
+resolution-markers = [
+    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform == 'win32'",
+    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform == 'win32'",
+    "python_full_version < '3.13' and platform_machine != 's390x' and sys_platform == 'win32'",
+    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform == 'win32'",
+    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform == 'emscripten'",
+    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform == 'emscripten'",
+    "python_full_version < '3.13' and platform_machine != 's390x' and sys_platform == 'emscripten'",
+    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform == 'emscripten'",
+    "python_full_version >= '3.13' and platform_machine != 's390x' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+    "python_full_version >= '3.13' and platform_machine == 's390x' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+    "(python_full_version < '3.13' and platform_machine != 'aarch64' and platform_machine != 's390x' and sys_platform == 'linux') or (python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation != 'CPython' and sys_platform == 'linux') or (python_full_version < '3.13' and platform_machine != 's390x' and sys_platform != 'emscripten' and sys_platform != 'linux' and sys_platform != 'win32')",
+    "python_full_version < '3.13' and platform_machine == 's390x' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+]
+dependencies = [
+    { name = "filelock", marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
+    { name = "fsspec", marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
+    { name = "jinja2", marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
+    { name = "networkx", marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-cublas-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'x86_64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-cuda-cupti-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'x86_64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-cuda-nvrtc-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'x86_64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-cuda-runtime-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'x86_64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-cudnn-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'x86_64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-cufft-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'x86_64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-curand-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'x86_64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-cusolver-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'x86_64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-cusparse-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'x86_64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-nccl-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'x86_64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-nvjitlink-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'x86_64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "nvidia-nvtx-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'x86_64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "setuptools", marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
+    { name = "sympy", marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
+    { name = "triton", marker = "(python_full_version < '3.13' and platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'x86_64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "typing-extensions", marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
+]
+wheels = [
+    { url = "https://download-r2.pytorch.org/whl/cu124/torch-2.5.1%2Bcu124-cp312-cp312-linux_x86_64.whl", hash = "sha256:bf6484bfe5bc4f92a4a1a1bf553041505e19a911f717065330eb061afe0e14d7", upload-time = "2024-10-29T23:34:41Z" },
+    { url = "https://download-r2.pytorch.org/whl/cu124/torch-2.5.1%2Bcu124-cp312-cp312-win_amd64.whl", hash = "sha256:3c3f705fb125edbd77f9579fa11a138c56af8968a10fc95834cdd9fdf4f1f1a6", upload-time = "2024-10-29T23:35:18Z" },
+    { url = "https://download-r2.pytorch.org/whl/cu124/torch-2.5.1%2Bcu124-cp313-cp313-linux_x86_64.whl", hash = "sha256:e9bebf91ede89267577911da4b0709ac6113a0cff6a1c2202c046b1ec2a51601", upload-time = "2024-10-29T23:37:02Z" },
+]
+
+[[package]]
 name = "torch-audiomentations"
 version = "0.12.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "julius" },
-    { name = "torch" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cu124", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
     { name = "torch-pitch-shift" },
     { name = "torchaudio" },
 ]
@@ -4945,7 +5206,11 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "packaging" },
     { name = "primepy" },
-    { name = "torch" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cu124", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
     { name = "torchaudio" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/79/a6/722a832bca75d5079f6731e005b3d0c2eec7c6c6863d030620952d143d57/torch_pitch_shift-1.2.5.tar.gz", hash = "sha256:6e1c7531f08d0f407a4c55e5ff8385a41355c5c5d27ab7fa08632e51defbd0ed", size = 4725, upload-time = "2024-09-25T19:10:12.922Z" }
@@ -4980,7 +5245,11 @@ dependencies = [
     { name = "lightning-utilities" },
     { name = "numpy" },
     { name = "packaging" },
-    { name = "torch" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cu124", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/81/34/39b8b749333db56c0585d7a11fa62a283c087bb1dfc897d69fb8cedbefb1/torchmetrics-1.9.0.tar.gz", hash = "sha256:a488609948600df52d3db4fcdab02e62aab2a85ef34da67037dc3e65b8512faa", size = 581765, upload-time = "2026-03-09T17:41:22.443Z" }
 wheels = [
@@ -5009,7 +5278,7 @@ name = "tqdm"
 version = "4.67.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/09/a9/6ba95a270c6f1fbcd8dac228323f2777d886cb206987444e4bce66338dd4/tqdm-4.67.3.tar.gz", hash = "sha256:7d825f03f89244ef73f1d4ce193cb1774a8179fd96f31d7e1dcde62092b960bb", size = 169598, upload-time = "2026-02-03T17:35:53.048Z" }
 wheels = [
@@ -5298,7 +5567,11 @@ dependencies = [
     { name = "onnxruntime" },
     { name = "pandas" },
     { name = "pyannote-audio" },
-    { name = "torch" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cu124') or (python_full_version >= '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (extra != 'extra-7-minutia-cpu' and extra != 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(python_full_version >= '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (python_full_version < '3.13' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (platform_python_implementation != 'CPython' and sys_platform == 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform != 'darwin' and sys_platform != 'linux' and extra == 'extra-7-minutia-cpu') or (sys_platform == 'darwin' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124')" },
+    { name = "torch", version = "2.5.1+cu124", source = { registry = "https://download.pytorch.org/whl/cu124" }, marker = "(python_full_version >= '3.13' and extra == 'extra-7-minutia-cu124') or (python_full_version < '3.13' and extra == 'extra-7-minutia-cpu' and extra == 'extra-7-minutia-cu124') or (platform_machine != 'aarch64' and extra == 'extra-7-minutia-cu124') or (platform_python_implementation != 'CPython' and extra == 'extra-7-minutia-cu124') or (sys_platform != 'linux' and extra == 'extra-7-minutia-cu124')" },
     { name = "torchaudio" },
     { name = "transformers" },
 ]

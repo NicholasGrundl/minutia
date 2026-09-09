@@ -33,9 +33,11 @@ dependencies = [
     "ffmpeg-python",
     "sounddevice",
     # Models / inference
+    # torch is a transitive dep of openai-whisper; its build (CPU vs CUDA) is
+    # selected via the `cpu` / `cu124` extras below, and the version is capped
+    # for every install path by [tool.uv] constraint-dependencies.
     "openai-whisper",
     "tiktoken",
-    "torch>=2.4,<2.6",
     "transformers",
     # LLM clients
     # Pin to the 1.x major: the 0.x -> 1.x jump removed sampling params
@@ -48,6 +50,15 @@ dependencies = [
     "platformdirs>=4.9.6",
     "pydantic-settings>=2.15.0",
 ]
+
+[project.optional-dependencies]
+# Mutually-exclusive PyTorch builds (see [tool.uv] below). torch itself arrives
+# transitively via openai-whisper; selecting an extra just pins which wheel index
+# it comes from. A bare `uv sync` (no extra) resolves torch from PyPI — the CUDA
+# build on Linux — so local/GPU use needs no extra. CI runs `uv sync --extra cpu`
+# to pull the ~200 MB CPU wheels instead of the ~2.5 GB CUDA stack it can't use.
+cpu = ["torch>=2.4,<2.6"]
+cu124 = ["torch>=2.4,<2.6"]
 
 [dependency-groups]
 # Installed by default on `uv sync`
@@ -89,6 +100,33 @@ media = [
 
 [project.scripts]
 minutia = "minutia.cli:main"
+
+[tool.uv]
+# Cap torch for EVERY install path (incl. the transitive dep via openai-whisper and
+# bare/tool installs), so we stay on the validated 2.5.x line without listing torch
+# as a direct dependency.
+constraint-dependencies = ["torch>=2.4,<2.6"]
+# The cpu / cu124 extras are two builds of the same torch — never install both.
+conflicts = [[{ extra = "cpu" }, { extra = "cu124" }]]
+
+# Explicit PyTorch wheel indexes. `explicit = true` keeps them out of general
+# resolution — they're consulted only for packages routed here via [tool.uv.sources],
+# and only when the matching extra is active.
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu124"
+url = "https://download.pytorch.org/whl/cu124"
+explicit = true
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cpu", extra = "cpu" },
+    { index = "pytorch-cu124", extra = "cu124" },
+]
 
 [tool.ruff]
 target-version = "py312"
