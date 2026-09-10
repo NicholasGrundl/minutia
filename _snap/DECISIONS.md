@@ -8,6 +8,52 @@ close.
 
 ---
 
+## 2026-09-10 — cli-wizard-redesign: rich wizard CLI shipped (feature done, pending PR)
+
+- **Set out to:** Rebuild the flat 672-line `cli.py` into a `cli/` subpackage with a concise command
+  tree and a full-screen rich wizard; make bare `minutia` the self-determining daily driver. All 8
+  tasks of `[done]cli-wizard-redesign.md`, built in one long BUILD arc across 6 `[MACRO]` commits
+  (`f61d9b3`…`6639300`) on branch `cli_commands`.
+- **Why:** The base is stable/released (v0.3.0) and the CLI is where the tool is actually used. The
+  old CLI was one ad-hoc module: two divergent one-shot paths (`go` vs `process-all`), inline
+  prompts, and heavy torch/whisper imports firing on *every* invocation (even `--help`).
+- **What shipped (the new surface):** bare `minutia` = wizard (self-determines: guided run, else
+  setup→run); `minutia setup`; `run pipeline` + `run extract-audio|transcribe|merge|summarize`;
+  `info` / `info config` / `info recordings`; `--version`. **Removed** `go`, `process-all`, top-level
+  `config`. `PipelineOrchestrator` + `baseline_pipeline.py` left the CLI path (retired later by
+  `orchestrator-retire-baseline`).
+- **Key decisions / discoveries:**
+  - **Cold start:** root cause was `minutia/__init__.py` eagerly importing the whole heavy stack —
+    fixed with PEP 562 lazy step modules; `--help`/`--version`/`info`/`setup` now import no
+    torch/whisper/anthropic. Verified by a subprocess regression test.
+  - **`run pipeline` (not bare `run`):** a Typer group can't take a positional `INPUT` on its
+    callback alongside subcommands, so the full pipeline is a leaf subcommand (user-endorsed).
+  - **`__init__` re-exports only `main`:** re-exporting the Typer `app` shadows the `app` submodule
+    and breaks module-level test patching.
+  - **Wizard design (user-directed):** wine palette (`#420f18`), compact `pagga` wordmark (twin-peaks
+    M), **live waveform-as-icon + pipeline telemetry** header, `❯` cursor. Look = live-tweakable
+    constants atop `tui.py`. TUI primitives are headless-testable (injectable key source + render).
+  - **DI-friendly seams:** shared step helpers + `run_full_pipeline` in `cli/_steps.py`; flows take an
+    injected `ui`; config persisted via a pure `config.write_user_config` (merge, `chmod 600`, never
+    logs the key).
+- **Live-dogfooding fixes (2 rounds):** ffmpeg overwrite crash on re-run (the tracked known bug,
+  fixed at source with `-y`); step failures now surface on-screen (no traceback); whisper decode
+  progress streams into a live log tail (swapped whisper's hidden stderr tqdm for loguru); recording
+  picker shows date/size/duration; notes panel routes by menu choice (killed the path-vs-text
+  guesser that crashed on a long multi-line paste with ENAMETOOLONG).
+- **How it ended:** All 8 tasks done; spec `[active]→[done]`; docs rewritten (README, AGENTS,
+  docs/setup, docs/running-the-pipeline) for the new tree; `rich`+`yakh` added. Gate green on
+  `src tests` (ruff + ty + 144 pytest). Branch is 6 commits ahead of `main`, PR body drafted at
+  `_snap/reference/PR-cli-wizard-redesign.md`.
+- **Why we stopped:** Feature complete and merge-ready; PR/merge/release are the user's to execute.
+- **Next:** User opens the PR + merges `cli_commands → main`, then version bump (post-merge, likely
+  **v0.4.0** — CLI surface change) via `scripts/release.py` + tag-driven CI. Then the refactor tail
+  resumes: `eval-seams` → `orchestrator-retire-baseline`. Wizard follow-up polish parked as
+  `[draft]wizard-tui-progress-and-logs`. Dogfood findings still feed the post-tail expansion
+  checkpoint.
+
+---
+
 ## 2026-09-09 — promotion + first releases shipped; reprioritization after stabilization
 
 - **Set out to:** (BUILD/discussion session) Take stock now that the base is stable, reconcile the
