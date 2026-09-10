@@ -93,16 +93,22 @@ persisted setup so the tool is ready after first run.
       `●`/animated + elapsed, threaded animator ticks it during blocking steps); tagline "meeting
       notes, distilled"; `❯` cursor. All look = live-tweakable constants atop `tui.py`. 17 headless
       tests; gate green (ruff + ty + 122 pytest).
-- [ ] **`wizard/flow.py` — flows + pure cores.** (a) **Setup flow**: recordings-dir panel +
-      API-key panel (paste / detect-from-env → persist via the writer). (b) **Guided-run flow**: pick
-      recording (newest-first) → prompt-kind menu → **notes panel** (multi-line paste / pick a file /
-      none) → cost confirm → staged pipeline (extract → transcribe → merge → summarize) → **artifacts
-      summary + manual-cleanup nudge**. Split the pure cores (resolve/persist/plan) from the TUI. TDD
-      the cores; test the flows with an injected TUI + mocked steps.
-- [ ] **Bare `minutia` self-determination.** `app.py` callback (`invoke_without_command=True`):
-      resolve settings; if API key + recordings dir resolve → guided-run flow; else → setup flow →
-      then guided-run. `minutia setup` runs the setup flow unconditionally. Tests: bare routes to
-      run vs setup based on resolution (mocked).
+- [x] **`wizard/flow.py` — flows + pure cores.** Built. (a) **Setup flow**: recordings-dir panel +
+      API-key panel (paste / detect-from-env → `write_user_config`). (b) **Guided-run flow**: pick
+      recording (newest-first) → prompt-kind → **notes panel** (multi-line paste / file / none) →
+      staged extract→transcribe→merge (quiet source calls sharing `ctx`, header telemetry per stage)
+      → **cost estimate + confirm panel** (after merge, since tokens need the transcript) →
+      summarize → **artifacts summary + manual-cleanup nudge**. Pure cores (`RunPlan`,
+      `detect_env_api_key`, `_language_of`) split from the TUI. Flows take an injected `ui`
+      (default `tui`); tested with a `FakeUI` + source-module-mocked steps. 12 tests; gate green
+      (ruff + ty + 142 pytest). Wizard package stays cold-start light.
+- [x] **Bare `minutia` self-determination.** `app.py` callback now `invoke_without_command=True`:
+      when no subcommand, `_dispatch_bare` — API key + recordings dir resolve → `run_guided`; else
+      `run_setup` → (if not cancelled) re-resolve → `run_guided`. Wizard imported **behind dispatch**
+      (cold start verified: cheap commands don't load `wizard.tui`/rich). Added `cli/setup.py` →
+      `minutia setup` runs `run_setup` unconditionally (wizard lazy-imported inside). Tests: bare
+      routes guided vs setup vs setup-then-guided vs cancel, + setup command (mocked flows). 4 tests;
+      gate green (ruff + ty + 146 pytest).
 - [ ] **Docs + gate.** Rewrite the CLI sections of `README.md` + `AGENTS.md` for the new tree
       (`run`/`setup`/`info`, bare wizard, `go`/`process-all` removed); note the new `rich`/`yakh`
       deps and the persisted-key behavior. Full gate green (ruff + ty + pytest); retire/replace the

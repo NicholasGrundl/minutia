@@ -10,8 +10,6 @@ from __future__ import annotations
 import subprocess
 import sys
 
-import pytest
-
 from minutia.cli.wizard import tui
 
 
@@ -131,23 +129,27 @@ class TestStagedProgress:
         assert results == ["A", "B"]
         assert painted == [(0.3, "extract"), (0.7, "transcribe"), (1.0, "Ready")]
 
-    def test_setup_failure_propagates(self):
-        steps = [tui.Step(0.3, "setup", lambda: (_ for _ in ()).throw(RuntimeError("boom")))]
-        with pytest.raises(RuntimeError, match="boom"):
-            tui.run_staged_progress(steps, [], setup_index=0, render=lambda *_: None)
+    def test_step_failure_returns_step_error(self):
+        steps = [tui.Step(0.3, "extract", lambda: (_ for _ in ()).throw(RuntimeError("boom")))]
+        results = tui.run_staged_progress(steps, [], render=lambda *_: None)
+        assert len(results) == 1
+        assert isinstance(results[0], tui.StepError)
+        assert results[0].label == "extract"
+        assert "boom" in results[0].message
 
-    def test_warmup_failure_is_swallowed(self):
+    def test_failure_stops_remaining_steps(self):
         def boom():
-            raise RuntimeError("warmup")
+            raise RuntimeError("kaboom")
 
         steps = [
-            tui.Step(0.3, "setup", lambda: "ok"),
-            tui.Step(0.7, "warmup", boom),
+            tui.Step(0.3, "a", lambda: "ok"),
+            tui.Step(0.6, "b", boom),
+            tui.Step(0.9, "c", lambda: "never"),
         ]
-        results = tui.run_staged_progress(
-            steps, [], setup_index=0, render=lambda *_: None
-        )
-        assert results == ["ok", None]  # warmup failure → None, loop continues
+        results = tui.run_staged_progress(steps, [], render=lambda *_: None)
+        assert results[0] == "ok"
+        assert isinstance(results[1], tui.StepError)
+        assert len(results) == 2  # step c never runs
 
 
 def test_importing_tui_does_not_import_yakh_or_heavy_deps():

@@ -13,16 +13,48 @@ from typing import Annotated
 import click
 import typer
 
-from ..config import ConfigurationError, resolve_settings
+from ..config import ConfigurationError, MinutiaSettings, resolve_settings
 from ..logging import configure_logging, logger
 from .info import info_app
 from .run import run_app
+from .setup import setup_command
 
 app = typer.Typer(
     name="minutia",
     help="OBS Video Processing CLI",
     add_completion=False,
+    invoke_without_command=True,
 )
+
+
+def _dispatch_bare(
+    config: MinutiaSettings, *, env_file: Path | None, no_env_file: bool
+) -> None:
+    """Bare ``minutia``: run the guided wizard if configured, else set up then run.
+
+    The wizard (and ``rich``/``yakh``) is imported here, behind dispatch, so ``--help`` /
+    ``--version`` / ``info`` stay cold-start cheap.
+    """
+    from .wizard import run_guided, run_setup
+
+    try:
+        if config.anthropic_api_key and config.recordings_dir is not None:
+            run_guided(config)
+            return
+        if not run_setup(config):
+            return  # user cancelled setup
+        # Re-resolve so the just-persisted recordings dir + key take effect, then run.
+        resolution = resolve_settings(env_file=env_file, discover_dotenv=not no_env_file)
+        run_guided(resolution.settings)
+    except KeyboardInterrupt:
+        typer.echo("\nCancelled.")
+    except click.ClickException:
+        raise
+    except Exception as exc:
+        # Step failures are already surfaced in-wizard; this catches anything unexpected so the
+        # user gets a clean message, never a traceback.
+        logger.exception("Wizard failed: {}", exc)
+        raise click.ClickException(str(exc)) from exc
 
 EnvFileOption = Annotated[
     Path | None,
@@ -101,8 +133,11 @@ def main_callback(
         config.base_output_dir,
         config.masked_anthropic_key,
     )
+    if ctx.invoked_subcommand is None:
+        _dispatch_bare(config, env_file=env_file, no_env_file=no_env_file)
 
 
+app.command("setup")(setup_command)
 app.add_typer(run_app, name="run")
 app.add_typer(info_app, name="info")
 

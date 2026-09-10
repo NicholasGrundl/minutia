@@ -153,6 +153,47 @@ log secret, empty=no-op. Persists `MINUTIA_RECORDINGS_DIR` + `MINUTIA_ANTHROPIC_
 (`tests/unit/test_config_writer.py`, 8 tests). Unblocks the setup flow. (Note: I built tui.py before
 this — spec order is writer(5) then tui(6); done out of order because tui was the design checkpoint.)
 
+### `wizard/flow.py` (spec task 7) — done
+
+Setup flow (recordings-dir + API-key panels → `write_user_config`) + guided-run flow (pick →
+prompt-kind → notes panel → staged extract/transcribe/merge with per-stage telemetry → cost
+estimate+confirm after merge → summarize → artifacts summary + cleanup nudge). Pure cores (`RunPlan`,
+`detect_env_api_key`, `_language_of`) split out. Guided flow calls **source step fns directly**
+(quiet, shares a `ctx` between staged steps) so nothing fights the Live screen; `run pipeline`
+untouched. Flows take injected `ui` (default `tui`) → tested with `FakeUI` + source-mocked steps
+(`tests/unit/test_cli_wizard_flow.py`, 12 tests). API key narrowed w/ a guard (no key → redirect to
+setup). Wizard package still cold-start light (heavy imports lazy in stage closures).
+
+### Bare `minutia` + `setup` command (spec task 8) — done
+
+`app.py`: `invoke_without_command=True`; callback ends with `_dispatch_bare(config, env_file, no_env_file)`
+when no subcommand — configured (key + recordings dir) → `run_guided`; else `run_setup` → if not
+cancelled, re-resolve settings (picks up persisted values) → `run_guided`. Wizard imported behind
+dispatch (cold start verified clean). `cli/setup.py` → `app.command("setup")(setup_command)`, wizard
+lazy inside. Tests `tests/unit/test_cli_bare_dispatch.py` (4). **The wizard is now runnable: bare
+`minutia` launches it.** Final tree: `setup` / `run` (pipeline + steps) / `info` + bare wizard.
+
+### Live-feedback round (after user dogfooded the wizard) — done
+
+User ran `minutia` and gave feedback; all addressed:
+1. **ffmpeg crash on real run** — `extract_audio_track` lacked `-y`; added `.overwrite_output()` in
+   `steps/video_extraction.py` (fixes the tracked known bug + the crash). Mock updated
+   (`overwrite_output` chainable).
+2. **No traceback ever** — `run_staged_progress` now runs each step in a **worker thread** while the
+   main thread renders; a step exception → on-screen `StepError` + graceful stop (new `tui.StepError`).
+   Flow checks results for `StepError` and shows a friendly line. Safety net in `_dispatch_bare` +
+   `setup_command` (KeyboardInterrupt → "Cancelled"; unexpected → clean ClickException).
+3. **Show logs / more than a bar** — progress screen now streams a **live loguru tail** (deque sink,
+   last 8 lines) + ticking elapsed + animated waveform. Directly answers the "feels stuck on a slow
+   3-min transcribe" pain.
+4. **mkv picker metadata** — rows show name · modified date · size · duration (ffprobe;
+   `_recording_label`/`_probe_duration`/`_human_size` in flow.py).
+5. **setup recordings menu** — Use `<default>` / Paste a folder / Skip (was a bare text prompt).
+6. **Wordmark M** — user picked variant C (twin peaks `█▀▄▀█`); `WORDMARK` updated. Kept pagga style.
+
+Gate: ruff + ty + **147/147**. Cold start still clean. `run_staged_progress` lost `setup_index`
+(dropped warmup/setup semantics — not used); tui progress tests rewritten for the StepError contract.
+
 ## Nits noticed (not fixed — out of scope, revisit)
 
 - `src/minutia/__init__.py` still has `__version__ = "0.1.0"` (stale; pyproject is `0.3.0`). The
@@ -165,6 +206,12 @@ this — spec order is writer(5) then tui(6); done out of order because tui was 
   (f61d9b3), T3–4 (0495329). **Uncommitted: wizard TUI + config writer** (+ rich/yakh deps). User
   previewed the wizard look and approved it. Next: **`wizard/flow.py`** (spec task 7) — setup flow
   (recordings-dir + API-key panels → `write_user_config`) + guided-run flow (pick recording →
-  prompt-kind → notes panel → cost confirm → `run_full_pipeline` staged → artifacts summary +
-  cleanup nudge); pure cores split from TUI, TDD'd, flows tested with injected TUI + mocked steps.
-  Recommend a checkpoint of the TUI + writer before the flows (sizeable, deps added).
+  prompt-kind → notes panel → cost confirm → staged → artifacts) — **DONE**. Uncommitted since
+  76cca82: `wizard/flow.py` + config writer? (writer already in 76cca82) → uncommitted = flow.py +
+  its tests + wizard/__init__ export + SESSION/spec. Next: **spec task 8 — bare `minutia`
+  self-determination + `cli/setup.py` — **DONE**. **Only spec task 9 (docs + gate) remains:** rewrite
+  the CLI sections of `README.md` + `AGENTS.md` for the new tree (`setup`/`run pipeline`/`run <step>`/
+  `info` + bare wizard; `go`/`process-all`/top-level `config` removed); note the `rich`/`yakh` deps +
+  persisted-key behavior; full gate. Uncommitted since 76cca82: flow.py, setup.py, app.py wiring,
+  wizard/__init__ export, bare-dispatch + flow tests. **The wizard is runnable now** — user can
+  `minutia` to see it live. Recommend checkpoint T7–8 before docs.

@@ -23,6 +23,7 @@ from __future__ import annotations
 import math
 import threading
 import time
+from collections import deque
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import Any
@@ -32,6 +33,8 @@ from rich.live import Live
 from rich.rule import Rule
 from rich.table import Table
 from rich.text import Text
+
+from ...logging import logger
 
 # --- Wine palette (live-tweakable) --------------------------------------------------------------
 # WINE is the deep anchor / brand (#420f18). It is a *fill* color: near-invisible as small
@@ -50,9 +53,9 @@ TAGLINE = "meeting notes, distilled"
 # --- Wordmark (pagga figlet 'minutia'; the ░ frame + █▀▄ faces read as two tones) ---------------
 WORDMARK = "\n".join(
     (
-        "░█▄█░▀█▀░█▀█░█░█░▀█▀░▀█▀░█▀█",
-        "░█░█░░█░░█░█░█░█░░█░░░█░░█▀█",
-        "░▀░▀░▀▀▀░▀░▀░▀▀▀░░▀░░▀▀▀░▀░▀",
+        "░█▀▄▀█░▀█▀░█▀█░█░█░▀█▀░▀█▀░█▀█",
+        "░█░▀░█░░█░░█░█░█░█░░█░░░█░░█▀█",
+        "░▀░░░▀░▀▀▀░▀░▀░▀▀▀░░▀░░▀▀▀░▀░▀",
     )
 )
 _FACE_CHS = frozenset("█▀▄")
@@ -412,40 +415,49 @@ class Step:
     state: str = ""
 
 
+@dataclass(frozen=True)
+class StepError:
+    """Marker returned for a step whose ``run`` raised — the staged run stops, no traceback.
+
+    The wizard surfaces this on-screen (and the caller shows a friendly message) instead of letting
+    an exception escape as a Python traceback.
+    """
+
+    label: str
+    message: str
+
+
+_LOG_TAIL_LINES = 8  # how many recent log lines the progress screen shows
+_LOG_LINE_WIDTH = 88  # truncate width so a long line never wraps the frame
+
+
 def _progress_frame(
-    panes: Sequence[RenderableType], fraction: float, label: str, status: HeaderStatus
+    panes: Sequence[RenderableType],
+    fraction: float,
+    label: str,
+    status: HeaderStatus,
+    log_lines: Sequence[str] = (),
 ) -> Group:
-    """Compose the progress pane: header (telemetry) + label line + hand-drawn wine bar."""
+    """Compose the progress pane: header + label + wine bar + a live tail of the step's logs."""
     filled = round(fraction * _BAR_WIDTH)
     bar = Text()
     bar.append("█" * filled, style=WINE)
     bar.append("░" * (_BAR_WIDTH - filled), style=FRAME_STYLE)
     bar.append(f"  {int(fraction * 100):>3d}%", style=DIM_STYLE)
-    return _screen([*panes, Text(label), bar], status)
+    body: list[RenderableType] = [*panes, Text(label, style="bold"), bar]
+    if log_lines:
+        body.append(Text())
+        for line in log_lines:
+            body.append(Text(f"  {line[:_LOG_LINE_WIDTH]}", style=DIM_STYLE))
+    return _screen(body, status)
 
 
-def _run_steps(
-    steps: Sequence[Step],
-    setup_index: int,
-    status: HeaderStatus,
-    paint: Callable[[float, str], None],
-) -> list[Any]:
-    """The dumb loop shared by the live + injected paths (see :func:`run_staged_progress`)."""
-    results: list[Any] = []
-    for index, step in enumerate(steps):
-        status.state = step.state or step.label
-        status.active = True
-        paint(step.fraction, step.label)  # render-before-block
-        try:
-            results.append(step.run())
-        except Exception:
-            if index == setup_index:
-                raise  # setup failure is real
-            results.append(None)  # warmup failure is best-effort
-    status.state = "done"
-    status.active = False
-    paint(1.0, "Ready")
-    return results
+def _worker(step: Step, box: dict[str, Any]) -> None:
+    """Run one step in a background thread; capture its result or exception into ``box``."""
+    try:
+        box["result"] = step.run()
+    except Exception as error:  # noqa: BLE001 - surfaced as a StepError, never a traceback
+        box["error"] = error
 
 
 def run_staged_progress(
@@ -453,61 +465,103 @@ def run_staged_progress(
     panes: Sequence[RenderableType],
     *,
     status: HeaderStatus | None = None,
-    setup_index: int = 0,
     render: Callable[[float, str], None] | None = None,
     clock: Callable[[], float] = time.monotonic,
 ) -> list[Any]:
-    """Run ``steps`` under the progress bar; return results aligned to steps.
+    """Run ``steps`` under the progress bar; return results (a :class:`StepError` for a failure).
 
-    Live path: a daemon animator repaints ~12x/s so the header **waveform scrolls** and the
-    **elapsed** clock ticks while each (blocking) ``step.run`` executes; the bar jumps to each
-    step's ``fraction`` at its boundary and lands on ``1.0`` when the last step returns.
+    Live path: each step runs in a **worker thread** while the main thread repaints ~12x/s — so the
+    header waveform scrolls, the elapsed clock ticks, and a **live tail of the step's log output**
+    scrolls under the bar (real feedback during slow work like transcription). A step that raises is
+    caught: its error is shown on-screen, the run stops, and a :class:`StepError` is returned in its
+    slot (no traceback ever reaches the user).
 
-    ``render`` is injectable: pass a recorder ``(fraction, label) -> None`` in tests to assert
-    ordering without a terminal (no thread, no tty).
+    ``render`` is injectable: pass a recorder ``(fraction, label) -> None`` in tests to drive the
+    steps without a terminal (no threads, no tty); failures still return a :class:`StepError`.
     """
     status = status or HeaderStatus()
 
     if render is not None:
-        return _run_steps(steps, setup_index, status, render)
+        results: list[Any] = []
+        for step in steps:
+            status.state = step.state or step.label
+            status.active = True
+            render(step.fraction, step.label)
+            try:
+                results.append(step.run())
+            except Exception as error:  # noqa: BLE001 - mirror the live StepError contract
+                status.state = "failed"
+                status.active = False
+                render(step.fraction, f"{step.label} — failed")
+                results.append(StepError(step.label, str(error)))
+                return results
+        status.state = "done"
+        status.active = False
+        render(1.0, "Ready")
+        return results
 
+    log_tail: deque[str] = deque(maxlen=_LOG_TAIL_LINES)
+    sink_id = logger.add(
+        lambda message: log_tail.append(str(message).rstrip()),
+        level="INFO",
+        format="{time:HH:mm:ss} {level: <7} {message}",
+        colorize=False,
+    )
     start = clock()
-    lock = threading.Lock()
-    stop = threading.Event()
-    cur_fraction = 0.0
-    cur_label = ""
-
-    with Live(
-        _progress_frame(panes, 0.0, "", status),
-        screen=True,
-        auto_refresh=False,
-        console=_console,
-    ) as live:
-
-        def repaint() -> None:
-            status.wave_phase = (clock() - start) * _WAVE_SPEED
-            status.detail = format_elapsed(clock() - start)
-            with lock:
-                live.update(
-                    _progress_frame(panes, cur_fraction, cur_label, status),
-                    refresh=True,
+    results = []
+    try:
+        with Live(
+            _progress_frame(panes, 0.0, "", status),
+            screen=True,
+            auto_refresh=False,
+            console=_console,
+        ) as live:
+            for step in steps:
+                status.state = step.state or step.label
+                status.active = True
+                box: dict[str, Any] = {}
+                thread = threading.Thread(
+                    target=_worker, args=(step, box), daemon=True
                 )
-
-        def animator() -> None:
-            while not stop.wait(1 / 12):
-                repaint()
-
-        thread = threading.Thread(target=animator, daemon=True)
-        thread.start()
-
-        def paint(fraction: float, label: str) -> None:
-            nonlocal cur_fraction, cur_label
-            cur_fraction = fraction
-            cur_label = label
-            repaint()
-
-        try:
-            return _run_steps(steps, setup_index, status, paint)
-        finally:
-            stop.set()
-            thread.join(timeout=0.5)
+                thread.start()
+                while thread.is_alive():
+                    status.wave_phase = (clock() - start) * _WAVE_SPEED
+                    status.detail = format_elapsed(clock() - start)
+                    live.update(
+                        _progress_frame(
+                            panes, step.fraction, step.label, status, list(log_tail)
+                        ),
+                        refresh=True,
+                    )
+                    time.sleep(1 / 12)
+                thread.join()
+                if "error" in box:
+                    error = box["error"]
+                    log_tail.append(f"ERROR in {step.label}: {error}")
+                    status.state = "failed"
+                    status.active = False
+                    live.update(
+                        _progress_frame(
+                            panes,
+                            step.fraction,
+                            f"{step.label} — failed",
+                            status,
+                            list(log_tail),
+                        ),
+                        refresh=True,
+                    )
+                    time.sleep(1.5)  # let the user read the failure
+                    results.append(StepError(step.label, str(error)))
+                    return results
+                results.append(box.get("result"))
+            status.state = "done"
+            status.active = False
+            status.detail = format_elapsed(clock() - start)
+            live.update(
+                _progress_frame(panes, 1.0, "Ready", status, list(log_tail)),
+                refresh=True,
+            )
+            time.sleep(0.4)
+        return results
+    finally:
+        logger.remove(sink_id)
