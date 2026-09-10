@@ -6,6 +6,10 @@ changelog:
     refactor tail (eval-seams → orchestrator-retire-baseline)."
   "2026-09-09b": "Flipped [ready]→[active]; BUILD session begins on task 1 (scaffold the cli/
     package)."
+  "2026-09-09c": "BUILD tasks 1-3 done (scaffold, cold-start, run group). Surface tweak (user
+    decision): the full non-interactive pipeline is `run pipeline` (a leaf subcommand with a
+    positional INPUT), not bare `run` — a Typer group cannot take a positional arg on its callback
+    alongside subcommands. Bare `run` lists its subcommands."
 ---
 
 # cli-wizard-redesign — CLI subpackage + rich first-run/guided wizard
@@ -48,23 +52,29 @@ persisted setup so the tool is ready after first run.
 
 ## Task Checklist
 
-- [ ] **Scaffold the `cli/` package.** Split `src/minutia/cli.py` into `cli/{app,run,setup,info}.py`
-      + `cli/wizard/{__init__,flow,tui}.py`; `cli/__init__.py` re-exports `app` + `main` so the
-      `minutia.cli:main` entry point and `click.testing.CliRunner` imports keep working. Pure
-      restructure — no behavior change. Gate: existing CLI tests stay green (adjusted only for import
-      paths).
-- [ ] **Cold-start discipline.** Move the heavy step imports (torch/whisper via
-      `steps.audio_transcription`, and anthropic) *behind dispatch* (lazy, inside the functions that
-      run them) so `--help`, `--version`, `info`, and `setup` never load them. Add an eager
-      `--version` callback. Test: `minutia info` / `--help` run without importing `torch`.
-- [ ] **`run` command group.** `minutia run` (no subcommand) runs the whole pipeline
-      non-interactively on the shared step helpers; `run extract-audio | transcribe | merge |
-      summarize` are the migrated step commands. Remove `go` and `process-all` from the CLI surface.
-      Gate: step/run behavior covered by regression tests (ported from the current step-command +
-      phase4 tests).
-- [ ] **`info` group.** Bare `minutia info` prints resolved settings + provenance (today's `config`
-      output); `info config` aliases it; `info recordings` lists the newest `.mkv` in the recordings
-      dir. TDD the recordings listing; move the config-display logic verbatim.
+- [x] **Scaffold the `cli/` package.** Done as a **minimal move** (user decision): `cli/app.py`
+      (all current commands, via `git mv`) + `cli/_steps.py` (shared step helpers) + `cli/__init__.py`
+      re-exporting **`main` only** — re-exporting the Typer `app` would shadow the `app` submodule and
+      break module-level test patching (the Typer lives at `cli.app.app`). `run`/`setup`/`info`/
+      `wizard` modules are created by their own later tasks, not up front. Tests retargeted to the new
+      module paths; gate green.
+- [x] **Cold-start discipline.** Heavy step imports made lazy inside the `cli/_steps.py` functions.
+      **Root cause was `src/minutia/__init__.py`** eagerly importing the whole heavy stack (any
+      `minutia.X` import pulled torch/whisper/anthropic) — slimmed to light imports + PEP 562
+      `__getattr__` lazy step modules (back-compat preserved). Added eager `--version` callback.
+      Subprocess regression test (`tests/unit/test_cli_cold_start.py`): `--version`/`--help`/`config`
+      import none of torch/whisper/anthropic. (Note: `info`/`setup` from the spec don't exist yet —
+      Tasks 4 & 7 — so the cheap surfaces tested today are `--version`/`--help`/`config`.)
+- [x] **`run` command group.** `minutia run pipeline` runs the whole pipeline non-interactively on
+      the shared step helpers (`run_full_pipeline` in `cli/_steps.py`, off the orchestrator); `run
+      extract-audio | transcribe | merge | summarize` are the migrated step commands; bare `run`
+      lists them. Removed `go` and `process-all` from the CLI surface. Cost gate mirrors `summarize`
+      (prompt / `--yes` / `--dry-run`). Regression tests ported; gate green (ruff + ty + 98 pytest).
+- [x] **`info` group.** `cli/info.py`: bare `minutia info` prints resolved settings + provenance
+      (config-display moved verbatim from `app.py`); `info config` aliases it; `info recordings`
+      lists the newest `.mkv` in the recordings dir (friendly errors: no dir configured / dir
+      missing; caps at 10 + "… and N more"). TDD'd the pure `_list_recordings`. **Top-level `config`
+      removed.** Gate green (ruff + ty + 105 pytest); cold start still clean.
 - [ ] **Config persistence writer.** A pure function that writes/merges the user `config.env`
       (platformdirs), preserving existing keys and `chmod 600` (it now holds a secret). Used to
       persist `recordings_dir` + the API key. TDD: round-trips, preserves unrelated keys, idempotent
@@ -110,14 +120,22 @@ Model: `_snap/reference/+cli_content/cli/` (the sibling-project CLI). Patterns t
 
 ```
 minutia                 wizard — interactive daily driver (self-determines)
-minutia run             run the whole pipeline (non-interactive)
+minutia run             lists the run subcommands (help)
+minutia run pipeline    run the whole pipeline (non-interactive); positional INPUT
 minutia run extract-audio | transcribe | merge | summarize   one step
 minutia setup           config wizard (recordings dir + API key), unconditional
 minutia info            resolved settings + provenance
 minutia info config     alias of bare info
 minutia info recordings list newest .mkv in the recordings dir
 ```
-`go` and `process-all` are removed (`run` supersedes both). `--version` is a top-level eager option.
+`go` and `process-all` are removed (`run pipeline` + the step subcommands supersede both).
+`--version` is a top-level eager option.
+
+**Why `run pipeline` and not bare `run`** (build-time decision, 2026-09-09): a Typer group cannot
+take a *positional* `input_video` on its callback while also exposing subcommands — click cannot
+disambiguate `run extract-audio` (subcommand) from `run file.mkv` (positional). Making the full run
+its own leaf subcommand (`run pipeline`) restores the positional-`INPUT` ergonomics of the old
+`process-all` and keeps `run <step>` unambiguous. Bare `run` shows help.
 
 ### Bare `minutia` flow (the daily driver)
 

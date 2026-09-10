@@ -193,3 +193,61 @@ def _summarize_step(
     )
     typer.echo(f"Markdown report saved to: {report_path}")
     return report_path
+
+
+def run_full_pipeline(
+    config: MinutiaSettings,
+    input_video: Path,
+    output_dir: Path,
+    *,
+    prompt_kind: str,
+    notes_path: Path | None,
+    model_name: str,
+    mic_track: int | None = None,
+    desktop_track: int | None = None,
+    personal_info_path: Path | None = None,
+    gpu: bool = True,
+    force: bool = False,
+    dry_run: bool = False,
+    yes: bool = False,
+) -> Path | None:
+    """Run extract → transcribe → merge → summarize on the shared step helpers.
+
+    The non-interactive pipeline **core**, deliberately off the orchestrator. Reused by
+    ``minutia run`` (all) and, later, the guided-run wizard — so keep it free of prompts and CLI
+    parsing (the callers own those). Returns the report path, or ``None`` for a dry run / when no
+    summary was produced.
+    """
+    _extract_audio_step(config, input_video, output_dir, mic_track, desktop_track, force)
+    transcripts = _transcribe_step(
+        config,
+        output_dir / "microphone_audio.wav",
+        output_dir / "desktop_audio.wav",
+        output_dir,
+        None,  # whisper model → configuration default
+        gpu,
+        force,
+    )
+
+    # Merge is pure/light; import lazily so the source module stays the single patch seam.
+    from ..steps.transcript_merger import process_transcripts
+
+    merged_path = output_dir / "merged_transcript.json"
+    process_transcripts(
+        str(transcripts["microphone"]),
+        str(transcripts["desktop"]),
+        str(merged_path),
+    )
+    typer.echo(f"Merged transcript saved to: {merged_path}")
+
+    return _summarize_step(
+        config,
+        merged_path,
+        output_dir,
+        prompt_kind,
+        notes_path,
+        personal_info_path,
+        model_name,
+        dry_run,
+        yes,
+    )

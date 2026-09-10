@@ -57,7 +57,7 @@ class TestSummarize:
     ):
         result = runner.invoke(
             minutia.cli.main,
-            ["summarize", str(merged_transcript), "--dry-run"],
+            ["run", "summarize", str(merged_transcript), "--dry-run"],
             env=_env(tmp_path),
         )
         assert result.exit_code == 0, result.output
@@ -77,6 +77,7 @@ class TestSummarize:
         result = runner.invoke(
             minutia.cli.main,
             [
+                "run",
                 "summarize",
                 str(merged_transcript),
                 str(tmp_path / "reports"),
@@ -107,7 +108,7 @@ class TestSummarize:
     ):
         result = runner.invoke(
             minutia.cli.main,
-            ["summarize", str(merged_transcript)],
+            ["run", "summarize", str(merged_transcript)],
             env=_env(tmp_path),
             input="n\n",
         )
@@ -117,7 +118,7 @@ class TestSummarize:
     def test_unknown_prompt_kind_rejected(self, runner, merged_transcript, tmp_path):
         result = runner.invoke(
             minutia.cli.main,
-            ["summarize", str(merged_transcript), "--prompt-kind", "nope"],
+            ["run", "summarize", str(merged_transcript), "--prompt-kind", "nope"],
             env=_env(tmp_path),
         )
         assert result.exit_code != 0
@@ -140,7 +141,7 @@ class TestIdempotency:
         monkeypatch.setattr("minutia.steps.video_extraction.process_mkv_file", boom)
         result = runner.invoke(
             minutia.cli.main,
-            ["extract-audio", str(video), str(out)],
+            ["run", "extract-audio", str(video), str(out)],
             env=_env(tmp_path),
         )
         assert result.exit_code == 0, result.output
@@ -164,121 +165,15 @@ class TestIdempotency:
         monkeypatch.setattr("minutia.steps.audio_transcription.process_audio_files", boom)
         result = runner.invoke(
             minutia.cli.main,
-            ["transcribe", str(mic), str(desk), str(out)],
+            ["run", "transcribe", str(mic), str(desk), str(out)],
             env=_env(tmp_path, MINUTIA_WHISPER_MODEL="base"),
         )
         assert result.exit_code == 0, result.output
         assert "skipping" in result.output
 
 
-class TestGo:
-    def test_go_requires_recordings_dir(self, runner, tmp_path):
-        result = runner.invoke(minutia.cli.main, ["go"], env=_env(tmp_path))
-        assert result.exit_code != 0
-        assert "MINUTIA_RECORDINGS_DIR" in result.output
-
-    def test_go_path_argument_overrides_recordings_dir(self, runner, tmp_path):
-        # A directory argument is browsed even when no recordings dir is
-        # configured; declining the first prompt (EOF) is fine — the pick
-        # list itself is what's under test.
-        browse = tmp_path / "browse"
-        browse.mkdir()
-        (browse / "local_meeting.mkv").write_text("v", encoding="utf-8")
-        result = runner.invoke(
-            minutia.cli.main,
-            ["go", str(browse)],
-            env=_env(tmp_path),
-            input="",  # EOF at the first prompt aborts the run
-        )
-        assert "local_meeting.mkv" in result.output
-        assert "MINUTIA_RECORDINGS_DIR" not in result.output
-
-    def test_go_lists_recordings_and_runs(
-        self, runner, tmp_path, monkeypatch, mock_llm
-    ):
-        recordings = tmp_path / "recordings"
-        recordings.mkdir()
-        (recordings / "meeting.mkv").write_text("v", encoding="utf-8")
-
-        out_root = tmp_path / "out"
-        workdir = out_root / "meeting"
-
-        def fake_extract(input_video, output_dir, **kwargs):
-            for name in ("microphone_audio.wav", "desktop_audio.wav"):
-                (workdir / name).write_text("wav", encoding="utf-8")
-            return {"microphone": "m", "desktop": "d"}
-
-        def fake_transcribe(mic, desk, output_dir, **kwargs):
-            paths = {}
-            for kind in ("microphone", "desktop"):
-                p = workdir / f"{kind}-whisper-base_transcription.json"
-                p.write_text("{}", encoding="utf-8")
-                paths[kind] = str(p)
-            return paths
-
-        def fake_merge(
-            mic_transcript_file, desktop_transcript_file, output_file, **kwargs
-        ):
-            data = {
-                "metadata": {},
-                "transcript": [
-                    {
-                        "source": "microphone",
-                        "start_time": 0.0,
-                        "end_time": 1.0,
-                        "text": "hi",
-                    }
-                ],
-            }
-            with open(output_file, "w", encoding="utf-8") as f:
-                json.dump(data, f)
-            return data
-
-        monkeypatch.setattr(
-            "minutia.steps.video_extraction.process_mkv_file", fake_extract
-        )
-        monkeypatch.setattr(
-            "minutia.steps.audio_transcription.process_audio_files", fake_transcribe
-        )
-        monkeypatch.setattr(minutia.cli.app, "process_transcripts", fake_merge)
-        mock_llm.set_responses(["Guided summary.", "20260702_guided_report"])
-
-        # Give `go` a concrete resolved settings object for this run.
-        from minutia.config import MinutiaSettings, SettingsResolution
-
-        settings = MinutiaSettings(
-            whisper_model="base",
-            recordings_dir=recordings,
-            base_output_dir=out_root,
-            anthropic_api_key="fake-key-for-tests",
-        )
-        resolution = SettingsResolution(
-            settings=settings,
-            sources={},
-            invocation_dir=tmp_path,
-            context_env_file=None,
-            user_config_file=tmp_path / "config.env",
-        )
-        monkeypatch.setattr(
-            minutia.cli.app, "resolve_settings", lambda **kwargs: resolution
-        )
-
-        result = runner.invoke(
-            minutia.cli.main,
-            ["go"],
-            env=_env(tmp_path),
-            # recording #1, prompt kind default, no notes file, confirm cost
-            input="1\n\n\ny\n",
-        )
-        assert result.exit_code == 0, result.output
-        assert "meeting.mkv" in result.output
-        report = workdir / "20260702_guided_report.md"
-        assert report.exists()
-        assert report.read_text(encoding="utf-8") == "Guided summary."
-
-
 class TestResolveNotesAnswer:
-    """`go` notes answer accepts inline text OR a file path (finish-cli-parity fix)."""
+    """`_resolve_notes_answer` takes inline text OR a file path (reused by the guided wizard)."""
 
     def test_blank_returns_none(self, tmp_path):
         assert minutia.cli._steps._resolve_notes_answer("", tmp_path) is None

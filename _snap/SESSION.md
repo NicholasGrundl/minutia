@@ -76,6 +76,55 @@ absent from `sys.modules`. Heavy stack loads only when a step actually runs.
 - **USER NOTE (surface at Task 5, `wizard/tui.py`):** user wants to customize colors / style /
   banner details — **pause and get their input** at that stage before finalizing the chrome.
 
+### Task 3 — `run` command group (in progress)
+
+Surface: `run` (no subcommand) = full pipeline non-interactive; `run extract-audio | transcribe |
+merge | summarize` = migrated step commands (`merge-transcripts` → `run merge`). **Remove `go` +
+`process-all`.** `config` stays top-level (Task 4 moves it to `info`). Cost gate on `run` (all):
+**mirror current `summarize`** (prompt by default, `--yes/-y` skips, `--dry-run` estimates) — user
+decision.
+
+- [x] 1. Added `run_full_pipeline` to `cli/_steps.py` — the non-interactive pipeline core (extract→
+      transcribe→merge→summarize on the step helpers, off the orchestrator). Reused by `run`-all now
+      + wizard guided-run (Task 6). Prompt-free/parse-free (callers own that) → DI-friendly.
+- [x] 2. `cli/run.py`: `run_app` Typer sub-app. **`run pipeline`** = full pipeline (leaf command,
+      positional INPUT); subcommands `extract-audio`/`transcribe`/`merge`/`summarize` migrated in
+      with enums + option types. **`merge-transcripts` → `run merge`.** Bare `run` lists subcommands.
+- [x] 3. `app.py`: slimmed to wiring + `config`; `add_typer(run_app, name="run")`; deleted
+      `go`/`process-all` + dead helpers (orchestrator imports, `_build_pipeline_config`,
+      progress/success renderers, `RunPaths`, `USER_CONFIG_FILE`). Cold start still clean.
+- [x] 4. Tests: prefixed moved step cmds with `run`; deleted `TestGo`; `process-all`→`run` in the
+      config test; `git mv test_cli_process_all.py → test_cli_run.py` rewritten as a run-all e2e.
+      Gate green: ruff + ty clean; **98/98**, order-robust.
+
+**STRUCTURAL DECISION (settled with user):** a Typer group can't take a *positional* `input_video`
+on its callback AND have subcommands (click can't tell `run extract-audio` from `run file.mkv`).
+Resolved by making the full run its own **leaf subcommand `run pipeline`** (positional INPUT, like
+old `process-all`); bare `run` shows help. User picked this over the `--input` option form. Spec +
+command tree updated to match.
+
+**TEST-HYGIENE FIX (feeds user's DI-mocks plan):** found a fixture-ordering trap — layering
+`monkeypatch.setattr(...resolve_settings...)` on top of `mock_llm`'s patch makes monkeypatch capture
+the *mock* as "original" and re-install it at teardown (monkeypatch tears down after mock_llm),
+leaking it into later tests. Fixed by overriding via `mocker` (one LIFO stack). This is exactly the
+kind of brittleness DI + injected doubles will remove.
+
+### Task 4 — `info` group (in progress)
+
+Surface: bare `minutia info` = resolved settings + provenance (today's `config` output); `info
+config` aliases it; `info recordings` lists newest `.mkv` in the recordings dir. **Top-level
+`minutia config` is removed** (replaced by `info` / `info config`), per the spec tree.
+
+- [x] 1. TDD'd pure `_list_recordings(dir) -> list[Path]` (newest-first `.mkv`); RED → GREEN.
+- [x] 2. `cli/info.py`: `info_app` — bare-info callback prints config; `info config` alias;
+      `info recordings` command formats the listing (friendly errors: no dir / missing / empty; caps
+      at 10).
+- [x] 3. `app.py`: moved `show_config` body → `info._show_config`; removed top-level `config`;
+      `add_typer(info_app, name="info")`. Trimmed now-unused imports (`Iterable`, `MinutiaSettings`).
+- [x] 4. Tests: `config`→`info` in test_cli_config_command; added `tests/unit/test_cli_info.py`;
+      cold-start probe now exercises `info`/`info config`. Gate green: ruff + ty; **105/105**;
+      cold start clean; old top-level `config` returns exit 2 (removed).
+
 ## Nits noticed (not fixed — out of scope, revisit)
 
 - `src/minutia/__init__.py` still has `__version__ = "0.1.0"` (stale; pyproject is `0.3.0`). The
@@ -84,7 +133,8 @@ absent from `sys.modules`. Heavy stack loads only when a step actually runs.
 
 ## Open / blockers
 
-- none. Tasks 1 + 2 done (scaffold + cold-start). Next: Task 3 (the `run` command group — run-all +
-  the four step subcommands on the shared `_steps` helpers; **removes `go`/`process-all`** from the
-  surface) OR checkpoint/commit Tasks 1–2 first (user's call). Reminder: Task 5 (`wizard/tui.py`) is
-  the colors/style/banner checkpoint the user asked to weigh in on.
+- none. Tasks 1–4 done (scaffold + cold-start + `run` group + `info` group). Uncommitted since the
+  Task 1–2 MACRO (f61d9b3): Tasks 3 + 4. Next: **Task 5 — `wizard/tui.py`** (full-screen rich
+  chrome) — this is the **colors/style/banner checkpoint the user asked to weigh in on**; surface
+  the design choices before finalizing. OR checkpoint/commit Tasks 3–4 first (user's call). Task 5
+  also adds deps `rich` + `yakh`.
