@@ -10,6 +10,7 @@ Dotenv files are read as data. They are never loaded into ``os.environ``.
 
 from __future__ import annotations
 
+import os
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -349,6 +350,43 @@ def _mask_secret(value: str | None) -> str:
     return f"{value[:2]}***{value[-2:]}"
 
 
+def write_user_config(
+    updates: Mapping[str, str], *, path: Path = USER_CONFIG_FILE
+) -> Path:
+    """Merge ``updates`` into the user ``config.env``, preserving unrelated lines. Returns the path.
+
+    The write-counterpart to :func:`resolve_settings`' user-config layer. The file is env-format
+    (``KEY=VALUE`` lines plus comments/blanks); existing keys are updated **in place**, new keys are
+    appended, and everything else (comments, unrelated keys, ordering) is preserved. It holds a
+    secret (the API key), so it is written owner read/write only (``chmod 600``) and values are
+    never logged. Values may not contain a newline. An empty ``updates`` leaves the file untouched.
+    """
+    for key, value in updates.items():
+        if "\n" in value or "\r" in value:
+            raise ValueError(f"config value for {key} may not contain a newline")
+
+    if not updates:
+        return path
+
+    existing = path.read_text(encoding="utf-8").splitlines() if path.exists() else []
+    remaining = dict(updates)
+    lines: list[str] = []
+    for line in existing:
+        stripped = line.strip()
+        if stripped and not stripped.startswith("#") and "=" in line:
+            key = line.split("=", 1)[0].strip()
+            if key in remaining:
+                lines.append(f"{key}={remaining.pop(key)}")
+                continue
+        lines.append(line)
+    lines.extend(f"{key}={value}" for key, value in remaining.items())
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    os.chmod(path, 0o600)
+    return path
+
+
 __all__ = [
     "CONFIG_PREFIX",
     "DEFAULT_OUTPUT_DIR",
@@ -358,4 +396,5 @@ __all__ = [
     "SettingsResolution",
     "discover_env_file",
     "resolve_settings",
+    "write_user_config",
 ]

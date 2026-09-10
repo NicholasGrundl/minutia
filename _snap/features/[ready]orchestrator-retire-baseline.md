@@ -32,6 +32,6 @@ now-redundant baseline script.
 
 ## Details
 
-Source: `_snap/features/[done]refactor_to_cli.md` Phase 6. Depends on `eval-seams` (the e2e test
+Source: `_snap/archive/features/[done]refactor_to_cli.md` Phase 6. Depends on `eval-seams` (the e2e test
 asserts the run-metadata sidecar). This is the spec that finally retires the pre-orchestrator
 script path.

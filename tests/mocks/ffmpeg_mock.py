@@ -103,6 +103,8 @@ def mock_ffmpeg(mocker, dummy_wav, chaos_config):
     def mock_output(stream, filename, **kwargs):
         chaos_config.trigger_if_set("ffmpeg.output")
         node = mocker.Mock(name="OutputNode", filename=filename)
+        # `.overwrite_output()` is chained in production; keep it returning the same node.
+        node.overwrite_output.return_value = node
         return node
 
     def mock_run(node, **kwargs):

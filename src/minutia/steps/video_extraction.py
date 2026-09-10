@@ -23,7 +23,9 @@ def extract_audio_track(input_file: Path, output_file: Path, track_index: int) -
     """Extract a specific audio stream into a WAV file."""
     input_stream = ffmpeg.input(str(input_file))
     audio = input_stream[f"a:{track_index}"]
-    output = ffmpeg.output(audio, str(output_file))
+    # overwrite_output (-y): without it ffmpeg prompts "File exists, overwrite?" and, with no
+    # stdin, errors — so a re-run into a dir that already has the WAVs would fail.
+    output = ffmpeg.output(audio, str(output_file)).overwrite_output()
     ffmpeg.run(output, capture_stdout=False, capture_stderr=True)
 
 

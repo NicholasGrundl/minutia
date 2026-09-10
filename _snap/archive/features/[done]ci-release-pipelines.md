@@ -1,5 +1,5 @@
 ---
-state: active          # draft | ready | active | done | deprecated
+state: done          # draft | ready | active | done | deprecated
 changelog:
   "2026-09-08": "Initial spec — the release/CI half of the tooling modernization. Blocked by
     main promotion; started as a fresh feature once main is the real trunk. Sibling of
@@ -8,6 +8,10 @@ changelog:
     stable + green; ci-release-pipelines branch cut from it). Starting BUILD — author
     scripts/release.py + ci.yml + release.yml + justfile recipes, then dry-run validate.
     Cutting the first real release (task 7) deferred until the workflows land on main."
+  "2026-09-09 (close)": "All tasks done → [done]. Merged via PR #2; workflows live on main. Task 7
+    validated end-to-end by cutting v0.2.0, then v0.3.0 (the latter carrying the PR #3 CPU-only-torch
+    CI fix). Reconciled during the 2026-09-09 reprioritization BUILD session (the merges + releases
+    happened outside snap sessions). Awaiting the [active]→[done] git mv rename."
 ---
 
 # CI + release pipelines (GitHub Actions + semver tagging)
@@ -56,8 +60,10 @@ CI runs it).
 - [x] Dry-run validate: `uv run python scripts/release.py patch -n` previews the right tag and
       the guards fire on a dirty tree / pre-existing tag. (Validated 2026-09-09: previewed
       `v0.1.1`; both warnings fired — dirty tree + a throwaway `v0.1.1` tag, since deleted.)
-- [ ] Cut a first real release to validate end-to-end (tag pushes → `release.yml` publishes a
-      Release with notes). Likely `v0.2.0` (first release off the stabilized `main`).
+- [x] Cut a first real release to validate end-to-end (tag pushes → `release.yml` publishes a
+      Release with notes). Done 2026-09-09: `v0.2.0` cut (first release off the stabilized `main`,
+      validated `release.yml`), then `v0.3.0` (carrying PR #3's CPU-only-torch CI fix). Both tags
+      published; `pyproject` now `0.3.0`.
 
 ## Details
 

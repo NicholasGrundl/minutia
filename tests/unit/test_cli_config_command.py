@@ -29,7 +29,7 @@ def test_config_command_shows_values_and_sources(runner, tmp_path):
         "MINUTIA_WHISPER_MODEL": "medium.en",
         "MINUTIA_OUTPUT_DIR": str(tmp_path / "out"),
     }
-    result = runner.invoke(minutia.cli.main, ["config"], env=env)
+    result = runner.invoke(minutia.cli.main, ["info"], env=env)
     assert result.exit_code == 0, result.output
     assert "whisper_model = medium.en  [environment]" in result.output
     assert "mic_track = 3  [default]" in result.output
@@ -39,9 +39,9 @@ def test_config_command_shows_values_and_sources(runner, tmp_path):
     assert "precedence:" in result.output
 
 
-def test_process_all_without_input_and_without_recordings_dir_errors(runner, tmp_path):
+def test_run_pipeline_without_input_and_without_recordings_dir_errors(runner, tmp_path):
     env = {"MINUTIA_OUTPUT_DIR": str(tmp_path / "out")}
-    result = runner.invoke(minutia.cli.main, ["process-all"], env=env)
+    result = runner.invoke(minutia.cli.main, ["run", "pipeline"], env=env)
     assert result.exit_code != 0
     assert "MINUTIA_RECORDINGS_DIR" in result.output
 
@@ -50,7 +50,7 @@ def test_config_command_discovers_nearest_env_file(runner, tmp_path):
     env_file = tmp_path / ".env"
     env_file.write_text("MINUTIA_WHISPER_MODEL=tiny\n", encoding="utf-8")
 
-    result = runner.invoke(minutia.cli.main, ["config"])
+    result = runner.invoke(minutia.cli.main, ["info"])
 
     assert result.exit_code == 0, result.output
     assert f"whisper_model = tiny  [{env_file}]" in result.output
@@ -60,7 +60,7 @@ def test_config_command_discovers_nearest_env_file(runner, tmp_path):
 def test_no_env_file_disables_contextual_discovery(runner, tmp_path):
     (tmp_path / ".env").write_text("MINUTIA_WHISPER_MODEL=tiny\n", encoding="utf-8")
 
-    result = runner.invoke(minutia.cli.main, ["--no-env-file", "config"])
+    result = runner.invoke(minutia.cli.main, ["--no-env-file", "info"])
 
     assert result.exit_code == 0, result.output
     assert "whisper_model = base  [default]" in result.output
@@ -74,7 +74,7 @@ def test_explicit_env_file_bypasses_discovery(runner, tmp_path):
     selected = tmp_path / "selected.env"
     selected.write_text("MINUTIA_WHISPER_MODEL=explicit\n", encoding="utf-8")
 
-    result = runner.invoke(minutia.cli.main, ["--env-file", str(selected), "config"])
+    result = runner.invoke(minutia.cli.main, ["--env-file", str(selected), "info"])
 
     assert result.exit_code == 0, result.output
     assert f"whisper_model = explicit  [{selected}]" in result.output
@@ -86,7 +86,7 @@ def test_explicit_and_disabled_env_file_are_mutually_exclusive(runner, tmp_path)
 
     result = runner.invoke(
         minutia.cli.main,
-        ["--env-file", str(selected), "--no-env-file", "config"],
+        ["--env-file", str(selected), "--no-env-file", "info"],
     )
 
     assert result.exit_code != 0
