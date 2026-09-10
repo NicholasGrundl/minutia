@@ -75,15 +75,24 @@ persisted setup so the tool is ready after first run.
       lists the newest `.mkv` in the recordings dir (friendly errors: no dir configured / dir
       missing; caps at 10 + "… and N more"). TDD'd the pure `_list_recordings`. **Top-level `config`
       removed.** Gate green (ruff + ty + 105 pytest); cold start still clean.
-- [ ] **Config persistence writer.** A pure function that writes/merges the user `config.env`
-      (platformdirs), preserving existing keys and `chmod 600` (it now holds a secret). Used to
-      persist `recordings_dir` + the API key. TDD: round-trips, preserves unrelated keys, idempotent
-      re-write, correct permissions, never logs the key.
-- [ ] **`wizard/tui.py` — full-screen chrome.** Port the reference's rich primitives: persistent
-      header, `select` menu (highlighted row styled), inline text/paste field, a **multi-line notes
-      field** (Enter = newline, Ctrl-D submits), and a **staged progress bar**. Footer shows the
-      keystroke hints on every screen. Keys via `yakh`; drawing via `rich` on the alternate screen.
-      Injectable render + key source so tests drive it without a real terminal. Adds `rich` + `yakh`.
+- [x] **Config persistence writer.** `config.write_user_config(updates, path=USER_CONFIG_FILE)` —
+      pure merge into the user `config.env`: updates keys in place, appends new ones, preserves
+      comments/unrelated keys/order, `chmod 600`, rejects newline-in-value, never logs the secret,
+      empty-updates is a no-op. Persists `MINUTIA_RECORDINGS_DIR` + `MINUTIA_ANTHROPIC_API_KEY`
+      (the namespaced alias the settings layer reads). TDD'd (8 tests). Lives in `config.py` as the
+      write-counterpart to `resolve_settings`.
+- [x] **`wizard/tui.py` — full-screen chrome.** Built `cli/wizard/{__init__,tui}.py`. Primitives:
+      persistent header, `select` (highlighted row = a **wine bar**, `❯` cursor), `prompt_text`
+      inline field, **multi-line `prompt_notes`** (Enter = newline, Ctrl-D submits, paste-friendly),
+      and staged progress bar. Footer hints on every screen. Keys via `yakh` (lazy-imported → stays
+      cold-start cheap); drawing via `rich` on the alternate screen. Injectable `key_source`
+      (normalized tokens) + `render` so tests drive it headless. Added deps `rich` + `python-yakh`.
+      **Design (user-directed):** wine palette anchored on `#420f18` (deep fill: selected-row bar,
+      rule, progress fill, active dot); compact `pagga` `minutia` wordmark left; **live waveform +
+      pipeline telemetry** right (the waveform doubles as the icon — idle `○`/flat, active
+      `●`/animated + elapsed, threaded animator ticks it during blocking steps); tagline "meeting
+      notes, distilled"; `❯` cursor. All look = live-tweakable constants atop `tui.py`. 17 headless
+      tests; gate green (ruff + ty + 122 pytest).
 - [ ] **`wizard/flow.py` — flows + pure cores.** (a) **Setup flow**: recordings-dir panel +
       API-key panel (paste / detect-from-env → persist via the writer). (b) **Guided-run flow**: pick
       recording (newest-first) → prompt-kind menu → **notes panel** (multi-line paste / pick a file /

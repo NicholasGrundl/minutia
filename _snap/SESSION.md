@@ -125,6 +125,34 @@ config` aliases it; `info recordings` lists newest `.mkv` in the recordings dir.
       cold-start probe now exercises `info`/`info config`. Gate green: ruff + ty; **105/105**;
       cold start clean; old top-level `config` returns exit 2 (removed).
 
+### Task 5 — `wizard/tui.py` (done; DESIGN CHECKPOINT met)
+
+Built `cli/wizard/{__init__,tui}.py`. Design settled **with the user**:
+- **Palette (wine):** anchor `#420f18` used as a *fill* (selected-row bar with light text, rule,
+  progress fill, active dot) — user chose the deep anchor as-is; I flagged it's near-invisible as
+  small fg on dark, hence fill-role. All palette values = live-tweakable constants atop `tui.py`.
+- **Header:** compact `pagga` `minutia` wordmark (left) + **live waveform + pipeline telemetry**
+  (right). The **waveform doubles as the product icon** (user's ask): idle `○`/flat, active
+  `●`/animated + elapsed clock; threaded animator repaints ~12fps during blocking steps. Telemetry
+  = pipeline stage (extract/transcribe/merge/summarize), not literal capture (minutia processes
+  files). Tagline "meeting notes, distilled". `❯` selection cursor.
+- **Primitives:** `select`, `prompt_text`, multi-line `prompt_notes` (Enter=newline, Ctrl-D submit),
+  `Step` + `run_staged_progress`. All take injectable `key_source` (normalized tokens) + `render`
+  → 17 headless tests, no tty. `yakh` lazy-imported (cold start stays clean; subprocess test proves).
+- **Deps added:** `rich>=13`, `python-yakh>=0.3` (ran `uv sync`).
+- Gate: ruff + ty clean; **122/122**.
+- **Color preview for the user** (renders in a real terminal):
+  `uv run python /tmp/claude-1000/-home-nicholasgrundl-projects-minutia/e48c67ee-11de-4fea-9f3f-4c49e73f5768/scratchpad/wizard_preview.py`
+  → user may tweak the wine/companion/wordmark/tagline constants; easy to iterate.
+
+### Config persistence writer (spec task 5) — done
+
+`config.write_user_config(updates, *, path=USER_CONFIG_FILE)` — pure env-file merge: in-place key
+updates, append new, preserve comments/unrelated/order, `chmod 600`, reject newline values, never
+log secret, empty=no-op. Persists `MINUTIA_RECORDINGS_DIR` + `MINUTIA_ANTHROPIC_API_KEY`. TDD'd
+(`tests/unit/test_config_writer.py`, 8 tests). Unblocks the setup flow. (Note: I built tui.py before
+this — spec order is writer(5) then tui(6); done out of order because tui was the design checkpoint.)
+
 ## Nits noticed (not fixed — out of scope, revisit)
 
 - `src/minutia/__init__.py` still has `__version__ = "0.1.0"` (stale; pyproject is `0.3.0`). The
@@ -133,8 +161,10 @@ config` aliases it; `info recordings` lists newest `.mkv` in the recordings dir.
 
 ## Open / blockers
 
-- none. Tasks 1–4 done (scaffold + cold-start + `run` group + `info` group). Uncommitted since the
-  Task 1–2 MACRO (f61d9b3): Tasks 3 + 4. Next: **Task 5 — `wizard/tui.py`** (full-screen rich
-  chrome) — this is the **colors/style/banner checkpoint the user asked to weigh in on**; surface
-  the design choices before finalizing. OR checkpoint/commit Tasks 3–4 first (user's call). Task 5
-  also adds deps `rich` + `yakh`.
+- none. Done: scaffold, cold-start, `run`, `info`, wizard TUI, **config writer**. Committed: T1–2
+  (f61d9b3), T3–4 (0495329). **Uncommitted: wizard TUI + config writer** (+ rich/yakh deps). User
+  previewed the wizard look and approved it. Next: **`wizard/flow.py`** (spec task 7) — setup flow
+  (recordings-dir + API-key panels → `write_user_config`) + guided-run flow (pick recording →
+  prompt-kind → notes panel → cost confirm → `run_full_pipeline` staged → artifacts summary +
+  cleanup nudge); pure cores split from TUI, TDD'd, flows tested with injected TUI + mocked steps.
+  Recommend a checkpoint of the TUI + writer before the flows (sizeable, deps added).
