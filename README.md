@@ -37,22 +37,29 @@ export ANTHROPIC_API_KEY=sk-ant-...
 
 ## Quickstart
 
-The guided, interactive path — pick a recording, choose a prompt kind, confirm
-the cost, and go:
+Just run `minutia`. The bare command is a full-screen **wizard** that
+self-determines: the first time (before your recordings folder and API key are
+set) it walks you through a one-time **setup**, then every run after that it's the
+guided daily driver — pick a recording, choose a summary style, attach notes,
+confirm the cost, and watch it run.
 
 ```bash
-minutia go            # browses MINUTIA_RECORDINGS_DIR
-minutia go .          # browse .mkv files in the current directory instead
-minutia config        # show every resolved config value and where it came from
+minutia            # the wizard — first run sets up, then guides each run
+minutia setup      # re-run the config wizard (recordings folder + API key) anytime
+minutia info       # show every resolved config value and where it came from
 ```
 
-Persistent defaults live in the platform-specific Minutia user config. A project-local `.env` is
-discovered from the invocation directory; use `minutia --env-file PATH ...` to select one or
-`minutia --no-env-file ...` to disable contextual loading.
+Setup persists your recordings folder and API key to the platform-specific
+Minutia user config (`chmod 600`), so the tool is ready after first run. A
+project-local `.env` is still discovered from the invocation directory; use
+`minutia --env-file PATH ...` to select one or `minutia --no-env-file ...` to
+disable contextual loading.
 
-For the full walkthrough — prerequisites, environment setup, the step-by-step
-commands (`extract-audio` → `transcribe` → `merge-transcripts` → `summarize`),
-and the one-shot `process-all` — see **[docs/running-the-pipeline.md](docs/running-the-pipeline.md)**.
+Prefer explicit, scriptable commands? Everything the wizard does is also available
+under `minutia run` — the whole pipeline in one line (`minutia run pipeline`) or a
+single stage at a time (`run extract-audio` → `transcribe` → `merge` →
+`summarize`). See **[docs/running-the-pipeline.md](docs/running-the-pipeline.md)**
+for the full walkthrough.
 
 ## Development
 

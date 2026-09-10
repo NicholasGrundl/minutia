@@ -60,7 +60,7 @@ uv tool install git+ssh://git@github.com/NicholasGrundl/minutia@main
 
 ```bash
 minutia --help
-minutia config     # prints every resolved config value and where it came from
+minutia info       # prints every resolved config value and where it came from
 ```
 
 If the `minutia` console script isn't on your `PATH`, run `uv tool update-shell` (then
@@ -97,7 +97,7 @@ in order of preference:
   configure recordings/output directories, Whisper model, and more. A project-local
   `.env` is discovered from the invocation directory; `minutia --env-file PATH ...`
   selects one explicitly, `minutia --no-env-file ...` disables discovery. Run
-  `minutia config` to see the resolved values and their sources.
+  `minutia info` to see the resolved values and their sources.
 - See **[running-the-pipeline.md](running-the-pipeline.md)** for the full walkthrough.
 
 ## Develop from a local clone

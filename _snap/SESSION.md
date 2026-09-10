@@ -217,6 +217,17 @@ which logs **audio-position progress** to loguru every 2% (`transcribing… 45% 
 audio)`). Now the wizard log tail streams real progress (and `run pipeline` logs it too). Best-effort
 + restored in finally; whisper-mock tests unaffected. 144 pass; ruff + ty clean. **Uncommitted**.
 
+### FEATURE DONE — docs (task 9) + close-out (2026-09-10)
+
+All 8 tasks complete. Task 9: rewrote CLI docs (`README.md`, `AGENTS.md`, `docs/setup.md`,
+`docs/running-the-pipeline.md`) for the new tree; removed every `go`/`process-all`/top-level
+`config` ref; updated the src architecture tree to the `cli/` subpackage; noted `rich`/`yakh` +
+persisted-key. Flipped spec `[active]→[done]` (git mv + frontmatter), moved to ROADMAP §Done, §Now is
+now the refactor tail. Gate green on `src tests` (ruff + ty + 144 pytest); pre-existing ruff debt in
+skill-assets/experiments is out of scope (CI checks `src tests` only). **Branch `cli_commands`,
+pending PR → main.** Remaining housekeeping (not blocking PR): flush SESSION → DECISIONS at true
+session close; version bump is a post-merge step on main (`scripts/release.py` + tag-driven CI).
+
 ### Draft spec captured (2026-09-10)
 
 User confirmed a working end-to-end run ("crude but works") and logged 4 observations →

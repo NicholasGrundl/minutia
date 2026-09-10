@@ -10,11 +10,11 @@ rebuild notebooks clean, then re-cut feature branches from `main`. **That plan i
 the base is on `main`, CI + releases are live, and `v0.3.0` is out. This ROADMAP has been
 re-ordered around what comes *after* stabilization.
 
-*Last updated: 2026-09-09 (PLAN session: added `[ready]cli-wizard-redesign` — CLI subpackage + rich
-wizard modeled on the sibling-project reference — and prioritized it FIRST in §Now, ahead of the tail.
-Earlier same day: reprioritization session reconciled the spine with what shipped (promotion PR #1,
-ci-release-pipelines PR #2, CPU-torch PR #3, releases v0.2.0 + v0.3.0) and restructured
-Done/Now/Next; decision to dogfood in parallel and defer the §C vision to a post-tail checkpoint.)*
+*Last updated: 2026-09-10 (BUILD complete: `cli-wizard-redesign` `[active]→[done]` — all 8 tasks +
+two live-dogfooding rounds; moved to §Done, pending PR from `cli_commands`. §Now is now the refactor
+tail: `eval-seams` → `orchestrator-retire-baseline`. Added `[draft]wizard-tui-progress-and-logs` as
+the wizard follow-up polish. Earlier (2026-09-09): PLAN added the redesign spec; reprioritization
+reconciled the spine with what shipped (PR #1/#2/#3, v0.2.0 + v0.3.0).)*
 
 ---
 
@@ -22,6 +22,13 @@ Done/Now/Next; decision to dogfood in parallel and defer the §C vision to a pos
 
 The whole stabilization arc is complete and shipped. Condensed here; narrative in `DECISIONS.md`.
 
+- **`[done]`** [`cli-wizard-redesign`](./features/%5Bdone%5Dcli-wizard-redesign.md) — rebuilt the flat
+  `cli.py` into a `cli/` subpackage: bare `minutia` wizard (self-determining, first-run setup +
+  guided run), `run pipeline`/`run <step>`, `info`, `setup`; `go`/`process-all`/top-level `config`
+  removed; cold-start fix (lazy torch/whisper); wine-palette rich TUI with waveform telemetry + live
+  log tail; whisper decode progress; ffmpeg overwrite bug fixed. Added `rich`+`yakh`. Follow-up
+  polish parked as `[draft]wizard-tui-progress-and-logs`. *(Completed 2026-09-10; on `cli_commands`,
+  pending PR.)*
 - **`[done]`** [`justfile-migration`](./archive/features/%5Bdone%5Djustfile-migration.md) — `Makefile` →
   `justfile`; adopted `ty`.
 - **`[done]`** [`refactor_to_cli`](./archive/features/%5Bdone%5Drefactor_to_cli.md) — Phases 0–4; CLI is
@@ -41,29 +48,21 @@ The whole stabilization arc is complete and shipped. Condensed here; narrative i
 (ruff + ty + 100 pytest); CLI validated on a real meeting; CI gating `main`; reproducible tagged
 releases; `pyproject` at `0.3.0`.
 
-## 🔨 Now — polish the CLI, then finish the refactor tail
+## 🔨 Now — finish the refactor tail
 
-The CLI is where the tool is actually used, so it goes **first** (user decision, 2026-09-09);
-the tail is low-risk consolidation that every future direction wants.
+The CLI polish landed first (user decision, 2026-09-09); the tail is low-risk consolidation that
+every future direction wants.
 
-1. **`[active]`** [`cli-wizard-redesign`](./features/%5Bactive%5Dcli-wizard-redesign.md) — **in
-   progress** (flipped `[ready]→[active]` 2026-09-09; BUILD on task 1, scaffold the `cli/` package).
-   Rebuild the flat `cli.py` into a `cli/` subpackage with a concise top-level surface
-   (`run` / `setup` / `info`) and a full-screen **rich wizard**, modeled on the sibling-project reference
-   (`_snap/reference/+cli_content/cli/`). Bare `minutia` self-determines (guided run, or first-run
-   setup that persists the API key + recordings dir, then runs); first-class notes panel; cold-start
-   fix (lazy torch/whisper). Drops `go`/`process-all` from the surface. Adds `rich` + `yakh`.
-   *→ next BUILD session flips this `[ready]→[active]`.*
-2. **`[ready]`** [`eval-seams`](./features/%5Bready%5Deval-seams.md) — `SummaryClient` protocol +
+1. **`[ready]`** [`eval-seams`](./features/%5Bready%5Deval-seams.md) — `SummaryClient` protocol +
    `<report>.run.json` run-metadata sidecar. The keystone for the eval branch: unblocks
    `evals-harness` and `local-llm-summarization`, makes runs reproducible/swappable, and its sidecar
    (model, params, cost, hashes per run) is exactly the data the parallel dogfooding wants. Also
    home for the deferred re-run / summarize-as-jobs flow.
-3. **`[ready]`** [`orchestrator-retire-baseline`](./features/%5Bready%5Dorchestrator-retire-baseline.md)
+2. **`[ready]`** [`orchestrator-retire-baseline`](./features/%5Bready%5Dorchestrator-retire-baseline.md)
    — orchestrator parity, then delete `baseline_pipeline.py`. **Depends on `eval-seams`** (its e2e
    test asserts the run-metadata sidecar). Retires the last pre-orchestrator script path (which
    `cli-wizard-redesign` already drops from the CLI surface) + updates `README.md`.
-4. **`[draft]`** [`wizard-tui-progress-and-logs`](./features/%5Bdraft%5Dwizard-tui-progress-and-logs.md)
+3. **`[draft]`** [`wizard-tui-progress-and-logs`](./features/%5Bdraft%5Dwizard-tui-progress-and-logs.md)
    — follow-up polish to the wizard TUI (captured from live dogfooding 2026-09-10): unify the
    progress updater and wire it to the TUI, a scrollable full-run log history, un-clip long paths,
    retire the moot `EN` tag. Downstream of `cli-wizard-redesign`; pick up after it closes.
