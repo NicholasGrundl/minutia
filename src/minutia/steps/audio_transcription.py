@@ -1,7 +1,10 @@
 import json
 import os
+import sys
 import time
+import types
 from datetime import UTC, datetime
+from typing import Any
 
 import torch
 import whisper
@@ -9,6 +12,66 @@ import whisper
 from ..logging import logger
 
 TRANSCRIPT_SCHEMA_VERSION = "1.0"
+
+# Whisper frames are 10 ms (HOP_LENGTH 160 / SAMPLE_RATE 16000), so a frame count converts to an
+# audio-time position — which makes a far more meaningful progress read than a raw frame count.
+_WHISPER_FRAME_SECONDS = 160 / 16000
+
+
+class _LoggingProgress:
+    """Stand-in for whisper's internal tqdm bar that logs decode progress to loguru.
+
+    Whisper renders its own tqdm frame bar to stderr, which is invisible under the wizard's
+    full-screen Live view — so a long transcription looks frozen. We swap that bar for this, which
+    reports the audio position (e.g. ``transcribing… 45%  (12:30 / 28:14 of audio)``) into loguru,
+    where the wizard's live log tail (and ``run pipeline``'s logs) can show real, moving progress.
+    """
+
+    def __init__(self, total=None, unit=None, disable=False, **kwargs):
+        self._total = total or 0
+        self._done = 0
+        self._last_pct = -2
+
+    def update(self, delta):
+        self._done += delta
+        if self._total <= 0:
+            return
+        pct = int(self._done / self._total * 100)
+        if pct < self._last_pct + 2:
+            return  # throttle: at most every 2%
+        self._last_pct = pct
+        pos = self._done * _WHISPER_FRAME_SECONDS
+        total = self._total * _WHISPER_FRAME_SECONDS
+        logger.info(
+            "transcribing… {:>3d}%  ({:d}:{:02d} / {:d}:{:02d} of audio)",
+            pct,
+            int(pos) // 60,
+            int(pos) % 60,
+            int(total) // 60,
+            int(total) % 60,
+        )
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+    def close(self):
+        pass
+
+
+def _transcribe_with_progress(model, audio_path, *, fp16):
+    """Run ``model.transcribe`` with whisper's tqdm bar swapped for loguru progress (best-effort)."""
+    module: Any = sys.modules.get("whisper.transcribe")
+    original = getattr(module, "tqdm", None)
+    if module is not None and original is not None:
+        module.tqdm = types.SimpleNamespace(tqdm=_LoggingProgress)
+    try:
+        return model.transcribe(audio_path, fp16=fp16, verbose=False)
+    finally:
+        if module is not None and original is not None:
+            module.tqdm = original
 
 
 def _normalise_segment(segment):
@@ -88,11 +151,10 @@ def transcribe_audio(audio_path, model_name="base", use_gpu=True):
         # Start timing
         start_time = time.time()
 
-        # Transcribe with GPU optimization
-        result = model.transcribe(
-            audio_path,
-            fp16=(device == "cuda"),  # Use FP16 on GPU for faster processing
-            verbose=False,  # Disable whisper's verbose output to use our logger
+        # Transcribe with GPU optimization. Whisper's own tqdm frame bar is swapped for loguru
+        # progress so the wizard's log tail shows the decode advancing (see _transcribe_with_progress).
+        result = _transcribe_with_progress(
+            model, audio_path, fp16=(device == "cuda")
         )
 
         # Calculate processing metrics

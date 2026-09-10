@@ -45,26 +45,6 @@ def _read_optional_text(path: Path | None, label: str) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def _resolve_notes_answer(answer: str, output_dir: Path) -> Path | None:
-    """Resolve the guided `go` notes answer, which may be a path *or* inline text.
-
-    - blank            -> no notes
-    - an existing file -> use it as-is
-    - anything else     -> treat as inline notes, persisted to <output_dir>/notes.md
-      so the text reaches the summarizer and stays alongside the run artifacts.
-    """
-    answer = answer.strip()
-    if not answer:
-        return None
-    candidate = Path(answer).expanduser()
-    if candidate.is_file():
-        return candidate
-    notes_file = output_dir / "notes.md"
-    notes_file.write_text(answer + "\n", encoding="utf-8")
-    typer.echo(f"Saved inline notes to: {notes_file}")
-    return notes_file
-
-
 def _extract_audio_step(
     config: MinutiaSettings,
     input_video: Path,

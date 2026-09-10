@@ -170,28 +170,3 @@ class TestIdempotency:
         )
         assert result.exit_code == 0, result.output
         assert "skipping" in result.output
-
-
-class TestResolveNotesAnswer:
-    """`_resolve_notes_answer` takes inline text OR a file path (reused by the guided wizard)."""
-
-    def test_blank_returns_none(self, tmp_path):
-        assert minutia.cli._steps._resolve_notes_answer("", tmp_path) is None
-        assert minutia.cli._steps._resolve_notes_answer("   ", tmp_path) is None
-
-    def test_existing_file_is_used_as_path(self, tmp_path):
-        notes = tmp_path / "my_notes.md"
-        notes.write_text("desktop=Alice", encoding="utf-8")
-        result = minutia.cli._steps._resolve_notes_answer(str(notes), tmp_path)
-        assert result == notes
-        # a real path must not spawn an inline notes.md
-        assert not (tmp_path / "notes.md").exists()
-
-    def test_inline_text_is_persisted_to_notes_md(self, tmp_path):
-        out = tmp_path / "run"
-        out.mkdir()
-        text = "microphone track is Nick Grundl, desktop track is client"
-        result = minutia.cli._steps._resolve_notes_answer(text, out)
-        assert result is not None
-        assert result == out / "notes.md"
-        assert result.read_text(encoding="utf-8") == text + "\n"

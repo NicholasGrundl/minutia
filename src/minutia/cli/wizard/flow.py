@@ -26,7 +26,7 @@ from rich.text import Text
 
 from ...config import USER_CONFIG_FILE, MinutiaSettings, write_user_config
 from ...prompts import DEFAULT_PROMPT_KIND, list_prompt_kinds
-from .._steps import _read_optional_text, _resolve_notes_answer
+from .._steps import _read_optional_text
 from ..info import _list_recordings
 from . import tui
 
@@ -163,22 +163,40 @@ def run_setup(
 
 
 def _collect_notes(ui, output_dir: Path) -> tuple[bool, Path | None]:
-    """Notes panel: paste multi-line / point at a file / none. Returns ``(ok, path)``."""
+    """Notes panel: paste multi-line / point at a file / none. Returns ``(ok, path)``.
+
+    The menu choice determines the type — inline text is never probed as a path and vice versa.
+    """
     options = ["Paste notes", "Use a notes file", "No notes"]
     choice = ui.select([Text("Meeting notes (speaker names, context…)", style="bold")], options)
     if choice is None:
         return (False, None)
-    if choice == 0:
-        text = ui.prompt_notes([Text("Notes", style="bold")])
+
+    if choice == 0:  # inline paste — always notes text, written to notes.md
+        text = ui.prompt_notes([Text("Notes — paste freely, Ctrl-D to submit", style="bold")])
         if text is None:
             return (False, None)
-        return (True, _resolve_notes_answer(text, output_dir))
-    if choice == 1:
+        text = text.strip()
+        if not text:
+            return (True, None)
+        notes_file = output_dir / "notes.md"
+        notes_file.write_text(text + "\n", encoding="utf-8")
+        return (True, notes_file)
+
+    if choice == 1:  # a file path — always a path
         answer = ui.prompt_text([Text("Path to a notes file", style="bold")], title="notes.md")
         if answer is None:
             return (False, None)
-        return (True, _resolve_notes_answer(answer, output_dir))
-    return (True, None)
+        answer = answer.strip()
+        if not answer:
+            return (True, None)
+        path = Path(answer).expanduser()
+        if not path.is_file():
+            ui.console().print(f"Notes file not found: {path} — continuing without notes.")
+            return (True, None)
+        return (True, path)
+
+    return (True, None)  # No notes
 
 
 def _print_artifacts(ui, output_dir: Path, report: Path | None) -> None:

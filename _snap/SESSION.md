@@ -194,6 +194,37 @@ User ran `minutia` and gave feedback; all addressed:
 Gate: ruff + ty + **147/147**. Cold start still clean. `run_staged_progress` lost `setup_index`
 (dropped warmup/setup semantics — not used); tui progress tests rewritten for the StepError contract.
 
+### Live-feedback round 2 — inline notes crash (fixed properly, uncommitted)
+
+User pasted multi-line inline notes → `Wizard failed: [Errno 36] File name too long`.
+Root cause: `_collect_notes` routed BOTH menu choices through `_resolve_notes_answer`, which
+guessed path-vs-inline via `Path(answer).is_file()` — a long multi-line string overflows the
+filename limit → ENAMETOOLONG. (A leftover from the old single free-text `go` prompt that had to
+guess.) **Proper fix** (per user: the TUI already knows the type from the menu choice): rewrote
+`_collect_notes` to handle each branch explicitly — "Paste notes" is always inline → `notes.md`;
+"Use a notes file" is always a path → validated (friendly not-found). **Deleted** the guessing
+helper `_resolve_notes_answer` from `cli/_steps.py` + its `TestResolveNotesAnswer` tests. 144 pass;
+ruff + ty clean. **Uncommitted** (on top of 0f6fa3a).
+
+### Live-feedback round 3 — transcription progress visibility (uncommitted)
+
+User: log tail shows, but transcribe "stuck ~8 min" — hard to tell it's progressing (correct: local
+medium.en is slow, but no intra-step signal). Root cause: `transcribe_audio` called
+`model.transcribe(verbose=False)` → whisper's own tqdm frame bar goes to **stderr**, invisible under
+the wizard's Live screen, so loguru went quiet during the decode. Fix: `_transcribe_with_progress`
+swaps whisper's internal `tqdm` (via `sys.modules["whisper.transcribe"].tqdm`) for `_LoggingProgress`,
+which logs **audio-position progress** to loguru every 2% (`transcribing… 45% (12:30 / 28:00 of
+audio)`). Now the wizard log tail streams real progress (and `run pipeline` logs it too). Best-effort
++ restored in finally; whisper-mock tests unaffected. 144 pass; ruff + ty clean. **Uncommitted**.
+
+### Draft spec captured (2026-09-10)
+
+User confirmed a working end-to-end run ("crude but works") and logged 4 observations →
+`[draft]wizard-tui-progress-and-logs.md` (+ ROADMAP §Now item 4): un-clip long log paths; unify the
+progress updater and wire it to the TUI (replacing the `_LoggingProgress` stopgap); retire/relocate
+the moot `EN` header tag (associate w/ waveform); **scrollable full-run log history** (replace the
+per-stage `deque(maxlen=8)` tail). Downstream of `cli-wizard-redesign` — pick up after it closes.
+
 ## Nits noticed (not fixed — out of scope, revisit)
 
 - `src/minutia/__init__.py` still has `__version__ = "0.1.0"` (stale; pyproject is `0.3.0`). The

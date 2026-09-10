@@ -63,6 +63,10 @@ the tail is low-risk consolidation that every future direction wants.
    — orchestrator parity, then delete `baseline_pipeline.py`. **Depends on `eval-seams`** (its e2e
    test asserts the run-metadata sidecar). Retires the last pre-orchestrator script path (which
    `cli-wizard-redesign` already drops from the CLI surface) + updates `README.md`.
+4. **`[draft]`** [`wizard-tui-progress-and-logs`](./features/%5Bdraft%5Dwizard-tui-progress-and-logs.md)
+   — follow-up polish to the wizard TUI (captured from live dogfooding 2026-09-10): unify the
+   progress updater and wire it to the TUI, a scrollable full-run log history, un-clip long paths,
+   retire the moot `EN` tag. Downstream of `cli-wizard-redesign`; pick up after it closes.
 
 ## 🐕 In parallel — dogfooding
 
