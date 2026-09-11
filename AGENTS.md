@@ -123,32 +123,48 @@ target is broken until it's either restored or repointed at the `_snap` git work
 
 ### CLI Commands
 
+The CLI is a `cli/` subpackage (`src/minutia/cli/`) with a concise command tree. Bare `minutia`
+is a full-screen **rich wizard** (`cli/wizard/`); execution lives under `run`, read-only
+introspection under `info`, and first-run config under `setup`. Heavy imports (torch/whisper,
+anthropic) are lazy, so `--help`/`--version`/`info`/`setup` stay cold-start cheap.
+
 ```bash
-# Guided interactive run: pick a recording, choose a prompt kind, confirm cost
-minutia go              # browses MINUTIA_RECORDINGS_DIR
-minutia go .            # browse .mkv files in a specific directory instead
+# Bare command = the interactive wizard. Self-determines: if the recordings folder + API key
+# resolve it runs the guided pipeline; otherwise it walks setup first, then runs.
+minutia
 
-# Show resolved configuration and where each value came from
-minutia config
+# First-run / re-run config wizard: persists recordings folder + Anthropic API key to the user
+# config.env (chmod 600). Unconditional (runs even when already configured).
+minutia setup
 
-# Extract audio from MKV (INPUT optional when MINUTIA_RECORDINGS_DIR is set —
-# picks the newest recording; skips if outputs exist, --force to redo)
-minutia extract-audio [INPUT.mkv] [OUTPUT_DIR] [--mic-track 3] [--desktop-track 2] [--force]
+# Read-only introspection (no heavy imports)
+minutia info                 # resolved settings + provenance (was `minutia config`)
+minutia info config          # alias of bare `info`
+minutia info recordings      # list the newest .mkv files in the recordings folder
 
-# Transcribe audio files (skips if outputs exist)
-minutia transcribe MIC_AUDIO.wav DESKTOP_AUDIO.wav [OUTPUT_DIR] [--whisper-model medium.en] [--gpu/--no-gpu] [--force]
+# Run the whole pipeline non-interactively (INPUT optional when MINUTIA_RECORDINGS_DIR is set —
+# newest recording; cost gate mirrors `run summarize`: prompt / --yes / --dry-run)
+minutia run pipeline [INPUT.mkv] [OUTPUT_DIR] [--mic-track 3] [--desktop-track 2] \
+    [--prompt-kind ...] [--notes NOTES.md] [--personal-info ME.md] [--model ...] \
+    [--gpu/--no-gpu] [--force] [--dry-run] [--yes]
 
-# Merge transcripts
-minutia merge-transcripts MIC_TRANSCRIPT.json DESKTOP_TRANSCRIPT.json OUTPUT.json
-
-# Generate an AI-named markdown meeting report (cost estimate + confirm first)
-minutia summarize MERGED_TRANSCRIPT.json [OUTPUT_DIR] \
+# Individual stages (each skips if outputs exist; --force to redo)
+minutia run extract-audio [INPUT.mkv] [OUTPUT_DIR] [--mic-track 3] [--desktop-track 2] [--force]
+minutia run transcribe MIC_AUDIO.wav DESKTOP_AUDIO.wav [OUTPUT_DIR] [--whisper-model medium.en] [--gpu/--no-gpu] [--force]
+minutia run merge MIC_TRANSCRIPT.json DESKTOP_TRANSCRIPT.json OUTPUT.json
+minutia run summarize MERGED_TRANSCRIPT.json [OUTPUT_DIR] \
     [--prompt-kind minutia|baseline|realtor|slide-review|interview-debrief|discovery-summary] \
     [--notes NOTES.md] [--personal-info ME.md] [--model claude-sonnet-4-6] [--dry-run] [--yes]
 
-# Complete pipeline via the orchestrator (INPUT optional as above)
-minutia process-all [INPUT.mkv] [OUTPUT_DIR] [--mic-track 3] [--desktop-track 2] [--model claude-sonnet-4-6]
+# --version is a top-level eager option
+minutia --version
 ```
+
+**Removed** (superseded): `minutia go` and `minutia process-all` → the wizard + `run pipeline`;
+top-level `minutia config` → `minutia info`. The `PipelineOrchestrator` + `baseline_pipeline.py`
+are no longer on the CLI path (retired later by `orchestrator-retire-baseline`).
+
+**New deps**: `rich` (wizard rendering) + `python-yakh` (keystrokes).
 
 **Default track numbers**: OBS recordings typically use track 3 for microphone and track 2 for
 desktop audio (1-indexed).
@@ -159,8 +175,16 @@ desktop audio (1-indexed).
 
 ```
 src/minutia/
-├── cli.py                      # Typer-based CLI entry point
-├── config.py                   # Configuration loading
+├── cli/                        # Typer CLI subpackage (entry point: minutia.cli:main)
+│   ├── app.py                  # top-level app wiring + bare-wizard dispatch + --version
+│   ├── run.py                  # `run` group: pipeline + the four stage subcommands
+│   ├── setup.py                # `setup` command → the config wizard
+│   ├── info.py                 # `info` group: settings/provenance, recordings listing
+│   ├── _steps.py               # shared step helpers (heavy imports lazy inside them)
+│   └── wizard/                 # full-screen rich wizard
+│       ├── tui.py              # presentation chrome (rich + yakh), injectable for tests
+│       └── flow.py             # setup + guided-run flows and their pure cores
+├── config.py                   # Configuration loading + user-config writer (write_user_config)
 ├── logging.py                  # Loguru setup
 ├── paths.py                    # RunPaths — path/output management
 ├── run_metadata.py             # Run metadata tracking
@@ -200,7 +224,7 @@ Each module has a clear single responsibility:
 - **`steps/transcript_merger.py`**: Chronological merging logic
 - **`steps/summarize_transcript.py`**: Anthropic API integration
 - **`pipeline/orchestrator.py`**: Step coordination and progress reporting
-- **`cli.py`**: Command orchestration and user interaction
+- **`cli/`**: Command orchestration and user interaction (the wizard, `run`/`info`/`setup`)
 
 ### Audio Track Handling
 
@@ -233,8 +257,8 @@ ANTHROPIC_API_KEY=sk-ant-...      # Required for summarization
 
 Optional (all `MINUTIA_`-prefixed):
 ```bash
-MINUTIA_RECORDINGS_DIR=~/Videos   # Where OBS drops MKVs; enables bare `minutia process-all`
-                                  # (picks the newest .mkv and says so)
+MINUTIA_RECORDINGS_DIR=~/Videos   # Where OBS drops MKVs; the wizard + `minutia run pipeline`
+                                  # browse it (newest .mkv when no input is given)
 MINUTIA_OUTPUT_DIR=...            # Artifact home; defaults to ~/Documents/minutia (platformdirs)
 MINUTIA_WHISPER_MODEL=medium.en   # Whisper model (default: base)
 MINUTIA_SUMMARY_MODEL=...         # Summarization model
@@ -343,13 +367,13 @@ Each pipeline stage logs via loguru:
 
 ```bash
 # Extract and transcribe a recording, step by step
-uv run minutia extract-audio recording.mkv ./output/
-uv run minutia transcribe ./output/microphone_audio.wav ./output/desktop_audio.wav ./output/
-uv run minutia merge-transcripts ./output/microphone_transcript.txt ./output/desktop_transcript.txt ./output/merged.json
-uv run minutia summarize ./output/merged.json ./output/summary.txt
+uv run minutia run extract-audio recording.mkv ./output/
+uv run minutia run transcribe ./output/microphone_audio.wav ./output/desktop_audio.wav ./output/
+uv run minutia run merge ./output/microphone_transcript.json ./output/desktop_transcript.json ./output/merged.json
+uv run minutia run summarize ./output/merged.json ./output/
 
 # Full pipeline in one command
-uv run minutia process-all recording.mkv ./output/
+uv run minutia run pipeline recording.mkv ./output/
 
 # Development iteration cycle
 make lint-fix

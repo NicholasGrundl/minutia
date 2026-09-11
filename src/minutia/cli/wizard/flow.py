@@ -142,7 +142,12 @@ def run_setup(
     picked = options[choice]
     if picked.startswith("Paste"):
         key = ui.prompt_text(
-            [Text("Paste your Anthropic API key (it is stored locally, chmod 600)", style="bold")],
+            [
+                Text(
+                    "Paste your Anthropic API key (it is stored locally, chmod 600)",
+                    style="bold",
+                )
+            ],
             title="sk-ant-…",
         )
         if key and key.strip():
@@ -168,12 +173,16 @@ def _collect_notes(ui, output_dir: Path) -> tuple[bool, Path | None]:
     The menu choice determines the type — inline text is never probed as a path and vice versa.
     """
     options = ["Paste notes", "Use a notes file", "No notes"]
-    choice = ui.select([Text("Meeting notes (speaker names, context…)", style="bold")], options)
+    choice = ui.select(
+        [Text("Meeting notes (speaker names, context…)", style="bold")], options
+    )
     if choice is None:
         return (False, None)
 
     if choice == 0:  # inline paste — always notes text, written to notes.md
-        text = ui.prompt_notes([Text("Notes — paste freely, Ctrl-D to submit", style="bold")])
+        text = ui.prompt_notes(
+            [Text("Notes — paste freely, Ctrl-D to submit", style="bold")]
+        )
         if text is None:
             return (False, None)
         text = text.strip()
@@ -184,7 +193,9 @@ def _collect_notes(ui, output_dir: Path) -> tuple[bool, Path | None]:
         return (True, notes_file)
 
     if choice == 1:  # a file path — always a path
-        answer = ui.prompt_text([Text("Path to a notes file", style="bold")], title="notes.md")
+        answer = ui.prompt_text(
+            [Text("Path to a notes file", style="bold")], title="notes.md"
+        )
         if answer is None:
             return (False, None)
         answer = answer.strip()
@@ -192,7 +203,9 @@ def _collect_notes(ui, output_dir: Path) -> tuple[bool, Path | None]:
             return (True, None)
         path = Path(answer).expanduser()
         if not path.is_file():
-            ui.console().print(f"Notes file not found: {path} — continuing without notes.")
+            ui.console().print(
+                f"Notes file not found: {path} — continuing without notes."
+            )
             return (True, None)
         return (True, path)
 
@@ -220,9 +233,7 @@ def run_guided(config: MinutiaSettings, *, ui=tui) -> None:
     """The guided daily-driver run — pick, configure, confirm, process, summarize, report."""
     console = ui.console()
     if config.recordings_dir is None:
-        console.print(
-            "No recordings directory configured. Run `minutia setup` first."
-        )
+        console.print("No recordings directory configured. Run `minutia setup` first.")
         return
     recordings_dir = Path(config.recordings_dir).expanduser()
     if not recordings_dir.is_dir():

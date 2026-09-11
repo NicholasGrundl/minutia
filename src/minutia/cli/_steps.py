@@ -198,7 +198,9 @@ def run_full_pipeline(
     parsing (the callers own those). Returns the report path, or ``None`` for a dry run / when no
     summary was produced.
     """
-    _extract_audio_step(config, input_video, output_dir, mic_track, desktop_track, force)
+    _extract_audio_step(
+        config, input_video, output_dir, mic_track, desktop_track, force
+    )
     transcripts = _transcribe_step(
         config,
         output_dir / "microphone_audio.wav",

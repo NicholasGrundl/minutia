@@ -1,5 +1,5 @@
 ---
-state: active         # draft | ready | active | done | deprecated
+state: done           # draft | ready | active | done | deprecated
 changelog:
   "2026-09-09": "Initial spec — converged from an interactive PLAN session. Models the CLI on the
     sibling-project reference at _snap/reference/+cli_content/cli/. Prioritized FIRST, ahead of the
@@ -10,6 +10,12 @@ changelog:
     decision): the full non-interactive pipeline is `run pipeline` (a leaf subcommand with a
     positional INPUT), not bare `run` — a Typer group cannot take a positional arg on its callback
     alongside subcommands. Bare `run` lists its subcommands."
+  "2026-09-10": "All 8 tasks done → [active]→[done]. Built info group, wizard TUI (wine palette +
+    waveform-icon telemetry, user-directed design), config writer, both flows, bare-minutia
+    self-determination + setup command. Two live-dogfooding rounds fixed: ffmpeg overwrite crash,
+    no-traceback step failures, live log tail, whisper decode progress, metadata mkv picker,
+    notes-by-menu-choice. Follow-up polish parked as [draft]wizard-tui-progress-and-logs. Docs
+    rewritten for the new tree. Ready for PR + merge."
 ---
 
 # cli-wizard-redesign — CLI subpackage + rich first-run/guided wizard
@@ -109,10 +115,13 @@ persisted setup so the tool is ready after first run.
       `minutia setup` runs `run_setup` unconditionally (wizard lazy-imported inside). Tests: bare
       routes guided vs setup vs setup-then-guided vs cancel, + setup command (mocked flows). 4 tests;
       gate green (ruff + ty + 146 pytest).
-- [ ] **Docs + gate.** Rewrite the CLI sections of `README.md` + `AGENTS.md` for the new tree
-      (`run`/`setup`/`info`, bare wizard, `go`/`process-all` removed); note the new `rich`/`yakh`
-      deps and the persisted-key behavior. Full gate green (ruff + ty + pytest); retire/replace the
-      `go` + `process-all` tests.
+- [x] **Docs + gate.** Rewrote the CLI sections of `README.md`, `AGENTS.md`, `docs/setup.md`, and
+      `docs/running-the-pipeline.md` for the new tree (bare wizard / `setup` / `run pipeline` /
+      `run <step>` / `info`); `go`/`process-all`/top-level `config` removed everywhere; noted the
+      `rich`/`yakh` deps + persisted-key behavior; updated the src architecture tree to the `cli/`
+      subpackage. `go`/`process-all` tests were retired back in tasks 3–4. Gate green (ruff + ty on
+      `src tests`, 144 pytest). (Pre-existing ruff debt in skill-assets/experiments is out of scope
+      — CI checks `src tests` only.)
 
 ## Details
 

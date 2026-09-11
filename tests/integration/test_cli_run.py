@@ -62,9 +62,7 @@ def test_run_all_chains_pipeline_and_writes_report(
         return data
 
     # Lazy imports resolve step functions in their source modules — patch them there.
-    monkeypatch.setattr(
-        "minutia.steps.video_extraction.process_mkv_file", fake_extract
-    )
+    monkeypatch.setattr("minutia.steps.video_extraction.process_mkv_file", fake_extract)
     monkeypatch.setattr(
         "minutia.steps.audio_transcription.process_audio_files", fake_transcribe
     )

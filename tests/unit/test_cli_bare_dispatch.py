@@ -48,14 +48,18 @@ def test_bare_configured_runs_guided(runner, tmp_path, monkeypatch):
 def test_bare_unconfigured_runs_setup_then_cancels(runner, tmp_path, monkeypatch):
     calls: list[str] = []
     monkeypatch.setattr("minutia.cli.wizard.run_guided", _spy(calls, "guided"))
-    monkeypatch.setattr("minutia.cli.wizard.run_setup", _spy(calls, "setup", False))  # cancelled
+    monkeypatch.setattr(
+        "minutia.cli.wizard.run_setup", _spy(calls, "setup", False)
+    )  # cancelled
     env = {"MINUTIA_OUTPUT_DIR": str(tmp_path / "out")}  # no key, no recordings dir
     result = runner.invoke(minutia.cli.main, [], env=env)
     assert result.exit_code == 0, result.output
     assert calls == ["setup"]  # cancel → guided not reached
 
 
-def test_bare_unconfigured_setup_completes_then_runs_guided(runner, tmp_path, monkeypatch):
+def test_bare_unconfigured_setup_completes_then_runs_guided(
+    runner, tmp_path, monkeypatch
+):
     calls: list[str] = []
     monkeypatch.setattr("minutia.cli.wizard.run_guided", _spy(calls, "guided"))
     monkeypatch.setattr("minutia.cli.wizard.run_setup", _spy(calls, "setup", True))

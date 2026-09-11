@@ -153,9 +153,7 @@ def transcribe_audio(audio_path, model_name="base", use_gpu=True):
 
         # Transcribe with GPU optimization. Whisper's own tqdm frame bar is swapped for loguru
         # progress so the wizard's log tail shows the decode advancing (see _transcribe_with_progress).
-        result = _transcribe_with_progress(
-            model, audio_path, fp16=(device == "cuda")
-        )
+        result = _transcribe_with_progress(model, audio_path, fp16=(device == "cuda"))
 
         # Calculate processing metrics
         elapsed_time = time.time() - start_time

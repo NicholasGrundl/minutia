@@ -70,7 +70,9 @@ GpuOption = Annotated[
 ]
 DryRunOption = Annotated[
     bool,
-    typer.Option("--dry-run", help="Estimate tokens and price without generating summary"),
+    typer.Option(
+        "--dry-run", help="Estimate tokens and price without generating summary"
+    ),
 ]
 YesOption = Annotated[
     bool, typer.Option("--yes", "-y", help="Skip the cost confirmation prompt")

@@ -71,7 +71,9 @@ class TestInfoCommand:
         assert alias.exit_code == 0, alias.output
         # Same body (ignore the leading loguru init line, which carries a timestamp).
         assert "whisper_model =" in alias.output
-        assert alias.output.count("precedence:") == bare.output.count("precedence:") == 1
+        assert (
+            alias.output.count("precedence:") == bare.output.count("precedence:") == 1
+        )
 
     def test_info_recordings_lists_newest_first(self, runner, tmp_path):
         recordings = tmp_path / "recordings"

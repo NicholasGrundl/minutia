@@ -290,7 +290,9 @@ def select(
         rows: list[RenderableType] = []
         for i, opt in enumerate(options):
             if i == state["idx"]:
-                rows.append(Text(f"{SELECT_CURSOR} {opt:<{width}}  ", style=SELECT_STYLE))
+                rows.append(
+                    Text(f"{SELECT_CURSOR} {opt:<{width}}  ", style=SELECT_STYLE)
+                )
             else:
                 rows.append(Text(f"  {opt}"))
         rows += [Text(), Text(footer, style=DIM_STYLE)]
@@ -520,9 +522,7 @@ def run_staged_progress(
                 status.state = step.state or step.label
                 status.active = True
                 box: dict[str, Any] = {}
-                thread = threading.Thread(
-                    target=_worker, args=(step, box), daemon=True
-                )
+                thread = threading.Thread(target=_worker, args=(step, box), daemon=True)
                 thread.start()
                 while thread.is_alive():
                     status.wave_phase = (clock() - start) * _WAVE_SPEED

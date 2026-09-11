@@ -162,7 +162,9 @@ class TestIdempotency:
         def boom(*args, **kwargs):
             raise AssertionError("process_audio_files should not be called")
 
-        monkeypatch.setattr("minutia.steps.audio_transcription.process_audio_files", boom)
+        monkeypatch.setattr(
+            "minutia.steps.audio_transcription.process_audio_files", boom
+        )
         result = runner.invoke(
             minutia.cli.main,
             ["run", "transcribe", str(mic), str(desk), str(out)],

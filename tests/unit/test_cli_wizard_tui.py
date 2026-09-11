@@ -40,7 +40,9 @@ class TestPureHelpers:
 
     def test_header_renders_without_error(self):
         # Renders the full frame (wordmark + telemetry + rule) to plain text via the console.
-        frame = tui._screen([], tui.HeaderStatus(state="transcribe", active=True, detail="00:12.3"))
+        frame = tui._screen(
+            [], tui.HeaderStatus(state="transcribe", active=True, detail="00:12.3")
+        )
         with tui.console().capture() as cap:
             tui.console().print(frame)
         out = cap.get()
@@ -92,9 +94,7 @@ class TestPromptText:
         assert result == "a"
 
     def test_esc_returns_none(self):
-        result = tui.prompt_text(
-            [], key_source=_keys("esc"), render=lambda _f: None
-        )
+        result = tui.prompt_text([], key_source=_keys("esc"), render=lambda _f: None)
         assert result is None
 
 
@@ -130,7 +130,11 @@ class TestStagedProgress:
         assert painted == [(0.3, "extract"), (0.7, "transcribe"), (1.0, "Ready")]
 
     def test_step_failure_returns_step_error(self):
-        steps = [tui.Step(0.3, "extract", lambda: (_ for _ in ()).throw(RuntimeError("boom")))]
+        steps = [
+            tui.Step(
+                0.3, "extract", lambda: (_ for _ in ()).throw(RuntimeError("boom"))
+            )
+        ]
         results = tui.run_staged_progress(steps, [], render=lambda *_: None)
         assert len(results) == 1
         assert isinstance(results[0], tui.StepError)

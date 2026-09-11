@@ -66,7 +66,9 @@ class FakeUI:
 
 class TestPureCores:
     def test_detect_env_api_key_precedence(self):
-        assert flow.detect_env_api_key({"ANTHROPIC_API_KEY": "a", "MINUTIA_ANTHROPIC_API_KEY": "b"}) == (
+        assert flow.detect_env_api_key(
+            {"ANTHROPIC_API_KEY": "a", "MINUTIA_ANTHROPIC_API_KEY": "b"}
+        ) == (
             "ANTHROPIC_API_KEY",
             "a",
         )
@@ -95,7 +97,10 @@ class TestSetupFlow:
     def test_persists_pasted_recordings_dir_and_pasted_key(self, tmp_path):
         cfg_path = tmp_path / "config.env"
         ui = FakeUI(
-            selects=[1, 0],  # recordings: "Paste a folder path"; key: "Paste an API key"
+            selects=[
+                1,
+                0,
+            ],  # recordings: "Paste a folder path"; key: "Paste an API key"
             texts=[str(tmp_path / "videos"), "sk-ant-pasted"],
         )
         ok = flow.run_setup(self._config(tmp_path), ui=ui, env={}, config_path=cfg_path)
@@ -107,7 +112,10 @@ class TestSetupFlow:
     def test_uses_default_recordings_and_detected_env_key(self, tmp_path):
         cfg_path = tmp_path / "config.env"
         ui = FakeUI(
-            selects=[0, 1],  # recordings: "Use <default>"; key: "Use ANTHROPIC_API_KEY…"
+            selects=[
+                0,
+                1,
+            ],  # recordings: "Use <default>"; key: "Use ANTHROPIC_API_KEY…"
         )
         ok = flow.run_setup(
             self._config(tmp_path),
@@ -205,7 +213,12 @@ def test_guided_stop_at_confirm_skips_summary(guided_config, tmp_path, monkeypat
     from minutia.prompts import DEFAULT_PROMPT_KIND, list_prompt_kinds
 
     ui = FakeUI(
-        selects=[0, list_prompt_kinds().index(DEFAULT_PROMPT_KIND), 2, 1]  # confirm → "Stop here"
+        selects=[
+            0,
+            list_prompt_kinds().index(DEFAULT_PROMPT_KIND),
+            2,
+            1,
+        ]  # confirm → "Stop here"
     )
     flow.run_guided(guided_config, ui=ui)
     text = ui.console().text
@@ -218,7 +231,12 @@ def test_guided_notes_paste_is_persisted(guided_config, tmp_path, monkeypatch):
     from minutia.prompts import DEFAULT_PROMPT_KIND, list_prompt_kinds
 
     ui = FakeUI(
-        selects=[0, list_prompt_kinds().index(DEFAULT_PROMPT_KIND), 0, 0],  # notes → "Paste notes"
+        selects=[
+            0,
+            list_prompt_kinds().index(DEFAULT_PROMPT_KIND),
+            0,
+            0,
+        ],  # notes → "Paste notes"
         notes=["desktop=Alice, mic=Nick"],
     )
     flow.run_guided(guided_config, ui=ui)
@@ -227,7 +245,9 @@ def test_guided_notes_paste_is_persisted(guided_config, tmp_path, monkeypatch):
     assert "desktop=Alice" in notes_file.read_text(encoding="utf-8")
 
 
-def test_guided_stage_failure_is_reported_not_raised(guided_config, tmp_path, monkeypatch):
+def test_guided_stage_failure_is_reported_not_raised(
+    guided_config, tmp_path, monkeypatch
+):
     _mock_pipeline(monkeypatch, tmp_path)
 
     def boom(*a, **k):

@@ -5,7 +5,7 @@ AI-generated meeting report. There are three ways to run it — pick based on ho
 much control you want.
 
 > **Invocation note:** examples use `minutia`. If the console script isn't on your
-> `PATH`, prefix every command with `uv run` (e.g. `uv run minutia go`).
+> `PATH`, prefix every command with `uv run` (e.g. `uv run minutia`).
 
 ---
 
@@ -23,10 +23,13 @@ much control you want.
 
 ```bash
 export MINUTIA_RECORDINGS_DIR=~/Videos        # where OBS drops .mkv files;
-                                              # enables bare `minutia go` / `process-all`
+                                              # the wizard + `minutia run pipeline` browse it
 export MINUTIA_OUTPUT_DIR=~/Documents/minutia # where artifacts are written
 export MINUTIA_WHISPER_MODEL=medium.en        # transcription model (default: base)
 ```
+
+> **Tip:** rather than exporting these by hand, run **`minutia setup`** once — it
+> persists your recordings folder and API key to the user config for you.
 
 **OBS audio tracks** — OBS records 1-indexed tracks; Minutia defaults to
 **track 3 = microphone**, **track 2 = desktop**. Override per-run with
@@ -35,7 +38,8 @@ export MINUTIA_WHISPER_MODEL=medium.en        # transcription model (default: ba
 **Check what's resolved** — this prints every config value and which layer supplied it:
 
 ```bash
-minutia config
+minutia info                 # resolved settings + provenance
+minutia info recordings      # list the newest .mkv files in the recordings folder
 ```
 
 ### Configuration layers
@@ -56,8 +60,8 @@ stopping at the first `.git` or `pyproject.toml` project boundary and before the
 directory. It never chooses configuration based on the input recording or output directory.
 
 ```bash
-minutia --env-file ./client.env config  # select an exact contextual file
-minutia --no-env-file config            # use global config + process env only
+minutia --env-file ./client.env info  # select an exact contextual file
+minutia --no-env-file info            # use global config + process env only
 ```
 
 Relative paths in an env-format file are resolved from that file's directory. Relative paths from
@@ -71,41 +75,47 @@ Best for real use. Each step is **idempotent** — it skips work when its output
 already exist (pass `--force` to redo a step). This matters because transcription
 is slow and one-time, while summarization is the part you iterate (see below).
 
+Each stage is a subcommand of `minutia run`:
+
 ```bash
 # 1. Extract the two audio tracks from the MKV
-minutia extract-audio recording.mkv ./out/
+minutia run extract-audio recording.mkv ./out/
 #    -> ./out/microphone_audio.wav
 #    -> ./out/desktop_audio.wav
 
 # 2. Transcribe both tracks with Whisper
-minutia transcribe ./out/microphone_audio.wav ./out/desktop_audio.wav ./out/
+minutia run transcribe ./out/microphone_audio.wav ./out/desktop_audio.wav ./out/
 #    -> ./out/microphone-whisper-medium.en_transcription.json
 #    -> ./out/desktop-whisper-medium.en_transcription.json
 #    (the model name is baked into the filename; it's `base` unless you set
 #     MINUTIA_WHISPER_MODEL or pass --whisper-model)
 
 # 3. Merge the two transcripts chronologically
-minutia merge-transcripts \
+minutia run merge \
     ./out/microphone-whisper-medium.en_transcription.json \
     ./out/desktop-whisper-medium.en_transcription.json \
     ./out/merged_transcript.json
 
 # 4. Generate the AI-named markdown report (shows a cost estimate + confirm first)
-minutia summarize ./out/merged_transcript.json ./out/ --prompt-kind minutia
+minutia run summarize ./out/merged_transcript.json ./out/ --prompt-kind minutia
 #    -> ./out/<AI-generated-name>.md
 ```
 
 ---
 
-## Fastest: guided run
+## Fastest: the guided wizard
 
-One interactive command. It browses your recordings directory, lets you pick the
-recording and prompt kind, and confirms the cost before spending anything.
+Just run `minutia`. The bare command is a full-screen wizard that browses your
+recordings folder, lets you pick the recording (with its date, size, and length)
+and summary style, attach notes, and confirms the cost before spending anything —
+then runs the whole pipeline with live progress.
 
 ```bash
-minutia go                # browses MINUTIA_RECORDINGS_DIR
-minutia go ./some/dir     # browse a specific directory instead
+minutia            # the wizard (first run walks setup, then guides each run)
 ```
+
+If your recordings folder or API key aren't configured yet, the wizard runs
+**setup** first (or run `minutia setup` on its own anytime).
 
 ---
 
@@ -116,9 +126,9 @@ for scripting. With `MINUTIA_RECORDINGS_DIR` set, the input is optional and the
 newest `.mkv` is used.
 
 ```bash
-minutia process-all recording.mkv ./out/
-minutia process-all recording.mkv ./out/ --model claude-sonnet-4-6
-minutia process-all                        # newest recording, default output dir
+minutia run pipeline recording.mkv ./out/
+minutia run pipeline recording.mkv ./out/ --model claude-sonnet-4-6
+minutia run pipeline --yes                    # newest recording, skip the cost prompt
 ```
 
 ---
@@ -132,19 +142,19 @@ personal-info — without re-transcribing:
 
 ```bash
 # Try a different summary flavor
-minutia summarize ./out/merged_transcript.json ./out/ --prompt-kind realtor
+minutia run summarize ./out/merged_transcript.json ./out/ --prompt-kind realtor
 
 # Feed per-meeting notes / a speaker mapping, plus your personal-info file
-minutia summarize ./out/merged_transcript.json ./out/ \
+minutia run summarize ./out/merged_transcript.json ./out/ \
     --prompt-kind minutia \
     --notes ./meeting-notes.md \
     --personal-info ./me.md
 
 # See the token estimate + price WITHOUT calling the API
-minutia summarize ./out/merged_transcript.json ./out/ --dry-run
+minutia run summarize ./out/merged_transcript.json ./out/ --dry-run
 
 # Skip the cost confirmation prompt (for scripts)
-minutia summarize ./out/merged_transcript.json ./out/ --yes
+minutia run summarize ./out/merged_transcript.json ./out/ --yes
 ```
 
 **Available prompt kinds** (`--prompt-kind`): `minutia` (default), `baseline`,
