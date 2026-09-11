@@ -23,6 +23,10 @@ jobs:
       # here is a fast, green lint + type gate on main and PRs. Scope matches the
       # local gate (justfile + [tool.ty.src]): src + tests. `ty check` takes no path
       # arg — its scope lives in [tool.ty.src] in pyproject.toml.
-      - run: uv run ruff format --check src tests
-      - run: uv run ruff check src tests
-      - run: uv run ty check
+      # --extra cpu on every `uv run` too: without it, `uv run` reconciles the env
+      # back to the default resolution (CUDA torch on Linux), tearing out the CPU
+      # torch the sync just installed and re-downloading ~2.6 GB of nvidia-* wheels
+      # before each command. Keeping the extra consistent = no torch swap.
+      - run: uv run --extra cpu ruff format --check src tests
+      - run: uv run --extra cpu ruff check src tests
+      - run: uv run --extra cpu ty check
