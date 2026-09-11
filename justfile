@@ -37,6 +37,14 @@ create-env-file:
     fi
 
 # ---------------------------------------------------------------------------
+# Tool install
+# ---------------------------------------------------------------------------
+
+# Reinstall the minutia CLI tool from the latest main on GitHub
+reinstall:
+    uv tool install --force git+https://github.com/NicholasGrundl/minutia@main
+
+# ---------------------------------------------------------------------------
 # Code quality
 # ---------------------------------------------------------------------------
 
