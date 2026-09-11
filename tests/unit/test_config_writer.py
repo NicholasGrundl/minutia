@@ -66,7 +66,9 @@ def test_idempotent_rewrite(tmp_path):
 def test_does_not_log_the_secret(tmp_path, caplog):
     target = tmp_path / "config.env"
     with caplog.at_level("DEBUG"):
-        write_user_config({"MINUTIA_ANTHROPIC_API_KEY": "sk-ant-supersecret"}, path=target)
+        write_user_config(
+            {"MINUTIA_ANTHROPIC_API_KEY": "sk-ant-supersecret"}, path=target
+        )
     assert "sk-ant-supersecret" not in caplog.text
 
 

@@ -44,7 +44,9 @@ def _dispatch_bare(
         if not run_setup(config):
             return  # user cancelled setup
         # Re-resolve so the just-persisted recordings dir + key take effect, then run.
-        resolution = resolve_settings(env_file=env_file, discover_dotenv=not no_env_file)
+        resolution = resolve_settings(
+            env_file=env_file, discover_dotenv=not no_env_file
+        )
         run_guided(resolution.settings)
     except KeyboardInterrupt:
         typer.echo("\nCancelled.")
@@ -55,6 +57,7 @@ def _dispatch_bare(
         # user gets a clean message, never a traceback.
         logger.exception("Wizard failed: {}", exc)
         raise click.ClickException(str(exc)) from exc
+
 
 EnvFileOption = Annotated[
     Path | None,
