@@ -23,7 +23,7 @@ changelog:
 ## Executive Overview
 
 Rebuild minutia's CLI from a flat 672-line `cli.py` into a clean `cli/` **subpackage** with a
-concise top-level surface and a **full-screen rich wizard**, modeled on the sibling-project reference CLI
+concise top-level surface and a **full-screen rich wizard**, modeled on a sibling project's reference CLI
 (`_snap/reference/+cli_content/cli/`). The bare `minutia` command becomes the opinionated daily
 driver: it self-determines — run the guided pipeline, or walk a first-run setup wizard (persisting
 the API key + recordings dir) when unconfigured, then run. Power-user execution moves under a `run`
@@ -127,7 +127,7 @@ persisted setup so the tool is ready after first run.
 
 ### Reference
 
-Model: `_snap/reference/+cli_content/cli/` (the sibling-project CLI). Patterns to mirror:
+Model: `_snap/reference/+cli_content/cli/` (a sibling project's CLI). Patterns to mirror:
 - **Thin `app.py`** that only *wires* (`app.command(...)(fn)`, `app.add_typer(sub, name=...)`).
 - **Self-determining bare command** (`invoke_without_command=True` + a callback that dispatches when
   no subcommand is given).

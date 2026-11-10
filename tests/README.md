@@ -2,8 +2,7 @@
 
 How the suite is laid out, what the fixtures do, and the exact setup sequence a
 test goes through. For the *why* (decisions, target design) see
-[`_snap/features/[draft]tests-refactor.md`](../_snap/features/%5Bdraft%5Dtests-refactor.md);
-reusable principles live in [`_snap/context/testing-practices/`](../_snap/context/testing-practices/).
+[`_snap/archive/features/[done]tests-refactor.md`](../_snap/archive/features/%5Bdone%5Dtests-refactor.md).
 
 ## Layout & tiers
 

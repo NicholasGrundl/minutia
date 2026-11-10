@@ -25,9 +25,10 @@ see [`_snap/AGENTS.md`](./_snap/AGENTS.md) for the full system. In short:
 - **`_snap/SESSION.md`** — current session's ephemeral scratchpad (the *present*)
 - **`_snap/DECISIONS.md`** — append-only log of what was done and why (the *past*)
 - **`_snap/features/`** — one spec per feature, e.g. `[active]refactor_to_cli.md`
-- **`_snap/context/`** — reference docs per topic (ffmpeg, pytest, anthropic, whisper, etc.)
-- **`_snap/skills/`** — activated into `.claude/skills/` as `/snap`, `/snap-git`,
-  `/snap-script`, `/snap-search`, `/snap-wiki`
+- **`_snap/archive/`** — completed feature specs and the stabilization brief
+
+The session playbooks and skills that drive this workflow live in a private repo. This repo
+carries the project-specific artifacts they produce.
 
 There is no separate `design/design.md` or `TASKS-TODO.md` at repo root — that content now
 lives in `_snap/features/` and `_snap/ROADMAP.md` respectively.
@@ -36,8 +37,7 @@ lives in `_snap/features/` and `_snap/ROADMAP.md` respectively.
 
 **IMPORTANT**: When working with any package or library, **always consult the official
 documentation FIRST** before making implementation decisions. Use the links below to fetch
-current API information and best practices; deeper reference material for these is also
-cached per-topic under `_snap/context/`.
+current API information and best practices.
 
 ### Core Dependencies
 
@@ -78,9 +78,7 @@ cached per-topic under `_snap/context/`.
 
 1. **ALWAYS check official docs FIRST** before implementing features or debugging issues.
 2. **Fetch docs when uncertain** — use WebFetch to get the latest documentation.
-3. **Add new docs to `_snap/context/`** as a new topic subfolder when you find helpful
-   documentation for a package not already covered.
-4. **Prefer official sources** — official documentation > blog posts > Stack Overflow.
+3. **Prefer official sources** — official documentation > blog posts > Stack Overflow.
 
 ## Development Commands
 
@@ -115,11 +113,6 @@ make jupyter                # or: uv run jupyter lab --autoreload
 make clean                  # clean build artifacts
 uv run minutia --help       # run CLI commands
 ```
-
-**Note**: `make commit` currently shells out to `.claude/hooks/macro-commit.sh --force`, which
-no longer exists (archived at `_snap/archive/old_claude_stuff/hooks/macro-commit.sh`) — this
-target is broken until it's either restored or repointed at the `_snap` git workflow
-(`/snap-git`). See `opensource_polishing.md` for tracking.
 
 ### CLI Commands
 
@@ -284,20 +277,18 @@ them. Relative process-environment and CLI paths are anchored to the invocation 
 
 **Never commit `.env` or real API keys.** `.gitignore` already excludes `.env*`.
 
-## AI-Assisted Workflow: `_snap` Skills
+## AI-Assisted Workflow: `_snap`
 
-The project uses the `_snap` skill system (activated in `.claude/skills/`) for planning and
-session workflows instead of the older, retired `.claude/commands/` slash-command convention:
+Features are planned, built, and reconciled through a spec-driven loop whose state lives in
+`_snap/` (see [`_snap/AGENTS.md`](./_snap/AGENTS.md)):
 
-- **`/snap`** — router: PLAN / BUILD / ALIGN a feature (interviews you, writes/updates specs
-  in `_snap/features/`, updates `_snap/ROADMAP.md`)
-- **`/snap-git`** — composes `[MACRO]` checkpoint commit messages from the working tree
-- **`/snap-script`** — authors PEP 723 single-file `uv run` scripts
-- **`/snap-search`** — filesystem exploration via `tree` before making changes
-- **`/snap-wiki`** — fetch reference material into `_snap/context/`
+- **PLAN** — interview, then write a spec in `_snap/features/` and add it to `_snap/ROADMAP.md`
+- **BUILD** — work the spec's task checklist; scratch notes go in `_snap/SESSION.md`
+- **CLOSE** — condense the session into `_snap/DECISIONS.md`
+- **ALIGN** — reconcile the roadmap, specs, and decisions against the code
 
-The prior `align-design` / `begin-tasks` / `commit-progress` / `macro-commit` slash commands
-are retired and archived at `_snap/archive/old_claude_stuff/`.
+`[MACRO]` commits mark the checkpoints at task and feature boundaries
+(`git log --grep '\[MACRO\]'`).
 
 ## Testing Strategy
 
@@ -341,7 +332,7 @@ pytest -m "unit or integration or slow" # Full validation (CI/nightly)
 ### Adding New Features
 
 1. Check `_snap/ROADMAP.md` and the relevant `_snap/features/*.md` spec first.
-2. If a feature needs planning, use `/snap` rather than starting ad hoc.
+2. If a feature needs planning, write a spec in `_snap/features/` first rather than starting ad hoc.
 3. Always add tests (or at minimum, manual testing steps).
 4. Update CLI help text and this file as needed.
 
@@ -357,8 +348,7 @@ Each pipeline stage logs via loguru:
 
 - Do not discard or overwrite user-maintained files; if manual edits exist, adapt around them.
 - Explain non-obvious code with short comments; avoid redundant commentary.
-- If external documentation is required, prefer official sources (links above), and cache
-  useful finds into `_snap/context/`.
+- If external documentation is required, prefer official sources (links above).
 - Surface assumptions or unresolved questions in your final summary so the user can follow up.
 - Per `_snap` convention: every `mv`/`git mv` is a separate, individually-approved,
   individually-committed operation — never bundled with content edits.

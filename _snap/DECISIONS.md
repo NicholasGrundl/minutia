@@ -95,7 +95,7 @@ close.
 
 - **Set out to:** Author the CI/release half of the tooling modernization — tasks 2–6 of the
   spec: `scripts/release.py`, `.github/workflows/ci.yml` + `release.yml`, justfile `tag-*`
-  recipes — adapted from the sibling-project templates at `_snap/reference/ci_content/`.
+  recipes — adapted from a sibling project's templates.
 - **Why:** With `main` promoted (PR #1) and the base green, the branch precondition was met; a
   lint/type gate on `main` plus reproducible tagged releases is the next block off the new trunk.
 - **How it ended:** Done for tasks 2–6, all validated locally.

@@ -18,7 +18,7 @@ changelog:
 
 ## Executive Overview
 
-Add GitHub Actions CI and release automation, adapted from the sibling-project sibling project's
+Add GitHub Actions CI and release automation, adapted from a sibling project's
 templates captured at `_snap/reference/ci_content/` (`ci.yml`, `release.yml`, `release.py`).
 
 - **CI** (`ci.yml`) — on push-to-`main` + PRs: `uv sync`, `ruff format --check`, `ruff check`,
@@ -68,7 +68,7 @@ CI runs it).
 ## Details
 
 - **Reference files:** `_snap/reference/ci_content/{ci.yml,release.yml,release.py}` — copy and
-  adapt, don't wholesale-import (the reference targets the sibling-project package and its `ty` layout).
+  adapt, don't wholesale-import (the reference targets a different package and its `ty` layout).
 - **Version source of truth:** `pyproject.toml` `[project].version` (hatchling, static). The
   `release.yml` guard reads it via `uv version --short`; `release.py` bumps it via
   `uv version --bump {patch|minor|major}`.

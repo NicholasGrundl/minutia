@@ -7,6 +7,13 @@ Each entry: `YYYY-MM-DD` · `path(s)` · short why.
 
 ---
 
+**2026-11-10** · `skills/`, `prompts/`, `context/`, `archive/blueprint/`, `archive/old_claude_stuff/`,
+`reference/ci_content/` (plus the activated copies in `.claude/skills/` and `.agents/skills/`)
+→ removed from this repo, not archived here · Public-release prune. The playbooks and skills are
+the reusable workflow and live in a private repo; `context/` was cached third-party documentation;
+the blueprint and old-command archives were superseded planning material. The project-specific
+record stays: `ROADMAP.md`, `DECISIONS.md`, `features/`, `archive/features/`.
+
 **2026-09-09** · `features/[done]{ci-release-pipelines,finish-cli-parity,justfile-migration,refactor_to_cli,settings-resolution,tests-refactor}.md`
 → `archive/features/` · The stabilization arc is complete and shipped (base on `main`, CI +
 releases live, `v0.3.0` out). Archived all six `[done]` specs to keep `features/` scoped to live

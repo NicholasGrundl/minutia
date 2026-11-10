@@ -20,7 +20,7 @@ rides along when the base is promoted to `main` — the `just`+`ty` dev loop is 
 base, while the GitHub Actions workflows (which only "go live" once `main` is the real trunk)
 are deliberately split into their own post-promotion feature.
 
-Reference: `just` and `ty` usage patterns come from the sibling-project sibling project, captured at
+Reference: `just` and `ty` usage patterns come from a sibling project, captured at
 `_snap/reference/ci_content/justfile`. Cached docs: `_snap/context/just/`, `_snap/context/ty/`,
 `_snap/context/uv/`.
 
