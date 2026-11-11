@@ -14,6 +14,23 @@ and add it to [`ROADMAP.md`](../ROADMAP.md).
 
 ---
 
+### Test-suite + fixtures sprint: benchmark fixtures, synthetic data, evals-in-tests
+
+- **Context**: 2026-11-11 — raised while planning `public-release`. The current fixtures
+  (`tests/fixtures/scenarios/`) are a handful of golden samples, two of them large third-party
+  media clips kept in HEAD for launch. The idea: rebuild the fixture set as a **benchmark-style
+  corpus** that evals can build on, add **primitives for synthetic data generation**, and make
+  the test suite *include* evals — e.g. a pytest extension or an in-`tests/` toolkit
+  (working name `pyevals`) that generates synthetic data and scores pipeline outputs.
+- **When**: first sprint after the repo is public. Prepares the ground for `eval-seams` →
+  `evals-harness`.
+- **Options**: (a) fixtures + synthetic-data primitives only, evals later; (b) a `tests/`
+  toolkit that both generates data and runs evals as pytest tests; (c) a standalone pytest
+  plugin. The full design is not needed yet.
+- **Effort**: Medium (sprint-sized); the plugin variant is Large.
+- **Decision**: 2026-11-11 — third-party fixtures stay in HEAD for launch; replacing them is
+  part of this sprint, not `public-release`.
+
 ### Dev-env modernization: direnv (.envrc)
 
 - **Context**: 2026-07-02 — user is migrating dev tooling. The **justfile** half was PROMOTED

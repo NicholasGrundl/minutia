@@ -10,7 +10,8 @@ rebuild notebooks clean, then re-cut feature branches from `main`. **That plan i
 the base is on `main`, CI + releases are live, and `v0.3.0` is out. This ROADMAP has been
 re-ordered around what comes *after* stabilization.
 
-*Last updated: 2026-09-10 (BUILD complete: `cli-wizard-redesign` `[active]→[done]` — all 8 tasks +
+*Last updated: 2026-11-11 (PLAN: added `[ready]public-release` as the new §Now; the refactor tail
+moves to §Then. Earlier, 2026-09-10: BUILD complete: `cli-wizard-redesign` `[active]→[done]` — all 8 tasks +
 two live-dogfooding rounds; moved to §Done, pending PR from `cli_commands`. §Now is now the refactor
 tail: `eval-seams` → `orchestrator-retire-baseline`. Added `[draft]wizard-tui-progress-and-logs` as
 the wizard follow-up polish. Earlier (2026-09-09): PLAN added the redesign spec; reprioritization
@@ -48,7 +49,15 @@ The whole stabilization arc is complete and shipped. Condensed here; narrative i
 (ruff + ty + 100 pytest); CLI validated on a real meeting; CI gating `main`; reproducible tagged
 releases; `pyproject` at `0.3.0`.
 
-## 🔨 Now — finish the refactor tail
+## 🚀 Now — go public
+
+0. **`[ready]`** [`public-release`](./features/%5Bready%5Dpublic-release.md) — finish the
+   `public-cleanup` branch (snap workspace local-only, eight small polish commits), fast-forward
+   `main`, publish `v0.2.0`–`v0.4.0` + cut `v0.4.1`, flip the repo public. Deliberately small
+   (user decision, 2026-11-11): dead code, fixtures and the summarizer rework stay for visible
+   work after launch. **Everything below resumes once this ships.**
+
+## 🔨 Then — finish the refactor tail
 
 The CLI polish landed first (user decision, 2026-09-09); the tail is low-risk consolidation that
 every future direction wants.
@@ -98,8 +107,12 @@ findings once the tail lands.
 
 - **`[draft]`** [`notebooks-clean-rebuild`](./features/%5Bdraft%5Dnotebooks-clean-rebuild.md) —
   rebuild `notebooks/` on synthetic data, outputs stripped, thin over the package.
-- **`[backlog]`** open-source release prep — audit in `+planning/opensource_polishing.md`
-  (local-only). See `EXECUTIVE_SUMMARY.md` §2 for completed privacy work + loose ends.
+- **Promoted 2026-11-11:** open-source release prep is now
+  [`public-release`](./features/%5Bready%5Dpublic-release.md) (§Now).
+- **`[backlog]`** test-suite + fixtures sprint — benchmark-style fixtures, synthetic-data
+  primitives, evals inside the test suite. First sprint after launch; see
+  [`BACKLOG.md`](./features/BACKLOG.md).
+- **Follow-up:** README screenshot/GIF of the wizard (first commit after going public).
 
 ## Known issues (tracked here until they earn a feature)
 
