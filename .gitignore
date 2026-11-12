@@ -13,8 +13,11 @@
 .DS_Store
 
 
-/_snap/reference/+*/
-
+# Local-only planning workspace and agent tooling
+/_snap/
+/.claude/
+/.agents/
+*:Zone.Identifier
 
 
 
