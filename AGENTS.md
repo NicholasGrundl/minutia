@@ -344,9 +344,6 @@ uv run minutia <command>
 
 - **`ty` baseline**: pre-existing type errors are baselined per file and per rule via
   `[[tool.ty.overrides]]` in `pyproject.toml`; new errors elsewhere still fail `just ty`.
-- **Unknown summary model**: `steps/summarize_transcript.py` looks a model up with
-  `anthropic_models.get(model_name)["name"]`, which fails with a `TypeError` for a model name
-  that is not in the registry.
 
 ## Dependencies & Performance
 
