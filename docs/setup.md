@@ -14,25 +14,10 @@ command in its own isolated environment, independent of any source checkout.
 - **`ffmpeg`** on your `PATH` — used to extract audio tracks from `.mkv` recordings
   (install via your OS package manager, e.g. `apt install ffmpeg` / `brew install ffmpeg`).
 - **An Anthropic API key** for summarization (`ANTHROPIC_API_KEY`).
-- **[`gh`](https://cli.github.com/) authenticated** — needed only while the repo is
-  private (see auth step below). Once the repo is public, installs need no auth.
 
 ## Install as a tool (recommended)
 
-### 1. One-time GitHub auth (private repo only)
-
-Installing from a private repo over HTTPS needs git to have credentials. The simplest
-modern path is to let the GitHub CLI act as git's credential helper:
-
-```bash
-gh auth login        # if you aren't already logged in
-gh auth setup-git    # wire `gh` as git's HTTPS credential helper for github.com
-```
-
-This only affects **HTTPS** git operations; an existing SSH `origin` and push flow are
-untouched. Prefer keys? See the [SSH alternative](#ssh-alternative).
-
-### 2. Install from `main`
+### Install from `main`
 
 ```bash
 uv tool install git+https://github.com/NicholasGrundl/minutia@main
@@ -41,16 +26,15 @@ uv tool install git+https://github.com/NicholasGrundl/minutia@main
 No `--python` flag is needed with a recent uv — it honors the project's
 `requires-python` cap and picks a compatible interpreter (3.12) on its own.
 
-Once the repo is public, the same command needs no auth. Once tagged releases exist,
-pin one instead of tracking `main`:
+To pin a tagged release instead of tracking `main`:
 
 ```bash
-uv tool install git+https://github.com/NicholasGrundl/minutia@v0.2.0
+uv tool install git+https://github.com/NicholasGrundl/minutia@v0.4.0
 ```
 
 ### SSH alternative
 
-If you authenticate to GitHub with an SSH key rather than the `gh` credential helper:
+If you prefer to fetch over SSH with your GitHub key:
 
 ```bash
 uv tool install git+ssh://git@github.com/NicholasGrundl/minutia@main

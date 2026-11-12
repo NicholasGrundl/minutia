@@ -18,9 +18,6 @@ the **anthropic 1.x** SDK.
 The recommended way to run minutia is as a `uv` tool installed from the repo:
 
 ```bash
-# One-time GitHub auth (only while the repo is private):
-gh auth setup-git
-
 # Install the `minutia` command in its own isolated environment:
 uv tool install git+https://github.com/NicholasGrundl/minutia@main
 ```
