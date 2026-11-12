@@ -1,8 +1,7 @@
 # Minutia test suite
 
 How the suite is laid out, what the fixtures do, and the exact setup sequence a
-test goes through. For the *why* (decisions, target design) see
-[`_snap/archive/features/[done]tests-refactor.md`](../_snap/archive/features/%5Bdone%5Dtests-refactor.md).
+test goes through.
 
 ## Layout & tiers
 

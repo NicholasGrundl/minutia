@@ -77,10 +77,6 @@ just test          # run the test suite (forwards args, e.g. `just test -k merge
 
 Run `just` with no arguments to list every recipe.
 
-The roadmap and feature specs live in `_snap/` — see `_snap/ROADMAP.md` for
-what's next and `_snap/features/` for per-feature specs. Follow the phase order
-described there when extending the CLI.
-
 ## Baseline Pipeline (legacy fallback)
 
 Before the CLI orchestrator existed, the extracted notebook workflow ran as a
