@@ -42,7 +42,10 @@ def _format_record(record: dict) -> str:
         "{extra[step]:<16} | "
         "{extra[input_file]} | "
         "{extra[run_root]} | "
-        "{message}"
+        # loguru appends the line terminator only for string formats; a callable
+        # format has to spell it out. `{exception}` is left out on purpose: failures
+        # log their message via `logger.exception("...: {}", exc)` without a traceback.
+        "{message}\n"
     )
 
 
