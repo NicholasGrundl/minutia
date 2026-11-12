@@ -24,7 +24,6 @@ classifiers = [
 dependencies = [
     "isodate",
     "loguru>=0.7.3",
-    "nanoid",
     # Data / validation
     "numpy",
     "pydantic",
@@ -38,14 +37,11 @@ dependencies = [
     # for every install path by [tool.uv] constraint-dependencies.
     "openai-whisper",
     "tiktoken",
-    "transformers",
     # LLM clients
     # Pin to the 1.x major: the 0.x -> 1.x jump removed sampling params
     # (temperature/top_p/top_k) from messages.create(). Keep dev and tool
     # installs on the same major so this drift can't recur.
     "anthropic>=1.4",
-    "instructor",
-    "openai",
     "typer>=0.25.1",
     "platformdirs>=4.9.6",
     "pydantic-settings>=2.15.0",
