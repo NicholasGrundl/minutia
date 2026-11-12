@@ -1,8 +1,7 @@
 # AGENTS.md
 
 This file provides guidance to AI coding agents (Claude Code, etc.) working in this repository.
-It is the **canonical** instructions file — `CLAUDE.md` is a symlink to it (per the `_snap`
-convention: `AGENTS.md` canonical, `CLAUDE.md`/`GEMINI.md` symlinks).
+It is the **canonical** instructions file — `CLAUDE.md` is a pointer to it.
 
 ## Project Overview
 
@@ -10,28 +9,15 @@ Minutia is a meeting recording, transcription, and summarization tool. It extrac
 from OBS-recorded MKV files, transcribes them using Whisper, merges the transcripts
 chronologically, and generates AI-powered summaries using Anthropic Claude.
 
-**Current status**: mid-refactor from a Jupyter-notebook-driven workflow into a structured CLI
-application. The active plan, task checklist, and current progress live in
-`_snap/features/[active]refactor_to_cli.md` — read that (not this file) for what's actually
-done vs. pending. The production notebook pipeline (`notebooks/CreateTranscriptProd.ipynb`,
-frozen as `notebooks/PRODUCTION_Summary_Generator.ipynb`) still works and remains the fallback
-until the CLI refactor reaches parity.
+**Current status**: the `minutia` CLI is the daily driver (the wizard plus `run` / `info` /
+`setup`). A pre-CLI standalone script (`baseline_pipeline.py`) and the `PipelineOrchestrator`
+remain in the tree but are off the CLI path and scheduled for removal.
 
-## Planning & session memory: `_snap/`
+## Planning docs
 
-This repo's roadmap, feature specs, decision history, and reusable skills live in `_snap/` —
-see [`_snap/AGENTS.md`](./_snap/AGENTS.md) for the full system. In short:
-- **`_snap/ROADMAP.md`** — ordered list of features to build (the *future*)
-- **`_snap/SESSION.md`** — current session's ephemeral scratchpad (the *present*)
-- **`_snap/DECISIONS.md`** — append-only log of what was done and why (the *past*)
-- **`_snap/features/`** — one spec per feature, e.g. `[active]refactor_to_cli.md`
-- **`_snap/archive/`** — completed feature specs and the stabilization brief
-
-The session playbooks and skills that drive this workflow live in a private repo. This repo
-carries the project-specific artifacts they produce.
-
-There is no separate `design/design.md` or `TASKS-TODO.md` at repo root — that content now
-lives in `_snap/features/` and `_snap/ROADMAP.md` respectively.
+The roadmap, feature specs and decision history are kept outside this repo; nothing in the tree
+depends on them. `[MACRO]` commits in the history mark task and feature checkpoints
+(`git log --grep '\[MACRO\]'`).
 
 ## Project Dependencies & Documentation
 
@@ -67,7 +53,8 @@ current API information and best practices.
 - **pytest** - Testing framework
   - 📚 How-to Guides: https://docs.pytest.org/en/stable/how-to/index.html#how-to-guides
   - 📚 API Reference: https://docs.pytest.org/en/stable/reference/index.html
-- **mypy** - Type checking (optional, future enhancement)
+- **ty** - Type checking (`just ty`; pre-existing errors are baselined in `pyproject.toml`)
+- **just** - Task runner (`just` with no arguments lists every recipe)
 
 ### Optional Providers (Future)
 
@@ -82,36 +69,35 @@ current API information and best practices.
 
 ## Development Commands
 
-The project uses **UV** for package management and **Make** for task running.
+The project uses **uv** for package management and **just** as the task runner.
 
 ```bash
-# Package management
-make install              # or: uv sync
-make install-dev          # or: uv sync --extra dev
-make install-all          # or: uv sync --extra dev --extra jupyter --extra media
-make create-env-file      # scaffold a .env template
+# Environment
+just sync                 # or: uv sync (dev group + CUDA torch)
+just sync-cpu             # or: uv sync --extra cpu (CPU-only torch; what CI installs)
+just sync-all             # or: uv sync --all-groups
+just create-env-file      # scaffold a .env template
+just reinstall            # reinstall the minutia tool from GitHub main
 
 # Code quality
-make lint                 # or: uv run ruff check .
-make lint-fix             # or: uv run ruff check --fix .
-make format                # or: uv run ruff format .
-make check-all             # lint-fix + format + test (chained)
+just ruff                 # ruff format + ruff check --fix (mutating; src + tests)
+just ty                   # or: uv run ty check (read-only)
+just ci                   # ruff, then ty
 
 # Testing
-make test                  # or: uv run pytest
-make test-unit              # or: uv run pytest -m unit
-make test-integration        # or: uv run pytest -m "unit or integration"
-make test-all                # or: uv run pytest -m "unit or integration or slow"
-make test-cov                 # or: uv run pytest --cov=src/minutia --cov-report=html --cov-report=term
+just test                 # or: uv run pytest (forwards args: just test -k merge)
+just test-unit            # or: uv run pytest -m unit
+just test-integration     # or: uv run pytest -m "unit or integration"
+just test-all             # or: uv run pytest -m "unit or integration or slow"
+just test-cov             # or: uv run pytest --cov=src/minutia --cov-report=html --cov-report=term
 
-# Sandboxed environments (e.g. Codex) where `uv run` hits permission issues
-make test-codex               # runs pytest via .venv/bin/python directly
-make lint-codex                # runs ruff via .venv/bin/python directly
+# Releases (bump, commit, tag, push; preview with: uv run python scripts/release.py patch -n)
+just tag-patch            # also: tag-minor, tag-major
 
 # Development environment
-make jupyter                # or: uv run jupyter lab --autoreload
-make clean                  # clean build artifacts
-uv run minutia --help       # run CLI commands
+just jupyter              # or: uv run jupyter lab --autoreload
+just clean                # remove build + test artifacts
+uv run minutia --help     # run CLI commands
 ```
 
 ### CLI Commands
@@ -155,7 +141,7 @@ minutia --version
 
 **Removed** (superseded): `minutia go` and `minutia process-all` → the wizard + `run pipeline`;
 top-level `minutia config` → `minutia info`. The `PipelineOrchestrator` + `baseline_pipeline.py`
-are no longer on the CLI path (retired later by `orchestrator-retire-baseline`).
+are no longer on the CLI path and are scheduled for removal.
 
 **New deps**: `rich` (wizard rendering) + `python-yakh` (keystrokes).
 
@@ -182,9 +168,8 @@ src/minutia/
 ├── paths.py                    # RunPaths — path/output management
 ├── run_metadata.py             # Run metadata tracking
 ├── prompts.py                  # Summarization prompt templates
-├── baseline_pipeline.py        # Standalone script version (pre-orchestrator); still the
-│                                # documented entry point in README.md — do not delete until
-│                                # steps/ has full parity (see refactor_to_cli spec)
+├── baseline_pipeline.py        # Standalone script version (pre-orchestrator); documented in
+│                                # README.md as the legacy fallback, off the CLI path
 ├── legacy/                     # Isolated Jupyter-widget-era code (not used by the CLI)
 │   ├── ui_jupyter.py
 │   ├── claude_audio_widget.py
@@ -198,14 +183,6 @@ src/minutia/
     ├── transcript_merger.py    # Chronological merging logic
     └── summarize_transcript.py # Anthropic API integration
 ```
-
-**Reference notebooks** (being migrated away from, kept for now):
-- `notebooks/CreateTranscriptProd.ipynb` — original production pipeline
-- `notebooks/PRODUCTION_Summary_Generator.ipynb` — frozen copy, current production fallback
-- Other `notebooks/*.ipynb` — dev/eval scratch work
-
-See `_snap/features/[active]refactor_to_cli.md` for the target architecture and current
-migration progress.
 
 ## Code Organization Patterns
 
@@ -236,8 +213,8 @@ files to their original track numbers.
 3. **Text → Merged**: Segments from both tracks sorted chronologically with source labels
 4. **Merged → Summary**: Anthropic Claude generates a structured meeting summary
 
-Transcripts use JSON-structured data with metadata (see `_snap/features/[active]refactor_to_cli.md`
-for the current schema).
+Transcripts use JSON-structured data with metadata; `steps/transcript_merger.py` defines the
+merged schema.
 
 ## Configuration & Secrets
 
@@ -255,7 +232,7 @@ MINUTIA_RECORDINGS_DIR=~/Videos   # Where OBS drops MKVs; the wizard + `minutia 
 MINUTIA_OUTPUT_DIR=...            # Artifact home; defaults to ~/Documents/minutia (platformdirs)
 MINUTIA_WHISPER_MODEL=medium.en   # Whisper model (default: base)
 MINUTIA_SUMMARY_MODEL=...         # Summarization model
-MINUTIA_PERSONAL_INFO=...         # Path to a personal-info file for prompts (Phase 4)
+MINUTIA_PERSONAL_INFO=...         # Path to a personal-info file for prompts
 MINUTIA_LOG_LEVEL=INFO
 ```
 
@@ -270,25 +247,12 @@ The user-global config is an env-format file at `platformdirs.user_config_path("
 invocation directory, stopping at the first `.git`/`pyproject.toml` project boundary and before the
 user's home directory. Use global `--env-file PATH` to select one explicitly or `--no-env-file` to
 disable contextual discovery. Input and output paths do not affect discovery. Run **`minutia
-config`** to print every resolved value and which layer supplied it.
+info`** to print every resolved value and which layer supplied it.
 
 Relative paths in the user config and contextual `.env` are anchored to the file that declares
 them. Relative process-environment and CLI paths are anchored to the invocation directory.
 
 **Never commit `.env` or real API keys.** `.gitignore` already excludes `.env*`.
-
-## AI-Assisted Workflow: `_snap`
-
-Features are planned, built, and reconciled through a spec-driven loop whose state lives in
-`_snap/` (see [`_snap/AGENTS.md`](./_snap/AGENTS.md)):
-
-- **PLAN** — interview, then write a spec in `_snap/features/` and add it to `_snap/ROADMAP.md`
-- **BUILD** — work the spec's task checklist; scratch notes go in `_snap/SESSION.md`
-- **CLOSE** — condense the session into `_snap/DECISIONS.md`
-- **ALIGN** — reconcile the roadmap, specs, and decisions against the code
-
-`[MACRO]` commits mark the checkpoints at task and feature boundaries
-(`git log --grep '\[MACRO\]'`).
 
 ## Testing Strategy
 
@@ -312,15 +276,14 @@ Three-tier approach, already implemented under `tests/`:
 ```bash
 pytest -m unit                          # Fast feedback loop
 pytest -m "unit or integration"         # Pre-commit validation
-pytest -m "unit or integration or slow" # Full validation (CI/nightly)
+pytest -m "unit or integration or slow" # Full validation (local)
 ```
 
 ### Fixtures & mocking
 
 - Shared fixtures live in `tests/conftest.py` (and per-tier `conftest.py` files).
 - Golden-sample fixtures live in `tests/fixtures/scenarios/{scenario}/` — real input/output
-  sets generated from the trusted notebook pipeline (see `refactor_to_cli` spec, "Golden
-  Sample" methodology).
+  sets generated from the trusted notebook pipeline.
 - Prefer the `mocker` fixture (from `pytest-mock`) over `unittest.mock.patch`.
 - Use `monkeypatch` only for simple environment-variable or attribute overrides.
 - Complex mocks (e.g. LLM responses, Whisper, FFmpeg) live in `tests/mocks/` — check there
@@ -331,10 +294,8 @@ pytest -m "unit or integration or slow" # Full validation (CI/nightly)
 
 ### Adding New Features
 
-1. Check `_snap/ROADMAP.md` and the relevant `_snap/features/*.md` spec first.
-2. If a feature needs planning, write a spec in `_snap/features/` first rather than starting ad hoc.
-3. Always add tests (or at minimum, manual testing steps).
-4. Update CLI help text and this file as needed.
+1. Always add tests (or at minimum, manual testing steps).
+2. Update CLI help text and this file as needed.
 
 ### Debugging Pipeline Issues
 
@@ -350,8 +311,8 @@ Each pipeline stage logs via loguru:
 - Explain non-obvious code with short comments; avoid redundant commentary.
 - If external documentation is required, prefer official sources (links above).
 - Surface assumptions or unresolved questions in your final summary so the user can follow up.
-- Per `_snap` convention: every `mv`/`git mv` is a separate, individually-approved,
-  individually-committed operation — never bundled with content edits.
+- Every `mv`/`git mv` is a separate, individually-approved, individually-committed
+  operation — never bundled with content edits.
 
 ### Common Development Workflows
 
@@ -366,9 +327,9 @@ uv run minutia run summarize ./output/merged.json ./output/
 uv run minutia run pipeline recording.mkv ./output/
 
 # Development iteration cycle
-make lint-fix
-make format
-make test
+just ruff
+just ty
+just test
 uv run minutia <command>
 ```
 
@@ -377,16 +338,17 @@ uv run minutia <command>
 - **Line length**: 88 characters (configured in `pyproject.toml`)
 - **Linter**: ruff (pycodestyle, pyflakes, isort, flake8-bugbear, comprehensions, pyupgrade)
 - **Formatter**: ruff format (double quotes, space indentation)
-- **Python version**: >= 3.12 (per `pyproject.toml`; some legacy artifacts reference 3.10+)
+- **Python version**: >= 3.12, < 3.14 (per `pyproject.toml`; `.python-version` pins 3.12)
 
 ## Known Issues
 
-See `_snap/ROADMAP.md` ("Known issues") and `_snap/features/[active]refactor_to_cli.md`
-("Known Issues") for the current list — currently just the FFmpeg output-overwrite handling in
-`video_extraction.py`, not yet re-verified against current code.
+- **`ty` baseline**: pre-existing type errors are baselined per file and per rule via
+  `[[tool.ty.overrides]]` in `pyproject.toml`; new errors elsewhere still fail `just ty`.
+- **Unknown summary model**: `steps/summarize_transcript.py` looks a model up with
+  `anthropic_models.get(model_name)["name"]`, which fails with a `TypeError` for a model name
+  that is not in the registry.
 
 ## Dependencies & Performance
 
-Heavy ML/AI dependencies: **torch** (Whisper execution, GPU/CPU), **transformers**,
-**whisper**, **anthropic**. First Whisper model load is slow; transcription time scales with
+Heavy ML/AI dependencies: **torch** (Whisper execution, GPU/CPU), **whisper**, **anthropic**. First Whisper model load is slow; transcription time scales with
 audio duration (roughly real-time on CPU); GPU acceleration used if CUDA is detected.
