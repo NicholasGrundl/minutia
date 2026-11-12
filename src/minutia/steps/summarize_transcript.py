@@ -65,7 +65,7 @@ def create_summary_prompt(transcript_text):
     </summaryformat>
 
     <summarydirections>
-    First create an executive summary section at the beginning of the summary providing a high level oiverview of who, what, where and when.
+    First create an executive summary section at the beginning of the summary providing a high level overview of who, what, where and when.
 
     Second reflect critically on the major topics discussed in the meeting and make a numbered list of each of these major topics.
 
@@ -73,7 +73,7 @@ def create_summary_prompt(transcript_text):
 
     Fourth, review the existing summary text and add any additional information or relevant notes.
 
-    Finally, end with a action items and conclusion section.
+    Finally, end with an action items and conclusion section.
     </summarydirections>
 
 
