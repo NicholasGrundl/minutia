@@ -19,10 +19,11 @@ jobs:
       # Local dev keeps GPU: a bare `uv sync` resolves torch from PyPI (CUDA). The
       # cpu / cu124 extras + their indexes are declared in pyproject.toml [tool.uv].
       - run: uv sync --extra cpu
-      # No pytest in CI (deliberate — see the ci-release-pipelines spec). The value
-      # here is a fast, green lint + type gate on main and PRs. Scope matches the
-      # local gate (justfile + [tool.ty.src]): src + tests. `ty check` takes no path
-      # arg — its scope lives in [tool.ty.src] in pyproject.toml.
+      # The gate on main and PRs: lint, types, then the unit tier. Lint/type scope
+      # matches the local gate (justfile + [tool.ty.src]): src + tests. `ty check`
+      # takes no path arg — its scope lives in [tool.ty.src] in pyproject.toml.
+      # Only the unit tier runs here (fast, fully mocked); the integration and slow
+      # tiers need ffmpeg and real Whisper models and stay local.
       # --extra cpu on every `uv run` too: without it, `uv run` reconciles the env
       # back to the default resolution (CUDA torch on Linux), tearing out the CPU
       # torch the sync just installed and re-downloading ~2.6 GB of nvidia-* wheels
@@ -30,3 +31,4 @@ jobs:
       - run: uv run --extra cpu ruff format --check src tests
       - run: uv run --extra cpu ruff check src tests
       - run: uv run --extra cpu ty check
+      - run: uv run --extra cpu pytest -m unit

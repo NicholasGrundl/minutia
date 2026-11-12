@@ -115,6 +115,6 @@ uv sync --extra cpu     # CPU-only wheels (~200 MB, no nvidia-* libs) — what C
 uv sync --extra cu124   # CUDA 12.4 wheels from the PyTorch index
 ```
 
-CI uses `--extra cpu` because the runners have no GPU and only run the lint + type gate;
-that avoids downloading the ~2.5 GB CUDA stack. Reproduce CI's environment locally with
+CI uses `--extra cpu` because the runners have no GPU and only run the lint + type gate and
+the unit tests; that avoids downloading the ~2.5 GB CUDA stack. Reproduce CI's environment locally with
 `just sync-cpu`.
