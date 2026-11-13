@@ -102,7 +102,7 @@ uv tool install --editable .
 ```
 
 (No `--python` needed with a recent uv.) See the README's **Development** section for the
-`just` task recipes (`just sync`, `just lint`, `just ty`, `just test`, `just check-all`).
+`just` task recipes (`just sync`, `just ruff`, `just ty`, `just test`, `just ci`).
 
 ### PyTorch build (CPU vs CUDA)
 

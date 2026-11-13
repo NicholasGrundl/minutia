@@ -65,11 +65,10 @@ as the task runner. Common recipes:
 
 ```bash
 just sync          # install/sync the dev environment
-just lint          # ruff check (read-only)
-just format        # ruff format
+just ruff          # format and apply safe lint fixes
 just ty            # type-check
-just check-all     # dev gate: mutating ruff, then ty, then the test suite
 just test          # run the test suite (forwards args, e.g. `just test -k merge`)
+just ci            # dev gate: ruff, then ty, then the unit tests
 ```
 
 Run `just` with no arguments to list every recipe.

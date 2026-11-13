@@ -76,13 +76,12 @@ The project uses **uv** for package management and **just** as the task runner.
 just sync                 # or: uv sync (dev group + CUDA torch)
 just sync-cpu             # or: uv sync --extra cpu (CPU-only torch; what CI installs)
 just sync-all             # or: uv sync --all-groups
-just create-env-file      # scaffold a .env template
 just reinstall            # reinstall the minutia tool from GitHub main
 
 # Code quality
 just ruff                 # ruff format + ruff check --fix (mutating; src + tests)
 just ty                   # or: uv run ty check (read-only)
-just ci                   # ruff, then ty
+just ci                   # ruff, then ty, then the unit tests
 
 # Testing
 just test                 # or: uv run pytest (forwards args: just test -k merge)
