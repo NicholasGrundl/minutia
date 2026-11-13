@@ -1,6 +1,6 @@
 [project]
 name = "minutia"
-version = "0.4.1"
+version = "0.4.2"
 description = "Meeting recording, transcription, and summarization tool"
 readme = "README.md"
 license = { text = "MIT" }
