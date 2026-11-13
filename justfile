@@ -23,19 +23,6 @@ sync-cpu:
 sync-all:
     uv sync --all-groups
 
-# Scaffold a .env template with API-key placeholders (won't overwrite an existing .env)
-create-env-file:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    if [ -f .env ]; then
-        echo ".env file already exists. Please ensure it contains your API keys."
-    else
-        printf '# API Keys\n' > .env
-        printf 'OPENAI_API_KEY=your_openai_api_key_here\n' >> .env
-        printf 'ANTHROPIC_API_KEY=your_anthropic_api_key_here\n' >> .env
-        echo ".env file created. Please edit it with your actual API keys."
-    fi
-
 # ---------------------------------------------------------------------------
 # Tool install
 # ---------------------------------------------------------------------------
@@ -58,8 +45,8 @@ ruff:
 ty:
     uv run ty check
 
-# Dev gate: mutating ruff, then ty, then the test suite
-ci: ruff ty
+# Dev gate: mutating ruff, then ty, then the unit tests (the same tiers GitHub CI runs)
+ci: ruff ty test-unit
 
 # ---------------------------------------------------------------------------
 # Testing
