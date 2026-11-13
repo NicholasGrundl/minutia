@@ -95,6 +95,8 @@ just tag-patch            # also: tag-minor, tag-major
 
 # Development environment
 just jupyter              # or: uv run jupyter lab --autoreload
+just demo                 # the real wizard on a fixture, slow steps faked (scripts/demo/)
+just screenshots          # re-render docs/assets/wizard-*.svg (pure Python, scripts/demo/)
 just clean                # remove build + test artifacts
 uv run minutia --help     # run CLI commands
 ```

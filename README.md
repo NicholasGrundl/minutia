@@ -5,6 +5,10 @@ summaries. It extracts per-track audio from an `.mkv`, transcribes each track
 with Whisper, merges the transcripts chronologically, and generates an
 AI-authored meeting report with Anthropic Claude.
 
+![The minutia wizard's first screen: the minutia wordmark above a list of three recordings with their date, size and length, the newest one highlighted](docs/assets/wizard-pick.svg)
+
+![The wizard's progress screen: a progress bar at 60 percent labelled transcribing, with a live tail of log lines from the extract and transcribe steps](docs/assets/wizard-progress.svg)
+
 The primary way to run it is the **`minutia` CLI**. A standalone
 [`baseline_pipeline`](#baseline-pipeline-legacy-fallback) script remains as a
 legacy fallback while the CLI reaches full parity.

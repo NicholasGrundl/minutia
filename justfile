@@ -95,6 +95,14 @@ tag-major:
 # Development
 # ---------------------------------------------------------------------------
 
+# Run the wizard against a fixture with the slow steps faked (no API key, GPU or network)
+demo *args:
+    uv run python scripts/demo/wizard_demo.py {{args}}
+
+# Re-render the README screenshots of the wizard as SVG (pure Python, via rich)
+screenshots:
+    uv run python scripts/demo/screenshots.py
+
 # Start Jupyter Lab with autoreload
 jupyter:
     uv run jupyter lab --autoreload
