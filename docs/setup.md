@@ -29,7 +29,7 @@ No `--python` flag is needed with a recent uv — it honors the project's
 To pin a tagged release instead of tracking `main`:
 
 ```bash
-uv tool install git+https://github.com/NicholasGrundl/minutia@v0.4.0
+uv tool install git+https://github.com/NicholasGrundl/minutia@v0.4.2
 ```
 
 ### SSH alternative

@@ -41,8 +41,12 @@ dependencies = [
     # Pin to the 1.x major: the 0.x -> 1.x jump removed sampling params
     # (temperature/top_p/top_k) from messages.create(). Keep dev and tool
     # installs on the same major so this drift can't recur.
-    "anthropic>=1.4",
-    "typer>=0.25.1",
+    "anthropic>=1.4,<2",
+    # typer 0.26 dropped its click dependency and vendors its own copy. The CLI
+    # raises and catches click exceptions directly, so stay on the click-based
+    # line and declare click explicitly until the CLI is ported.
+    "typer>=0.25.1,<0.26",
+    "click>=8.2.1",
     "platformdirs>=4.9.6",
     "pydantic-settings>=2.15.0",
     # Wizard TUI: rich (drawing; add explicitly — previously only transitive via

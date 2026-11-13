@@ -2326,6 +2326,7 @@ version = "0.4.1"
 source = { editable = "." }
 dependencies = [
     { name = "anthropic" },
+    { name = "click" },
     { name = "ffmpeg-python" },
     { name = "isodate" },
     { name = "loguru" },
@@ -2387,7 +2388,8 @@ media = [
 
 [package.metadata]
 requires-dist = [
-    { name = "anthropic", specifier = ">=1.4" },
+    { name = "anthropic", specifier = ">=1.4,<2" },
+    { name = "click", specifier = ">=8.2.1" },
     { name = "ffmpeg-python" },
     { name = "isodate" },
     { name = "loguru", specifier = ">=0.7.3" },
@@ -2403,7 +2405,7 @@ requires-dist = [
     { name = "tiktoken" },
     { name = "torch", marker = "extra == 'cpu'", specifier = ">=2.4,<2.6", index = "https://download.pytorch.org/whl/cpu", conflict = { package = "minutia", extra = "cpu" } },
     { name = "torch", marker = "extra == 'cu124'", specifier = ">=2.4,<2.6", index = "https://download.pytorch.org/whl/cu124", conflict = { package = "minutia", extra = "cu124" } },
-    { name = "typer", specifier = ">=0.25.1" },
+    { name = "typer", specifier = ">=0.25.1,<0.26" },
 ]
 provides-extras = ["cpu", "cu124"]
 
