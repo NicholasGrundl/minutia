@@ -33,8 +33,9 @@ dependencies = [
     "sounddevice",
     # Models / inference
     # torch is a transitive dep of openai-whisper; its build (CPU vs CUDA) is
-    # selected via the `cpu` / `cu124` extras below, and the version is capped
-    # for every install path by [tool.uv] constraint-dependencies.
+    # selected via the `cpu` / `cu124` extras below. The version is capped by
+    # [tool.uv] constraint-dependencies for `uv sync` / `uv lock` only; a
+    # `uv tool install` ignores that table and resolves the newest torch.
     "openai-whisper",
     "tiktoken",
     # LLM clients
@@ -106,9 +107,11 @@ media = [
 minutia = "minutia.cli:main"
 
 [tool.uv]
-# Cap torch for EVERY install path (incl. the transitive dep via openai-whisper and
-# bare/tool installs), so we stay on the validated 2.5.x line without listing torch
-# as a direct dependency.
+# Cap torch for project installs (`uv sync` / `uv lock`, incl. the transitive dep via
+# openai-whisper), so development and CI stay on the validated 2.5.x line without
+# listing torch as a direct dependency. This does NOT reach `uv tool install`, which
+# reads neither this table nor uv.lock: users get the newest torch that resolves.
+# The install workflow (.github/workflows/install.yml) exercises that path.
 constraint-dependencies = ["torch>=2.4,<2.6"]
 # The cpu / cu124 extras are two builds of the same torch — never install both.
 conflicts = [[{ extra = "cpu" }, { extra = "cu124" }]]

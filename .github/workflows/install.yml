@@ -1,0 +1,34 @@
+name: install
+
+# Installs minutia the way a user does: `uv tool install`, which ignores uv.lock
+# and resolves the newest versions pyproject.toml allows. The ci workflow uses the
+# lockfile, so it cannot see a break caused by a new upstream release (typer 0.26
+# dropping click did exactly that). The schedule catches breaks that arrive with
+# no commit here.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "17 6 * * 1" # Mondays 06:17 UTC
+  workflow_dispatch:
+
+jobs:
+  tool-install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.12" # pin for reproducibility; bump alongside local uv
+          # No cache: the point is a fresh resolution against today's index.
+          enable-cache: false
+      # Unlocked on purpose. This pulls the default (CUDA) torch build, as a user's
+      # install does, so the job downloads a few GB.
+      - run: uv tool install .
+      - name: Show what was resolved
+        run: uv tool list --show-version-specifiers --show-python
+      # Cold-start commands: they import the CLI (typer/click/rich) but not torch.
+      - run: minutia --version
+      - run: minutia --help
