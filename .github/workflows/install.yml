@@ -3,13 +3,12 @@ name: install
 # Installs minutia the way a user does: `uv tool install`, which ignores uv.lock
 # and resolves the newest versions pyproject.toml allows. The ci workflow uses the
 # lockfile, so it cannot see a break caused by a new upstream release (typer 0.26
-# dropping click did exactly that). The schedule catches breaks that arrive with
-# no commit here.
+# dropping click did exactly that).
+#
+# Periodic only: it is slow and not a merge gate. Run it by hand before a release
+# or after a dependency change: `gh workflow run install`.
 
 on:
-  push:
-    branches: [main]
-  pull_request:
   schedule:
     - cron: "17 6 * * 1" # Mondays 06:17 UTC
   workflow_dispatch:
